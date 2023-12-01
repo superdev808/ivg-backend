@@ -42,7 +42,7 @@ app.set("port", port);
 AppRoutes.getRoutes(app, router);
 
 app.use(
-    "/api/",
+    "/v1/",
     cors({
         optionsSuccessStatus: 200,
         credentials: true
