@@ -55,6 +55,8 @@ if (process.env.CURRENT_ENV !== "prod") {
     mongoose.set("debug", true);
     mongoose.set("debug", { color: false });
 }
+
+console.log(process.env.MongoDbUri)
 mongoose.connect(process.env.MongoDbUri).then(
     () => {
         console.log("Connected to MongoDB");
