@@ -7,6 +7,7 @@ const path = require('path');
 require("dotenv").config({ path: path.resolve(__dirname, "./../.env") });
 
 const AppRoutes = require("./routes/app-routes");
+const CalculatorRoutes = require("./routes/calculator-routes");
 
 const app = express();
 
@@ -40,6 +41,7 @@ const port = process.env.PORT || 8000;
 app.set("port", port);
 
 AppRoutes.getRoutes(app, router);
+CalculatorRoutes.getRoutes(app, router);
 
 app.use(
     "/api/",
