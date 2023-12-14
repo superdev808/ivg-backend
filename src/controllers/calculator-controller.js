@@ -26,21 +26,25 @@ exports.getCalculatorOptions = async (req, res, next) => {
         return;
     }
 
-    const query = quiz;
-    const data = await Model.find(query);
-    let result = [];
-    if (fields.length > 1) {
-        result = _.uniq(data.map((item) => {
-            const res = {};
-            fields.forEach(field => {
-                res[field] = item[field];
-            });
+    try {
+        const query = quiz;
+        const data = await Model.find(query);
+        let result = [];
+        if (fields.length > 1) {
+            result = _.uniq(data.map((item) => {
+                const res = {};
+                fields.forEach(field => {
+                    res[field] = item[field];
+                });
 
-            return res;
-        }));
-    } else {
-        result = _.uniq(data.map((item) => item[fields[0]]));
+                return res;
+            }));
+        } else {
+            result = _.uniq(data.map((item) => item[fields[0]]));
+        }
+
+        response.success(res, result);
+    } catch (ex) {
+        response.serverError(res, { message: ex.message });
     }
-
-    response.success(res, result);
 }
