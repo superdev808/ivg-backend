@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 
 const scanbodySchema = mongoose.Schema({
-    "IMPLANT BRAND": { type: String },
-    "IMPLANT SYSTEM": { type: String },
-    "EXTERNAL DIAMETER": { type: String },
-    "PLATFORM": { type: String },
-    "Authentic or Generic": { type: String },
-    "SCANBODY": { type: String },
-    "SCANBODY ITEM #": { type: String },
+    "Implant Brand": { type: String },
+    "Implant System": { type: String },
+    "External Diameter": { type: String },
+    "Platform": { type: String },
+    "Authentic or Generic?": { type: String },
+    "Manufacturer": { type: String },
+    "Scanbody Item Number": { type: String },
     "Link to Purchase": { type: String },
     "Notes": { type: String },
     "Interface/ Cross-Compatibility": { type: String },
