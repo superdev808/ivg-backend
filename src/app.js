@@ -9,7 +9,7 @@ require("dotenv").config({ path: path.resolve(__dirname, "./../.env") });
 const AppRoutes = require("./routes/app-routes");
 const CalculatorRoutes = require("./routes/calculator-routes");
 const WorkflowRoutes = require("./routes/workflow-routes");
-
+const UserRoutes = require('./routes/user-routes');
 
 const app = express();
 
@@ -45,6 +45,7 @@ app.set("port", port);
 AppRoutes.getRoutes(app, router);
 CalculatorRoutes.getRoutes(app, router);
 WorkflowRoutes.getRoutes(app, router);
+UserRoutes.getRoutes(app, router);
 
 app.use(
     "/v1/",
