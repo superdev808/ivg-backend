@@ -3,6 +3,11 @@ const ScanbodyModel = require("../models/scanbody-model");
 const response = require("../utils/response");
 const _ = require("lodash");
 
+const fieldsToSearch = {
+    'Scanbodies': ["Implant Brand", "Implant System", "Scanbody Item Number", "Manufacturer"],
+    'Crown Materials': []
+}
+
 exports.getCalculatorOptions = async (req, res, next) => {
     const { type, quiz, fields } = req.body;
 
@@ -44,6 +49,33 @@ exports.getCalculatorOptions = async (req, res, next) => {
         }
 
         response.success(res, result);
+    } catch (ex) {
+        response.serverError(res, { message: ex.message });
+    }
+}
+
+exports.searchCalculator = async (req, res, next) => {
+    const { text } = req.query;
+    const modelNameMap = {'Scanbodies': ScanbodyModel, 'Crown Materials': CrownMaterialModel};
+
+    try {
+        const modelNames = [];
+        for (const modelName of Object.keys(modelNameMap)) {
+            const orFields = fieldsToSearch[modelName].map((field) => ({
+                [field]: { $regex: new RegExp(text, 'i') }
+            }));
+
+            if (orFields.length) {
+                const results = await modelNameMap[modelName].find({
+                    $or: orFields
+                });
+
+                if (results.length) {
+                    modelNames.push(modelName)
+                }
+            }
+        }
+        return response.success(res, modelNames);
     } catch (ex) {
         response.serverError(res, { message: ex.message });
     }
