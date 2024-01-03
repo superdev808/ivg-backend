@@ -12,13 +12,22 @@ const getModelByCalculatorType = (modelMap, key = "") => {
 
 /**
  * Retrieves quiz data from the specified Mongoose model based on the provided query.
- *
- * @param {Object} Model - The Mongoose model for the calculator type.
+ * @param {Object} QuizModel - The Mongoose model for the quiz.
  * @param {Object} query - The query to filter the quiz data. Defaults to an empty object.
+ * @param {boolean} enableFilter - If true, excludes specified fields from the quiz data. Defaults to false.
  * @returns {Promise<Object>} - A promise that resolves to the quiz data from the model.
  */
-const getQuizData = (Model, query = {}) =>
-  Model.findOne(query).select({ _id: 0 });
+const getQuizData = (QuizModel, query = {}, enableFilter = false) => {
+  let filteredKey = { _id: 0 };
+  if (enableFilter) {
+    const excludedFields = {};
+    Object.keys(query).forEach((key) => {
+      excludedFields[key] = 0;
+    });
+    filteredKey = { ...filteredKey, ...excludedFields };
+  }
+  return QuizModel.findOne(query).select(filteredKey);
+};
 
 /**
  * function to filter quiz keys based on the provided quiz object.

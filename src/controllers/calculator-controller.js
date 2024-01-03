@@ -101,12 +101,7 @@ exports.searchCalculator = async (req, res, next) => {
 exports.getAllOnXCalculatorOptions = async (req, res) => {
   try {
     // Destructure relevant properties from the request body
-    const { type, quiz, fields, output } = req.body;
-
-    // Validate required properties
-    if (!type || !quiz || !fields || fields.length === 0) {
-      throw new Error("Invalid request. Missing or empty required properties.");
-    }
+    const { type = "", quiz = {}, fields = [], output = "" } = req.body;
 
     const decodedCalculatorType = decodeURIComponent(type);
 
@@ -114,7 +109,10 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
 
     // Check if the calculator type exists in the model map
     if (!Model) {
-      return response.notFoundError(res, `${decodedCalculatorType} data does not exist`);
+      return response.notFoundError(
+        res,
+        `${decodedCalculatorType} data does not exist`
+      );
     }
 
     const quizData = await getQuizData(Model);
@@ -126,19 +124,22 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
       const OutputModel = getModelByCalculatorType(modelMap, output);
 
       if (!OutputModel) {
-        return response.notFoundError(res, `${decodedCalculatorType} data does not exist`);
+        return response.notFoundError(
+          res,
+          `${decodedCalculatorType} data does not exist`
+        );
       }
-      
-      quizResponse = await getQuizData(OutputModel, quiz);
+
+      quizResponse = await getQuizData(OutputModel, quiz, true);
     }
     // Handle case where data array is empty
     if (data.length === 0) {
       return response.notFoundError(res, `No data found`);
     }
     const result = getUniqueResult(data, fields);
-    const resp = {
-      result,
-      quizResponse
+    const resp = { result };
+    if (quizResponse) {
+      resp["quizResponse"] = quizResponse;
     }
     response.success(res, resp);
   } catch (ex) {
