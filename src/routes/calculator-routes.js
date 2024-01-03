@@ -1,10 +1,11 @@
 const bodyParser = require('body-parser');
-const { getCalculatorOptions, searchCalculator } = require("../controllers/calculator-controller");
+const { getCalculatorOptions, searchCalculator, getAllOnXCalculatorOptions } = require("../controllers/calculator-controller");
 
 class CalculatorRoutes {
     static getRoutes(app, router) {
         router.post("/materials", bodyParser.json(), getCalculatorOptions);
-        router.get("/search", searchCalculator)
+        router.get("/search", searchCalculator);
+        router.post("/allOnXCalculator", bodyParser.json(), getAllOnXCalculatorOptions);
     }
 }
 
