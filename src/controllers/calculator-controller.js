@@ -130,7 +130,7 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
         );
       }
 
-      quizResponse = await getQuizData(OutputModel, quiz, true);
+      quizResponse = await getQuizData(OutputModel, quizQuery, true);
     }
     // Handle case where data array is empty
     if (data.length === 0) {
