@@ -129,8 +129,9 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
           `${decodedCalculatorType} data does not exist`
         );
       }
-
-      quizResponse = await getQuizData(OutputModel, quiz, true);
+      const quizOutputData = await getQuizData(OutputModel);
+      const quizOutputQuery = getQuizQuery(quizOutputData, quiz) || {};
+      quizResponse = await getQuizData(OutputModel, quizOutputQuery, true);
     }
     // Handle case where data array is empty
     if (data.length === 0) {
