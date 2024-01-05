@@ -5,7 +5,7 @@ const DrillKitAndSequenceModel = require("../models/drillkit_and_sequence_model"
 const ImplantPurchaseModel = require("../models/implant_purchase_model");
 const MasterImplantDriverModel = require("../models/master_implant_driver_model");
 const ScanbodyModel = require("../models/scanbody-model");
-const { getQuizData, getUniqueResult, getQuizQuery, getModelByCalculatorType } = require("../utils/helper");
+const { getQuizData, getUniqueResult, getQuizQuery, getModelByCalculatorType, formatDrillkitAndSequence, formatBoneReduction, formatMasterImplantDriver, formatChairSidePickUp, formatImplantPurchase } = require("../utils/helper");
 const response = require("../utils/response");
 const _ = require("lodash");
 
@@ -132,6 +132,21 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
       const quizOutputData = await getQuizData(OutputModel);
       const quizOutputQuery = getQuizQuery(quizOutputData, quiz) || {};
       quizResponse = await getQuizData(OutputModel, quizOutputQuery, true);
+      if (output === 'DrillKitAndSequence') {
+        quizResponse = formatDrillkitAndSequence(quizResponse);
+      }
+      if (output === "BoneReduction") {
+        quizResponse = formatBoneReduction(quizResponse);
+      }
+      if (output === "MasterImplantDriver") {
+        quizResponse = formatMasterImplantDriver(quizResponse);
+      }
+      if (output === "ChairSidePickUp") {
+        quizResponse = formatChairSidePickUp(quizResponse);
+      }
+      if (output === "ImplantPurchase") {
+        quizResponse = formatImplantPurchase(quizResponse);
+      }
     }
     // Handle case where data array is empty
     if (data.length === 0) {
