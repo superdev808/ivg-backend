@@ -15,6 +15,7 @@ const OUTPUT_LABELS = {
   LUTING_AGENT : "Luting Agent",
   TEFLON_TAPE : "Teflon Tape",
   MATERIAL_CLOSE_ACCESS_HOLE : "Material to Close Screw Access Hole",
+  IMPLANT : "Implant",
 };
 
 module.exports = {

@@ -23,9 +23,9 @@ const formatDrillkitAndSequence = (quizResponse = null) => {
   // Destructure relevant information from the quizResponse
   const {
     _doc: {
-      "Implant Drill Kit Name": implantDrillKitName,
-      "Drill Kit Item Number": drillKitItemNumber,
-      "Link to Drill Kit": linkToDrillKit,
+      "Implant Drill Kit Name": implantDrillKitName = "",
+      "Drill Kit Item Number": drillKitItemNumber = "",
+      "Link to Drill Kit": linkToDrillKit = "",
       ...restDrills
     },
   } = quizResponse;
@@ -43,10 +43,10 @@ const formatDrillkitAndSequence = (quizResponse = null) => {
     const itemNumberKey = `${nameKey} Item Number`;
 
     // Extract individual drill details
-    const itemName = drillsData[nameKey] || null;
-    const link = drillsData[linkKey] || null;
-    const itemNumber = drillsData[itemNumberKey] || null;
-    const quantity = !!link ? 1 : null;
+    const itemName = drillsData[nameKey] || "";
+    const link = drillsData[linkKey] || "";
+    const itemNumber = drillsData[itemNumberKey] || "";
+    const quantity = !!link && link !== "-" ? 1 : null;
 
     // Check if the name is not null and not "No Drill Sequence" before adding to the array
     if (itemName !== null && itemName !== "No Drill Sequence") {
@@ -63,7 +63,7 @@ const formatDrillkitAndSequence = (quizResponse = null) => {
           itemName: implantDrillKitName,
           itemNumber: drillKitItemNumber,
           link: linkToDrillKit,
-          quantity: !!linkToDrillKit ? 1 : null,
+          quantity: !!linkToDrillKit && linkToDrillKit !== "-" ? 1 : null,
         },
       ],
     },
@@ -139,8 +139,8 @@ const formatMasterImplantDriver = (quizResponse = null) => {
   const {
     _doc: {
       "Driver Name": itemName = "",
-      "Item Number": itemNumber = null,
-      "Link to Purchase": link = null,
+      "Item Number": itemNumber = "",
+      "Link to Purchase": link = "",
     },
   } = quizResponse;
 
@@ -174,12 +174,12 @@ const formatChairSidePickUp = (quizResponse = null) => {
   const {
     _doc: {
       "Luting Agent Name": lutingAgentName = "",
-      "Luting Agent Link to Purchase": lutingAgentLink = null,
+      "Luting Agent Link to Purchase": lutingAgentLink = "",
       "Teflon Tape": teflonTape = "",
-      "Teflon Tape Link to Purchase": teflonTapeLink = null,
+      "Teflon Tape Link to Purchase": teflonTapeLink = "",
       "Material to close screw access hole Name": materialName = "",
       "Material to close screw access hole link to purchase":
-        materialLink = null,
+        materialLink = "",
     },
   } = quizResponse;
 
@@ -190,7 +190,7 @@ const formatChairSidePickUp = (quizResponse = null) => {
       info: [
         {
           itemName: lutingAgentName,
-          itemNumber: null,
+          itemNumber: "",
           link: lutingAgentLink,
           quantity: !!lutingAgentLink ? 1 : null,
         },
@@ -201,7 +201,7 @@ const formatChairSidePickUp = (quizResponse = null) => {
       info: [
         {
           itemName: teflonTape,
-          itemNumber: null,
+          itemNumber: "",
           link: teflonTapeLink,
           quantity: !!teflonTapeLink ? 1 : null,
         },
@@ -212,7 +212,7 @@ const formatChairSidePickUp = (quizResponse = null) => {
       info: [
         {
           itemName: materialName,
-          itemNumber: null,
+          itemNumber: "",
           link: materialLink,
           quantity: !!materialLink ? 1 : null,
         },
@@ -235,18 +235,15 @@ const formatImplantPurchase = (quizResponse = null) => {
   const {
     _doc: {
       "Implant Name": implantName = "",
-      "Link to purchase": link = null,
+      "Link to purchase": link = "",
       "Article Number": itemNumber = "",
     },
   } = quizResponse;
 
-  // Constants for labels to ensure consistency
-  const LABEL_IMPLANT = "Implant";
-
   // Format the final response with labeled information
   return [
     {
-      label: LABEL_IMPLANT,
+      label: OUTPUT_LABELS.IMPLANT,
       info: [
         {
           itemName: implantName,
