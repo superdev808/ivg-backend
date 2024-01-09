@@ -5,7 +5,9 @@ const DrillKitAndSequenceModel = require("../models/drillkit_and_sequence_model"
 const ImplantPurchaseModel = require("../models/implant_purchase_model");
 const MasterImplantDriverModel = require("../models/master_implant_driver_model");
 const ScanbodyModel = require("../models/scanbody-model");
+const { OUTPUT_TYPES } = require("../utils/constant");
 const { getQuizData, getUniqueResult, getQuizQuery, getModelByCalculatorType } = require("../utils/helper");
+const { formatDrillkitAndSequence, formatBoneReduction, formatMasterImplantDriver, formatChairSidePickUp, formatImplantPurchase } = require("../utils/outputFormatter");
 const response = require("../utils/response");
 const _ = require("lodash");
 
@@ -132,6 +134,25 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
       const quizOutputData = await getQuizData(OutputModel);
       const quizOutputQuery = getQuizQuery(quizOutputData, quiz) || {};
       quizResponse = await getQuizData(OutputModel, quizOutputQuery, true);
+      switch (output) {
+        case OUTPUT_TYPES.DRILL_KIT_AND_SEQUENCE:
+          quizResponse = formatDrillkitAndSequence(quizResponse);
+          break;
+        case OUTPUT_TYPES.BONE_REDUCTION:
+          quizResponse = formatBoneReduction(quizResponse);
+          break;
+        case OUTPUT_TYPES.MASTER_IMPLANT_DRIVER:
+          quizResponse = formatMasterImplantDriver(quizResponse);
+          break;
+        case OUTPUT_TYPES.CHAIR_SIDE_PICK_UP:
+          quizResponse = formatChairSidePickUp(quizResponse);
+          break;
+        case OUTPUT_TYPES.IMPLANT_PURCHASE:
+          quizResponse = formatImplantPurchase(quizResponse);
+          break;
+        default:
+          quizResponse = [];
+      }
     }
     // Handle case where data array is empty
     if (data.length === 0) {
