@@ -154,10 +154,7 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
           quizResponse = [];
       }
     }
-    // Handle case where data array is empty
-    if (data.length === 0) {
-      return response.notFoundError(res, `No data found`);
-    }
+
     const result = getUniqueResult(data, fields);
     const resp = { result };
     if (quizResponse) {
