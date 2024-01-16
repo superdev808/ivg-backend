@@ -12,7 +12,7 @@ const schema = new Schema({
     "Link to Purchase": { type: String },
 });
 
-const ImpressionCopingModel = mongoose.model("ImpressionCoping", schema, "ImpressionCoping");
+const TemporaryCopingModel = mongoose.model("TemporaryCoping", schema, "TemporaryCoping");
 
-module.exports = ImpressionCopingModel;
+module.exports = TemporaryCopingModel;
 

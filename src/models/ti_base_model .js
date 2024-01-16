@@ -13,7 +13,7 @@ const schema = new Schema({
     "Link to Purchase": { type: String },
 });
 
-const ImpressionCopingModel = mongoose.model("ImpressionCoping", schema, "ImpressionCoping");
+const TIBaseModel = mongoose.model("TIBase", schema, "TIBase");
 
-module.exports = ImpressionCopingModel;
+module.exports = TIBaseModel;
 

@@ -3,8 +3,13 @@ const ChairSidePickUpModel = require("../models/chairside_pickup_model");
 const CrownMaterialModel = require("../models/crown-material-model");
 const DrillKitAndSequenceModel = require("../models/drillkit_and_sequence_model");
 const ImplantPurchaseModel = require("../models/implant_purchase_model");
+const ImpressionCopingModel = require("../models/impression_coping_model");
 const MasterImplantDriverModel = require("../models/master_implant_driver_model");
+const MasterScanbodyModel = require("../models/master_scanbody_model");
 const ScanbodyModel = require("../models/scanbody-model");
+const ScanbodyDriverModel = require("../models/scanbody_driver_model");
+const TemporaryCopingModel = require("../models/temporary_coping_model ");
+const TIBaseModel = require("../models/ti_base_model ");
 const { OUTPUT_TYPES } = require("../utils/constant");
 const { getQuizData, getUniqueResult, getQuizQuery, getModelByCalculatorType } = require("../utils/helper");
 const { formatDrillkitAndSequence, formatBoneReduction, formatMasterImplantDriver, formatChairSidePickUp, formatImplantPurchase } = require("../utils/outputFormatter");
@@ -21,6 +26,11 @@ const modelMap = {
   DrillKitAndSequence: DrillKitAndSequenceModel,
   ImplantPurchase: ImplantPurchaseModel,
   MasterImplantDriver: MasterImplantDriverModel,
+  MasterScanbody: MasterScanbodyModel,
+  ScanbodyDriver: ScanbodyDriverModel,
+  ImpressionCoping: ImpressionCopingModel,
+  TemporaryCoping: TemporaryCopingModel,
+  TIBase: TIBaseModel
 };
 exports.getCalculatorOptions = async (req, res, next) => {
     const { type, quiz, fields } = req.body;
