@@ -4,10 +4,8 @@ const { Schema } = mongoose;
 const schema = new Schema({
     "Implant Brand": { type: String },
     "Implant Model": { type: String },
-    "Implant Diameter": { type: Schema.Types.Mixed }, // Can be either string, number, or other types
-    "Implant Platform": { type: Schema.Types.Mixed }, // Can be either string, number, or other types
-    "Implant Length": { type: String },
-    "Implant Surface Treatment": { type: String },
+    "Implant Diameter": { type: Schema.Types.Mixed },
+    "Implant Platform": { type: Schema.Types.Mixed },
     "Do you need to purchase materials for chairside pick-up?": { type: String },
     "Luting Agent Name": { type: String },
     "Luting Agent Link to Purchase": { type: String },
@@ -17,6 +15,6 @@ const schema = new Schema({
     "Material to close screw access hole link to purchase": { type: String },
 });
 
-const ChairSidePickUpModel = mongoose.model('ChairSidePickUp', schema, "Surgery_ChairSidePickUp");
+const ChairSidePickUpModel = mongoose.model("ChairSidePickUp", schema, "ChairSidePickUp");
 
 module.exports = ChairSidePickUpModel;

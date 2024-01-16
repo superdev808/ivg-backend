@@ -23,9 +23,9 @@ const formatDrillkitAndSequence = (quizResponse = null) => {
   // Destructure relevant information from the quizResponse
   const {
     _doc: {
-      "Implant Drill Kit Name": implantDrillKitName = "",
+      "Drill Kit Name": implantDrillKitName = "",
       "Drill Kit Item Number": drillKitItemNumber = "",
-      "Link to Drill Kit": linkToDrillKit = "",
+      "Drill Kit Link to Purchase": linkToDrillKit = "",
       ...restDrills
     },
   } = quizResponse;
@@ -89,9 +89,9 @@ const formatBoneReduction = (quizResponse = null) => {
   const {
     _doc: {
       "Bur Kit Name (Bone Reduction)": burKitName = "",
-      "Bur Kit Product Code": burKitItemNumber = "",
-      "Bur Kit Link to Purchase": linkToBurKit = "",
-      "Surgical Bur Kit (Denture Conversion)": surgicalBurKit = "",
+      "Item Code": burKitItemNumber = "",
+      "Link to Purchase": linkToBurKit = "",
+      "Bur Kit (Denture Conversion) Name": surgicalBurKit = "",
     },
   } = quizResponse;
 
@@ -138,7 +138,7 @@ const formatMasterImplantDriver = (quizResponse = null) => {
 
   const {
     _doc: {
-      "Driver Name": itemName = "",
+      "Item Name": itemName = "",
       "Item Number": itemNumber = "",
       "Link to Purchase": link = "",
     },
@@ -234,9 +234,9 @@ const formatImplantPurchase = (quizResponse = null) => {
 
   const {
     _doc: {
-      "Implant Name": implantName = "",
-      "Link to purchase": link = "",
-      "Article Number": itemNumber = "",
+      "Item Name": implantName = "",
+      "Link to Purchase": link = "",
+      "Item Number": itemNumber = "",
     },
   } = quizResponse;
 

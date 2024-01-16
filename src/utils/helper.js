@@ -62,7 +62,7 @@ const getUniqueResult = (data, fields) => {
       } else {
         return item[fields[0]];
       }
-    })
+    }).filter(Boolean)
   );
 };
 

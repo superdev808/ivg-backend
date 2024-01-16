@@ -8,11 +8,11 @@ const schema = mongoose.Schema({
     "Implant Length": { type: String },
     "Implant Surface Treatment": { type: String },
     "Do you need to purchase an implant?": { type: String },
-    "Implant Name": { type: String },
-    "Article Number": { type: String },
-    "Link to purchase": { type: String }
+    "Item Name": { type: String },
+    "Item Number": { type: String },
+    "Link to Purchase": { type: String }
 });
 
-const ImplantPurchaseModel = mongoose.model('ImplantPurchase', schema, "Surgery_ImplantPurchase");
+const ImplantPurchaseModel = mongoose.model("ImplantPurchase", schema, "ImplantPurchase");
 
 module.exports = ImplantPurchaseModel;

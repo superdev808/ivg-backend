@@ -4,18 +4,16 @@ const { Schema } = mongoose;
 const schema = new Schema({
     "Implant Brand": { type: String },
     "Implant Model": { type: String },
-    "Implant Diameter": { type: Schema.Types.Mixed }, // Can be either string, number, or other types
-    "Implant Platform": { type: Schema.Types.Mixed }, // Can be either string, number, or other types
-    "Implant Length": { type: String },
-    "Implant Surface Treatment": { type: String },
+    "Implant Diameter": { type: Schema.Types.Mixed },
+    "Implant Platform": { type: Schema.Types.Mixed },
     "Will you perform bone reduction?": { type: String },
     "Bur Kit Name (Bone Reduction)": { type: String },
-    "Bur Kit Product Code": { type: String },
-    "Bur Kit Link to Purchase": { type: String },
-    "Surgical Bur Kit (Denture Conversion)": { type: String },
+    "Item Code": { type: String },
+    "Link to Purchase": { type: String },
+    "Bur Kit (Denture Conversion) Name": { type: String },
 });
 
-const BoneReductionModel = mongoose.model('BoneReduction', schema, "Surgery_BoneReduction");
+const BoneReductionModel = mongoose.model("BoneReduction", schema, "BoneReduction");
 
 module.exports = BoneReductionModel;
 
