@@ -134,7 +134,7 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
     let quizResponse = null;
     if (output) {
       const OutputModel = getModelByCalculatorType(modelMap, output);
-
+      console.log("OutputModel", OutputModel)
       if (!OutputModel) {
         return response.notFoundError(
           res,
@@ -166,6 +166,9 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
     }
 
     const result = getUniqueResult(data, fields);
+    if (result.length === 0) {
+      result.push("");
+    }
     const resp = { result };
     if (quizResponse) {
       resp["quizResponse"] = quizResponse;
