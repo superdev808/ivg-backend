@@ -1,9 +1,15 @@
-const BoneReductionModel = require("../models/bone_reduction_model");
-const ChairSidePickUpModel = require("../models/chairside_pickup_model");
+const BoneReductionModel = require("../models/bone-reduction-model");
+const ChairSidePickUpModel = require("../models/chair-side-pickup-model");
 const CrownMaterialModel = require("../models/crown-material-model");
 const DrillKitAndSequenceModel = require("../models/drillkit_and_sequence_model");
+const HealingAbutmentsModel = require("../models/healing-abutments-model");
+const ImplantAnalogsModel = require("../models/implant-analog-model");
+const ImplantsModel = require("../models/implant-model");
+const ImplantScrewsModel = require("../models/implant-screw-model");
 const ImplantPurchaseModel = require("../models/implant_purchase_model");
 const MasterImplantDriverModel = require("../models/master_implant_driver_model");
+const RestorativeMultiUnitAbutmentsModel = require("../models/restorative-multi-unit-abutments-model");
+const RestroativeDirectToImplantModel = require("../models/restroative-direct-to-implant-model");
 const ScanbodyModel = require("../models/scanbody-model");
 const { OUTPUT_TYPES } = require("../utils/constant");
 const { getQuizData, getUniqueResult, getQuizQuery, getModelByCalculatorType } = require("../utils/helper");
@@ -15,30 +21,29 @@ const fieldsToSearch = {
     'Scanbodies': ["Implant Brand", "Implant System", "Scanbody Item Number", "Manufacturer"],
     'Crown Materials': []
 }
+
 const modelMap = {
   BoneReduction: BoneReductionModel,
   ChairSidePickUp: ChairSidePickUpModel,
   DrillKitAndSequence: DrillKitAndSequenceModel,
   ImplantPurchase: ImplantPurchaseModel,
   MasterImplantDriver: MasterImplantDriverModel,
+  Scanbodies: ScanbodyModel,
+  "Crown Materials": CrownMaterialModel,
+  RestroativeDirectToImplant: RestroativeDirectToImplantModel,
+  RestorativeMultiUnitAbutments: RestorativeMultiUnitAbutmentsModel,
+  HealingAbutments: HealingAbutmentsModel,
+  ImplantAnalogs: ImplantAnalogsModel,
+  ImplantScrews: ImplantScrewsModel,
+  Implants: ImplantsModel
 };
+
 exports.getCalculatorOptions = async (req, res, next) => {
     const { type, quiz, fields } = req.body;
 
     const calculatorType = decodeURIComponent(type);
 
-    let Model = null;
-
-    switch (calculatorType) {
-        case "Scanbodies":
-            Model = ScanbodyModel;
-            break;
-        case "Crown Materials":
-            Model = CrownMaterialModel;
-            break;
-        default:
-            break;
-    }
+    let Model = getModelByCalculatorType(modelMap, calculatorType);
 
     if (!Model) {
         response.notFoundError(res, `${type} data is not existing`);
