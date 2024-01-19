@@ -1,15 +1,27 @@
-const BoneReductionModel = require("../models/bone_reduction_model");
-const ChairSidePickUpModel = require("../models/chairside_pickup_model");
+const BoneReductionModel = require("../models/bone-reduction-model");
+const ChairSidePickUpModel = require("../models/chair-side-pickup-model");
 const CrownMaterialModel = require("../models/crown-material-model");
 const DrillKitAndSequenceModel = require("../models/drillkit_and_sequence_model");
+const HealingAbutmentsModel = require("../models/healing-abutments-model");
+const ImplantAnalogsModel = require("../models/implant-analog-model");
+const ImplantsModel = require("../models/implant-model");
+const ImplantScrewsModel = require("../models/implant-screw-model");
 const ImplantPurchaseModel = require("../models/implant_purchase_model");
-const ImpressionCopingModel = require("../models/impression_coping_model");
+const ImpressingCopingsDirectToImplantsModel = require("../models/impressing-copings-direct-to-implant-model");
+const ImpressingCopingsMUAsModel = require("../models/impressing-copings-mua-model");
 const MasterImplantDriverModel = require("../models/master_implant_driver_model");
-const MasterScanbodyModel = require("../models/master_scanbody_model");
+const MUAsModel = require("../models/mua-model");
+const RestorativeMultiUnitAbutmentsModel = require("../models/restorative-multi-unit-abutments-model");
+const RestroativeDirectToImplantModel = require("../models/restroative-direct-to-implant-model");
+const ScanbodyDriversDirectToImplantsModel = require("../models/scanbody-drivers-direct-to-implants-model");
+const ScanbodyDriversMUAsModel = require("../models/scanbody-drivers-muas-model");
 const ScanbodyModel = require("../models/scanbody-model");
-const ScanbodyDriverModel = require("../models/scanbody_driver_model");
-const TemporaryCopingModel = require("../models/temporary_coping_model ");
-const TIBaseModel = require("../models/ti_base_model ");
+const ScanbodyMUAsModel = require("../models/scanbody-mua-model");
+const StockAbutmentsModel = require("../models/stock-abutments-model");
+const TemporaryCopingsDirectToImplantsModel = require("../models/temporary-copings-direct-to-implants-model");
+const TemporaryCopingsMUAsModel = require("../models/temporary-copings-muas-model");
+const TiBasesDirectToImplantsModel = require("../models/ti-bases-direct-to-implant-model");
+const TiBasesMUAsModel = require("../models/ti-bases-muas-model");
 const { OUTPUT_TYPES } = require("../utils/constant");
 const { getQuizData, getUniqueResult, getQuizQuery, getModelByCalculatorType } = require("../utils/helper");
 const { formatDrillkitAndSequence, formatBoneReduction, formatMasterImplantDriver, formatChairSidePickUp, formatImplantPurchase } = require("../utils/outputFormatter");
@@ -20,35 +32,40 @@ const fieldsToSearch = {
     'Scanbodies': ["Implant Brand", "Implant System", "Scanbody Item Number", "Manufacturer"],
     'Crown Materials': []
 }
+
 const modelMap = {
   BoneReduction: BoneReductionModel,
   ChairSidePickUp: ChairSidePickUpModel,
   DrillKitAndSequence: DrillKitAndSequenceModel,
   ImplantPurchase: ImplantPurchaseModel,
   MasterImplantDriver: MasterImplantDriverModel,
-  MasterScanbody: MasterScanbodyModel,
-  ScanbodyDriver: ScanbodyDriverModel,
-  ImpressionCoping: ImpressionCopingModel,
-  TemporaryCoping: TemporaryCopingModel,
-  TIBase: TIBaseModel
+  Scanbodies: ScanbodyModel,
+  "Crown Materials": CrownMaterialModel,
+  RestroativeDirectToImplant: RestroativeDirectToImplantModel,
+  RestorativeMultiUnitAbutments: RestorativeMultiUnitAbutmentsModel,
+  HealingAbutments: HealingAbutmentsModel,
+  ImplantAnalogs: ImplantAnalogsModel,
+  ImplantScrews: ImplantScrewsModel,
+  Implants: ImplantsModel,
+  ImpressingCopingsDirectToImplants: ImpressingCopingsDirectToImplantsModel,
+  ImpressingCopingsMUAs: ImpressingCopingsMUAsModel,
+  MUAs: MUAsModel,
+  ScanbodyMUAs: ScanbodyMUAsModel,
+  ScanbodyDriversDirectToImplants: ScanbodyDriversDirectToImplantsModel,
+  ScanbodyDriversMUAs: ScanbodyDriversMUAsModel,
+  StockAbutments: StockAbutmentsModel,
+  TemporaryCopingsDirectToImplants: TemporaryCopingsDirectToImplantsModel,
+  TemporaryCopingsMUAs: TemporaryCopingsMUAsModel,
+  TiBasesDirectToImplants: TiBasesDirectToImplantsModel,
+  TiBasesMUAs: TiBasesMUAsModel
 };
+
 exports.getCalculatorOptions = async (req, res, next) => {
     const { type, quiz, fields } = req.body;
 
     const calculatorType = decodeURIComponent(type);
 
-    let Model = null;
-
-    switch (calculatorType) {
-        case "Scanbodies":
-            Model = ScanbodyModel;
-            break;
-        case "Crown Materials":
-            Model = CrownMaterialModel;
-            break;
-        default:
-            break;
-    }
+    let Model = getModelByCalculatorType(modelMap, calculatorType);
 
     if (!Model) {
         response.notFoundError(res, `${type} data is not existing`);
@@ -178,5 +195,3 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
     response.serverError(res, { message: ex.message });
   }
 };
-  
-  

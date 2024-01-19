@@ -14,6 +14,7 @@ const schema = new Schema({
     "Drill 1 Name": { type: String },
     "Drill 1 Item Number": { type: String },
     "Drill 1 Link to Purchase": { type: String },
+    "Manufacturer Recommendations": { type: String },
     "Drill 2 Name": { type: String },
     "Drill 2 Item Number": { type: String },
     "Drill 2 Link to Purchase": { type: String },
@@ -30,11 +31,14 @@ const schema = new Schema({
     "Drill 6 Item Number": { type: String },
     "Drill 6 Link to Purchase": { type: String },
     "Drill 7 Name": { type: String },
-    "Drill 7 Item Number": { type: String },
+    "Drill 7 item Number": { type: String },
     "Drill 7 Link to Purchase": { type: String },
     "Drill 8 Name": { type: String },
-    "Drill 8 Item Number": { type: String },
+    "Drill 8 item Number": { type: String },
     "Drill 8 Link to Purchase": { type: String },
+    "Drill 9 Name": { type: String },
+    "Drill 9 item Number": { type: String },
+    "Drill 9 Link to Purchase": { type: String }
 });
 
 const DrillKitAndSequenceModel = mongoose.model("DrillKitAndSequence", schema, "DrillKitAndSequence");
