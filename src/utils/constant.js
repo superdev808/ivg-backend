@@ -1,9 +1,9 @@
 const OUTPUT_TYPES = {
   DRILL_KIT_AND_SEQUENCE: "DrillKitAndSequence",
   BONE_REDUCTION: "BoneReduction",
-  MASTER_IMPLANT_DRIVER: "MasterImplantDriver",
+  MASTER_IMPLANT_DRIVER: "RestroativeDirectToImplant",
   CHAIR_SIDE_PICK_UP: "ChairSidePickUp",
-  IMPLANT_PURCHASE: "ImplantPurchase",
+  IMPLANT_PURCHASE: "Implants",
 };
 
 const OUTPUT_LABELS = {

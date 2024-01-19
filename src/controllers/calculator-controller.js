@@ -6,7 +6,6 @@ const HealingAbutmentsModel = require("../models/healing-abutments-model");
 const ImplantAnalogsModel = require("../models/implant-analog-model");
 const ImplantsModel = require("../models/implant-model");
 const ImplantScrewsModel = require("../models/implant-screw-model");
-const ImplantPurchaseModel = require("../models/implant_purchase_model");
 const ImpressingCopingsDirectToImplantsModel = require("../models/impressing-copings-direct-to-implant-model");
 const ImpressingCopingsMUAsModel = require("../models/impressing-copings-mua-model");
 const MUAsModel = require("../models/mua-model");
@@ -36,8 +35,6 @@ const modelMap = {
   BoneReduction: BoneReductionModel,
   ChairSidePickUp: ChairSidePickUpModel,
   DrillKitAndSequence: DrillKitAndSequenceModel,
-  ImplantPurchase: ImplantPurchaseModel,
-  //MasterImplantDriver: MasterImplantDriverModel,
   Scanbodies: ScanbodyModel,
   "Crown Materials": CrownMaterialModel,
   RestroativeDirectToImplant: RestroativeDirectToImplantModel,

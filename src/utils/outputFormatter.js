@@ -91,12 +91,14 @@ const formatBoneReduction = (quizResponse = null) => {
       "Bur Kit Name (Bone Reduction)": burKitName = "",
       "Item Code": burKitItemNumber = "",
       "Link to Purchase": linkToBurKit = "",
-      "Bur Kit (Denture Conversion) Name": surgicalBurKit = "",
+      "Bur Kit (Denture Conversion) Name": surgicalBurKitName = "",
+      "Bur Link to Purchase": surgicalBurKitLink = ""
     },
   } = quizResponse;
 
-  // Extract individual details from the surgicalBurKit
-  const [itemName = "", link = ""] = surgicalBurKit.split("\n");
+  if (!(burKitName && surgicalBurKitName)) {
+    return [];
+  }
 
   // Format and return the bone reduction information
   return [
@@ -115,10 +117,10 @@ const formatBoneReduction = (quizResponse = null) => {
       label: OUTPUT_LABELS.SURGICAL_BUR_KIT,
       info: [
         {
-          itemName,
+          itemName: surgicalBurKitName,
           itemNumber: null,
-          link,
-          quantity: !!link ? 1 : null,
+          link: surgicalBurKitLink,
+          quantity: !!surgicalBurKitLink ? 1 : null,
         },
       ],
     },
@@ -239,6 +241,10 @@ const formatImplantPurchase = (quizResponse = null) => {
       "Item Number": itemNumber = "",
     },
   } = quizResponse;
+
+  if (!(implantName && link && itemNumber)) {
+    return [];
+  }
 
   // Format the final response with labeled information
   return [
