@@ -13,6 +13,7 @@ const RestroativeDirectToImplantModel = require("../models/restroative-direct-to
 const ScanbodyModel = require("../models/scanbody-model");
 const { OUTPUT_TYPES } = require("../utils/constant");
 const { getQuizData, getUniqueResult, getQuizQuery, getModelByCalculatorType } = require("../utils/helper");
+const { sendEmail } = require("../utils/mailer");
 const { formatDrillkitAndSequence, formatBoneReduction, formatMasterImplantDriver, formatChairSidePickUp, formatImplantPurchase } = require("../utils/outputFormatter");
 const response = require("../utils/response");
 const _ = require("lodash");
@@ -170,5 +171,24 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
     response.serverError(res, { message: ex.message });
   }
 };
+
+exports.sendAllOnXInfo = async (req, res) => {
+  try {
+    const { attachment } = req.body;
+
+    // Check if required fields are provided
+    if (!attachment) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+  
+    // Call the sendEmail function
+    sendEmail(attachment);
+
+    // Respond with success message
+    response.success(res, 'Email sent successfully');
+  } catch (ex) {
+    response.serverError(res, { message: ex.message });
+  }
+}
   
   
