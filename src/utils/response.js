@@ -24,6 +24,11 @@ exports.validationError = (res, message) => {
     return res.status(400).json({ status: "Error", message: message || "Validation Error" });
 };
 
+// Returns 400 Bad Request
+exports.badRequest = (res, message) => {
+    return res.status(400).json({ status: "Error", message: message || "Bad Request" });
+};
+
 // Returns 404 Not Found Error
 exports.notFoundError = (res, message) => {
     return res.status(404).json({ status: "Error", message: message || "Not Found" });
@@ -33,3 +38,4 @@ exports.notFoundError = (res, message) => {
 exports.conflict = (res, message) => {
     return res.status(409).json({ status: "Error", message: message || "Request is in conflict with current state of the server" });
 };
+

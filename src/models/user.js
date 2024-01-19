@@ -11,6 +11,10 @@ const UserSchema = new Schema({
         type: String,
         required: true,
     },
+    phone: {
+        type: String,
+        required: true,
+    },
     email: {
         type: String,
         required: true,
@@ -27,6 +31,13 @@ const UserSchema = new Schema({
         type: Date,
         default: Date.now,
     },
+    verified: {
+        type: Boolean,
+        default: false,
+    },
+
+
+
 });
 
 UserSchema.plugin(mongoosePagniate);
