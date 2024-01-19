@@ -9,7 +9,6 @@ const ImplantScrewsModel = require("../models/implant-screw-model");
 const ImplantPurchaseModel = require("../models/implant_purchase_model");
 const ImpressingCopingsDirectToImplantsModel = require("../models/impressing-copings-direct-to-implant-model");
 const ImpressingCopingsMUAsModel = require("../models/impressing-copings-mua-model");
-const MasterImplantDriverModel = require("../models/master_implant_driver_model");
 const MUAsModel = require("../models/mua-model");
 const RestorativeMultiUnitAbutmentsModel = require("../models/restorative-multi-unit-abutments-model");
 const RestroativeDirectToImplantModel = require("../models/restroative-direct-to-implant-model");
@@ -38,7 +37,7 @@ const modelMap = {
   ChairSidePickUp: ChairSidePickUpModel,
   DrillKitAndSequence: DrillKitAndSequenceModel,
   ImplantPurchase: ImplantPurchaseModel,
-  MasterImplantDriver: MasterImplantDriverModel,
+  //MasterImplantDriver: MasterImplantDriverModel,
   Scanbodies: ScanbodyModel,
   "Crown Materials": CrownMaterialModel,
   RestroativeDirectToImplant: RestroativeDirectToImplantModel,
@@ -151,7 +150,7 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
     let quizResponse = null;
     if (output) {
       const OutputModel = getModelByCalculatorType(modelMap, output);
-      console.log("OutputModel", OutputModel)
+
       if (!OutputModel) {
         return response.notFoundError(
           res,
