@@ -16,6 +16,8 @@ const OUTPUT_LABELS = {
   TEFLON_TAPE : "Teflon Tape",
   MATERIAL_CLOSE_ACCESS_HOLE : "Material to Close Screw Access Hole",
   IMPLANT : "Implant",
+  SCANBODIES: "Scanbody"
+
 };
 
 module.exports = {

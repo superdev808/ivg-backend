@@ -262,6 +262,53 @@ const formatImplantPurchase = (quizResponse = null) => {
   ];
 };
 
+/**
+ * Formats the quiz response containing information about implant purchase.
+ * @param {Object} quizResponse - The quiz response object.
+ * @returns {Array} - Formatted quiz response with labeled information or [] if the input is invalid.
+ */
+const formatScanbodies = (quizResponse = null) => {
+  // Check if the quizResponse is valid
+  if (!validateQuizResponse(quizResponse)) {
+    return [];
+  }
+
+  const {
+    _doc: {
+      Manufacturer= "",
+      "Link to Purchase": link = "",
+      "Item Name": itemName = "",
+      "Scanbody Item Number": itemNumber = "",
+      "Notes": notes = "",
+      "Interface/ Cross-Compatibility": interface = "",
+      Rx = "" ,
+      Driver = "",
+      Screw = ""
+    },
+  } = quizResponse;
+
+  // Format the final response with labeled information
+  return [
+    {
+      label: OUTPUT_LABELS.SCANBODIES,
+      info: [
+        {
+          itemName,
+          itemNumber,
+          link,
+          quantity: !!link ? 1 : null,
+          Manufacturer,
+          "Notes": notes,
+          "Interface/ Cross-Compatibility": interface,
+          "RX" : Rx,
+          Driver,
+          Screw
+        },
+      ],
+    },
+  ];
+};
+
 module.exports = {
   validateQuizResponse,
   formatDrillkitAndSequence,
@@ -269,4 +316,5 @@ module.exports = {
   formatMasterImplantDriver,
   formatChairSidePickUp,
   formatImplantPurchase,
+  formatScanbodies
 };
