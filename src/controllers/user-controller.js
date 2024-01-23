@@ -9,7 +9,7 @@ const { validateRegisterInput, validateLoginInput, validateEmail, validateUserIn
 const response = require('../utils/response');
 
 const { sendVerificationEmail, sendResetPasswordEmail } = require('../utils/emailService');
-const { has } = require('lodash');
+const {uploadToS3, generateFileKey, generateSignedUrl} = require('../utils/storageService');
 
 async function hashPassword(password) {
 	try {
@@ -428,3 +428,72 @@ exports.updateUserInfo = async (req, res) => {
        return response.serverError(res, error.message);
     }
 }
+
+exports.userInfoAddtional = async (req, res) => {
+	try {
+        const token = req.headers.authorization.split(' ')[1]; 
+        if (!token) {
+            return response.validationError(res, 'Token is required.');
+        }
+
+        const decoded = jwt.verify(token, keys.secretOrKey);
+
+        const userId = decoded.id;
+
+        const user = await UserAdditional.findOne({userId: userId});
+        if (!user) {
+            return response.notFoundError(res, 'User not found.');
+        }
+
+		const logo = generateSignedUrl(user.logo);
+
+        const userData = { 
+            id: user.id,
+			organizationName: user.organizationName,
+			logo: logo || '',
+
+
+        };
+		return response.success(res, userData);
+    } catch (error) {
+        return response.serverError(res, error.message);
+    }
+}
+
+exports.uploadLogo = async (req, res) => {
+	try {
+        const token = req.headers.authorization.split(' ')[1]; 
+        if (!token) {
+            return response.validationError(res, 'Token is required.');
+        }
+
+        const decoded = jwt.verify(token, keys.secretOrKey);
+
+        const userId = decoded.id;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return response.notFoundError(res, 'User not found.');
+        }
+
+		const upload = uploadToS3(userId, 'user', 'logo').single('image');
+
+		upload(req, res, async function (err) {
+			if (err) {
+				return response.serverError(res, err.message);
+			}
+		
+			const key = generateFileKey(userId, 'user', 'logo', req.file);
+
+			const userAdd = await UserAdditional.findOne({userId: userId});
+	
+			userAdd.logo = key || '';
+			userAdd.save();
+			return response.success(res, { message: 'File uploaded successfully.' });
+		})
+		
+		
+		;} catch (error) {
+		return response.serverError(res, error.message);
+	}
+};

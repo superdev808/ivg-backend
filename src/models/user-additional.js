@@ -39,6 +39,10 @@ const UserAdditionalSchema = new Schema({
         type: String,
         required: false,
     },
+    logo: {
+        type: String,
+        required: false,
+    },
  
 });
 

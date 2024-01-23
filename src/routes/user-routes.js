@@ -13,7 +13,9 @@ const {
 	resetPassword,
 	userInfo,
 	updateUserInfo,
-	sendResetPassword
+	sendResetPassword,
+	userInfoAddtional,
+	uploadLogo
 } = require('../controllers/user-controller');
 const bodyParser = require('body-parser');
 
@@ -33,7 +35,9 @@ class UserRoutes {
 		router.post('/send-reset-password', bodyParser.json(), sendResetPassword);
 		router.post('/validate-reset-token', bodyParser.json(), validateResetToken);
 		router.get('/user-info', checkAccessToken, userInfo);
+		router.get('/user-info-additional', checkAccessToken, userInfoAddtional);
 		router.put('/update-user-info', checkAccessToken, bodyParser.json(), updateUserInfo);
+		router.post('/upload-logo', checkAccessToken, bodyParser.json(), uploadLogo);
 	}
 }
 
