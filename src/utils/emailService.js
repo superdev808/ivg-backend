@@ -38,11 +38,50 @@ const sendVerificationEmail = async (user, verificationToken) => {
 
 	request
 		.then((result) => {
-			return response.success(result, result);
+			return result;
 		})
 		.catch((err) => {
-			return response.serverError(result, err.message);
+			throw new Error(err.message);
 		});
 };
 
-module.exports = { sendVerificationEmail };
+const sendResetPassword = async (user, token) => {
+	const templatePath = path.join(__dirname, '..','templates', 'reset-password-email.html');
+	let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+
+	// Replace the placeholders with the actual values
+	htmlTemplate = htmlTemplate.replace(/{{FIRST_NAME}}/g, user.firstName);
+	htmlTemplate = htmlTemplate.replace(/{{FRONTEND_URL}}/g, process.env.FRONTEND_URL);
+	htmlTemplate = htmlTemplate.replace(/{{TOKEN}}/g, token);
+
+	const request = mailjet.post('send', { version: 'v3.1' }).request({
+		Messages: [
+			{
+				From: {
+					Email: process.env.EMAIL_USER || '',
+					Name: 'Ivory Guide',
+				},
+				To: [
+					{
+						Email: user.email,
+						Name: `${user.firstName} ${user.lastName}`,
+					},
+				],
+				Subject: 'Verify Your Email',
+				TextPart: `Reset your Ivory Guide account password by clicking this line: ${process.env.FRONTEND_URL}/reset-password?token=${token}`,
+				HTMLPart: htmlTemplate,
+			},
+		],
+	});
+
+	request
+		.then((result) => {
+			return result;
+		})
+		.catch((err) => {
+			throw new Error(err.message);
+		});
+};
+
+
+module.exports = { sendVerificationEmail, sendResetPassword };

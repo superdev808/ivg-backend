@@ -1,12 +1,35 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+
 const keys = require('../config/keys');
 const User = require('../models/user');
 const UserAdditional = require('../models/user-additional');
 const { validateRegisterInput, validateLoginInput, validateEmail } = require('../utils/validation');
 const response = require('../utils/response');
 
-const {sendVerificationEmail} = require('../utils/emailService');
+const { sendVerificationEmail, sendResetPassword } = require('../utils/emailService');
+const { has } = require('lodash');
+
+async function hashPassword(password) {
+	try {
+		const salt = await bcrypt.genSalt(10);
+		const hash = await bcrypt.hash(password, salt);
+		return hash;
+	} catch (err) {
+		throw err;
+	}
+}
+
+async function setupVerification(user) {
+	const token = crypto.randomBytes(20).toString('hex');
+	user.verificationToken = token;
+	user.verificationTokenExpiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
+
+	await user.save();
+
+	await sendVerificationEmail(user, token);
+}
 
 exports.checkEmail = async (req, res) => {
 	const data = req.body;
@@ -18,7 +41,7 @@ exports.checkEmail = async (req, res) => {
 		const user = await User.findOne({ email: data.email });
 
 		if (user) {
-			return response.conflict(res, {available: false, message: 'Email already exists'});
+			return response.conflict(res, { available: false, message: 'Email already exists' });
 		} else {
 			return response.success(res, { message: 'Email is available.', available: true });
 		}
@@ -28,30 +51,17 @@ exports.checkEmail = async (req, res) => {
 };
 
 exports.registerUser = async (req, res) => {
-	// Function to hash password
-	async function hashPassword(password) {
-		try {
-			const salt = await bcrypt.genSalt(10);
-			const hash = await bcrypt.hash(password, salt);
-			return hash;
-		} catch (err) {
-			throw err;
-		}
-	}
-
-	// Validate body
 	const { errors, isValid } = validateRegisterInput(req.body);
 	console.log('###', req.body);
 	if (!isValid) {
 		return response.validationError(res, errors);
 	}
 
-	// Check if email already exists
 	const user = await User.findOne({ email: req.body.email });
 	if (user) {
 		return response.conflict(res, { message: 'Email already exists' });
 	}
-	// Create new user
+
 	const newUser = new User({
 		firstName: req.body.firstName,
 		lastName: req.body.lastName,
@@ -61,7 +71,7 @@ exports.registerUser = async (req, res) => {
 		verified: false,
 		role: 'User',
 	});
-	// Create new user additional data
+
 	const newUserAdditional = new UserAdditional({
 		organizationName: req.body.organizationName,
 		organizationRole: req.body.organizationRole,
@@ -73,29 +83,34 @@ exports.registerUser = async (req, res) => {
 		referralSourceOther: req.body.referralSourceOther || '',
 	});
 
-	// Save user
 	try {
 		newUser.password = await hashPassword(newUser.password);
 		const savedUser = await newUser.save();
 		newUserAdditional.userId = savedUser._id;
 		await newUserAdditional.save();
 
-        // Generate a token for email verification
-        const verificationToken = jwt.sign(
-            { userId: newUser._id },
-            keys.secretOrKey,
-            { expiresIn: '1d' } // expires in 1 day
-        );
-
-        // Send verification email with the token
-        await sendVerificationEmail(savedUser, verificationToken);
-
+		await setupVerification(newUser);
 
 		return response.success(res, { message: 'User registered, please check your email to verify your account.', userId: savedUser.Id });
-
-        
 	} catch (err) {
 		return response.serverError(res, err.message);
+	}
+};
+
+exports.sendVerification = async (req, res) => {
+	try {
+		const { email } = req.body;
+		if (!email) {
+			return response.validationError(res, 'Email is required.');
+		}
+		const user = User.findOne({ email: email });
+		if (!user) {
+			return response.notFoundError(res, 'User not found.');
+		}
+		await setupVerification(newUser);
+		return response.success(res, { message: 'Verification email sent successfully.' });
+	} catch (error) {
+		return response.serverError(res, error.message);
 	}
 };
 
@@ -110,9 +125,9 @@ exports.loginUser = (req, res) => {
 		if (!user) {
 			return res.status(404).json({ message: 'Email not found' });
 		}
-        if (!user.verified) {
-            return res.status(401).json({ message: 'Account not verified. Please check your email to verify your account.' });
-        }
+		if (!user.verified) {
+			return res.status(401).json({ message: 'Account not verified. Please check your email to verify your account.' });
+		}
 		bcrypt.compare(password, user.password).then((isMatch) => {
 			if (isMatch) {
 				const payload = {
@@ -244,28 +259,115 @@ exports.updateUser = (req, res) => {
 	});
 };
 
-
-
 exports.verifyUser = async (req, res) => {
-	const { token } = req.query;
-
 	try {
-		const { userId } = jwt.verify(token, keys.secretOrKey);
-		const user = await User.findById(userId);
+		const {  token } = req.query;
+
+		if (!token) {
+			return response.validationError(res, 'Token is required.');
+		}
+		
+		const query = {
+				verificationToken: token,
+				verificationTokenExpiry: { $gt: Date.now() },
+			};
+
+		const user = await User.findOne(query);
 
 		if (!user) {
-            return response.badRequest(res, { message: 'Invalid token.' });
+			return response.badRequest(res, { message: 'Invalid token.' });
 		}
 
 		user.verified = true;
+		user.verificationToken = undefined;
+		user.verificationTokenExpiry = undefined;
 		await user.save();
 
-        return response.success(res, { message: 'Account verified successfully.' });
+		return response.success(res, { message: 'Account verified successfully.' });
 	} catch (error) {
 		if (error instanceof jwt.TokenExpiredError) {
-            return response.badRequest(res, { message: 'Token has expired. Please request a new verification link.' });
+			return response.badRequest(res, { message: 'Token has expired. Please request a new verification link.' });
 		} else {
-            return response.serverError(res, { message: error });
+			return response.serverError(res, { message: error });
 		}
+	}
+};
+
+exports.validateResetToken = async (req, res) => {
+	try {
+		const {  token } = req.body;
+
+		if (!token) {
+			return response.validationError(res, 'Token is required.');
+		}
+	
+		const query = {
+				resetPasswordToken: token,
+				resetPasswordExpiry: { $gt: Date.now() },
+			};
+		
+
+		const user = await User.findOne(query);
+
+		if (user) {
+			return response.success(res, { valid: true });
+		} else {
+			return response.success(res, { valid: false });
+		}
+	} catch (error) {
+		return response.serverError(res, error.message);
+	}
+};
+
+exports.requestPasswordReset = async (req, res) => {
+	try {
+		const { email } = req.body;
+		if (!email) {
+			return response.validationError(res, 'Email is required.');
+		}
+		let user = await User.findOne({ email: email });
+
+		if (!user) {
+			return response.notFoundError(res, 'Email not found.');
+		}
+
+		const token = crypto.randomBytes(20).toString('hex');
+		user.resetPasswordToken = token;
+		user.resetPasswordExpiry = Date.now() + 3600000; // 1 hour
+
+		await user.save();
+
+		await sendResetPassword(user, token);
+		return response.success(res, 'Reset password email sent successfully.');
+	} catch (error) {
+		return response.serverError(res, error.message);
+	}
+};
+
+exports.resetPassword = async (req, res) => {
+	try {
+		const { token, password } = req.body;
+		if (!token || !password) {
+			return response.validationError(res, { message: 'Token and password are required.' });
+		}
+
+		const user = await User.findOne({
+			resetPasswordToken: token,
+			resetPasswordExpiry: { $gt: Date.now() },
+		});
+
+		if (!user) {
+			return response.badRequest(res, 'Invalid token.');
+		}
+
+		user.password = await hashPassword(password);
+		user.resetPasswordToken = undefined;
+		user.resetPasswordExpiry = undefined;
+
+		await user.save();
+
+		response.success(res, { message: 'Password reset successfully.' });
+	} catch (error) {
+		return response.serverError(res, error.message);
 	}
 };
