@@ -16,6 +16,6 @@ const scanbodySchema = mongoose.Schema({
     "Screw": { type: String }
 });
 
-const MasterScanbodyModel = mongoose.model('Scanbody', scanbodySchema, "MasterScanbody");
+const MasterScanbodyModel = mongoose.model('MasterScanbody', scanbodySchema, "MasterScanbody");
 
 module.exports = MasterScanbodyModel;
