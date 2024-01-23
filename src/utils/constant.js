@@ -4,6 +4,7 @@ const OUTPUT_TYPES = {
   MASTER_IMPLANT_DRIVER: "RestroativeDirectToImplant",
   CHAIR_SIDE_PICK_UP: "ChairSidePickUp",
   IMPLANT_PURCHASE: "Implants",
+  MASTER_SCANBODY: "MasterScanbody"
 };
 
 const OUTPUT_LABELS = {

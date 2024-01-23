@@ -32,18 +32,18 @@ const formatDrillkitAndSequence = (quizResponse = null) => {
 
   // Copy the remaining drill data into a new object
   const drillsData = { ...restDrills };
-
+  
   // Initialize an array to store the converted drill information
   const convertedDrillsArray = [];
 
   // Iterate over the drill data
-  for (let i = 1; drillsData[`Drill ${i}`]; i++) {
+  for (let i = 1; drillsData[`Drill ${i} Name`]; i++) {
     const nameKey = `Drill ${i}`;
     const linkKey = `${nameKey} Link to Purchase`;
     const itemNumberKey = `${nameKey} Item Number`;
 
     // Extract individual drill details
-    const itemName = drillsData[nameKey] || "";
+    const itemName = drillsData[`Drill ${i} Name`] || "";
     const link = drillsData[linkKey] || "";
     const itemNumber = drillsData[itemNumberKey] || "";
     const quantity = !!link && link !== "-" ? 1 : null;
@@ -309,6 +309,40 @@ const formatScanbodies = (quizResponse = null) => {
   ];
 };
 
+const formatCommonResponse = (quizResponse = null, labelName = "") => {
+  // Check if the quizResponse is valid
+  if (!validateQuizResponse(quizResponse) && !labelName) {
+    return [];
+  }
+
+  const {
+    _doc: {
+      "Item Name": itemName = "",
+      "Link to Purchase": link = "",
+      "Item Number": itemNumber = "",
+    },
+  } = quizResponse;
+
+  if (!(itemName && link && itemNumber)) {
+    return [];
+  }
+
+  // Format the final response with labeled information
+  return [
+    {
+      label: labelName,
+      info: [
+        {
+          itemName,
+          itemNumber,
+          link,
+          quantity: !!link ? 1 : null,
+        },
+      ],
+    },
+  ];
+};
+
 module.exports = {
   validateQuizResponse,
   formatDrillkitAndSequence,
@@ -316,5 +350,6 @@ module.exports = {
   formatMasterImplantDriver,
   formatChairSidePickUp,
   formatImplantPurchase,
-  formatScanbodies
+  formatScanbodies,
+  formatCommonResponse
 };

@@ -8,7 +8,7 @@ const schema = new Schema({
   "Implant Platform": { type: String },
   "Implant Length": { type: String },
   "Authentic or Generic": { type: String },
-  "Driver Length": { type: String },
+  "Implant Driver Length": { type: String },
   "One Piece or Torque Attachment": { type: String },
   "Driver Size": { type: String },
   "Abutment Angulation": { type: String },

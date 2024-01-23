@@ -13,8 +13,9 @@ const RestorativeMultiUnitAbutmentsModel = require("../models/restorative-multi-
 const RestroativeDirectToImplantModel = require("../models/restroative-direct-to-implant-model");
 const ScanbodyDriversDirectToImplantsModel = require("../models/scanbody-drivers-direct-to-implants-model");
 const ScanbodyDriversMUAsModel = require("../models/scanbody-drivers-muas-model");
-const ScanbodyModel = require("../models/scanbody-model");
+const ScanbodyModel = require("../models/scanbody-new-model");
 const ScanbodyMUAsModel = require("../models/scanbody-mua-model");
+const MasterScanbodyModel = require("../models/master-scanbody-model");
 const StockAbutmentsModel = require("../models/stock-abutments-model");
 const TemporaryCopingsDirectToImplantsModel = require("../models/temporary-copings-direct-to-implants-model");
 const TemporaryCopingsMUAsModel = require("../models/temporary-copings-muas-model");
@@ -22,7 +23,7 @@ const TiBasesDirectToImplantsModel = require("../models/ti-bases-direct-to-impla
 const TiBasesMUAsModel = require("../models/ti-bases-muas-model");
 const { OUTPUT_TYPES } = require("../utils/constant");
 const { getQuizData, getUniqueResult, getQuizQuery, getModelByCalculatorType } = require("../utils/helper");
-const { formatDrillkitAndSequence, formatBoneReduction, formatMasterImplantDriver, formatChairSidePickUp, formatImplantPurchase } = require("../utils/outputFormatter");
+const { formatDrillkitAndSequence, formatBoneReduction, formatMasterImplantDriver, formatChairSidePickUp, formatImplantPurchase, formatScanbodies, formatCommonResponse } = require("../utils/outputFormatter");
 const response = require("../utils/response");
 const _ = require("lodash");
 
@@ -36,6 +37,7 @@ const modelMap = {
   ChairSidePickUp: ChairSidePickUpModel,
   DrillKitAndSequence: DrillKitAndSequenceModel,
   Scanbodies: ScanbodyModel,
+  MasterScanbody: MasterScanbodyModel,
   "Crown Materials": CrownMaterialModel,
   RestroativeDirectToImplant: RestroativeDirectToImplantModel,
   RestorativeMultiUnitAbutments: RestorativeMultiUnitAbutmentsModel,
@@ -157,6 +159,7 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
       const quizOutputData = await getQuizData(OutputModel);
       const quizOutputQuery = getQuizQuery(quizOutputData, quiz) || {};
       quizResponse = await getQuizData(OutputModel, quizOutputQuery, true);
+      
       switch (output) {
         case OUTPUT_TYPES.DRILL_KIT_AND_SEQUENCE:
           quizResponse = formatDrillkitAndSequence(quizResponse);
@@ -173,8 +176,11 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
         case OUTPUT_TYPES.IMPLANT_PURCHASE:
           quizResponse = formatImplantPurchase(quizResponse);
           break;
+        case OUTPUT_TYPES.MASTER_SCANBODY:
+          quizResponse = formatScanbodies(quizResponse);
+          break;
         default:
-          quizResponse = [];
+          quizResponse = formatCommonResponse(quizResponse, output);
       }
     }
 
