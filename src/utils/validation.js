@@ -101,6 +101,31 @@ exports.validateRegisterInput = (data) => {
 };
 
 
+
+
+
+exports.validateUserInfoUpdate = (data) => {
+    let errors = {};
+    data.firstName = !isEmpty(data.firstName) ? data.firstName : '';
+    data.lastName = !isEmpty(data.lastName) ? data.lastName : '';
+    data.phone = !isEmpty(data.phone) ? data.phone : '';
+    
+    if (Validator.isEmpty(data.firstName) || Validator.isEmpty(data.lastName)) {
+        errors.name = 'Name field is required';
+    }
+
+
+    if (Validator.isEmpty(data.phone)) {
+        errors.phone = 'Phone field is required';
+    }
+
+    return {
+        errors,
+        isValid: isEmpty(errors),
+    };
+};
+
+
 exports.isValidToken = (expiresUnixTimestamp) => {
     return new Date(new Date()) - new Date(expiresUnixTimestamp * 1000) < 0;
 };

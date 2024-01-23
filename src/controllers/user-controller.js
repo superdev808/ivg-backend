@@ -5,10 +5,10 @@ const crypto = require('crypto');
 const keys = require('../config/keys');
 const User = require('../models/user');
 const UserAdditional = require('../models/user-additional');
-const { validateRegisterInput, validateLoginInput, validateEmail } = require('../utils/validation');
+const { validateRegisterInput, validateLoginInput, validateEmail, validateUserInfoUpdate } = require('../utils/validation');
 const response = require('../utils/response');
 
-const { sendVerificationEmail, sendResetPassword } = require('../utils/emailService');
+const { sendVerificationEmail, sendResetPasswordEmail } = require('../utils/emailService');
 const { has } = require('lodash');
 
 async function hashPassword(password) {
@@ -29,6 +29,16 @@ async function setupVerification(user) {
 	await user.save();
 
 	await sendVerificationEmail(user, token);
+}
+
+async function setupPasswordReset(user) {
+	const token = crypto.randomBytes(20).toString('hex');
+		user.resetPasswordToken = token;
+		user.resetPasswordExpiry = Date.now() + 3600000; // 1 hour
+
+	await user.save();
+
+	await sendResetPasswordEmail(user, token);
 }
 
 exports.checkEmail = async (req, res) => {
@@ -52,7 +62,6 @@ exports.checkEmail = async (req, res) => {
 
 exports.registerUser = async (req, res) => {
 	const { errors, isValid } = validateRegisterInput(req.body);
-	console.log('###', req.body);
 	if (!isValid) {
 		return response.validationError(res, errors);
 	}
@@ -173,6 +182,7 @@ exports.getUserInfo = (req, res) => {
 					firstName: user.firstName,
 					lastName: user.lastName,
 					role: user.role,
+					phone: user.phone,
 				},
 			});
 		}
@@ -220,44 +230,7 @@ exports.deleteUser = (req, res) => {
 		});
 };
 
-exports.updateUser = (req, res) => {
-	if (!req.params.id) {
-		console.log('400 response');
-		return res.status(400).send({
-			message: 'Invalid Request',
-		});
-	}
 
-	const newUser = new User({
-		...req.body,
-	});
-
-	bcrypt.genSalt(10, (err, salt) => {
-		bcrypt.hash(newUser.password, salt, (err, hash) => {
-			if (err) throw err;
-			newUser.password = hash;
-			User.findByIdAndUpdate(req.params.id, newUser, { new: true })
-				.then((user) => {
-					if (!user) {
-						return res.status(404).send({
-							message: 'Not found with id ' + req.params.id,
-						});
-					}
-					res.send(user);
-				})
-				.catch((err) => {
-					if (err.kind === 'ObjectId') {
-						return res.status(404).send({
-							message: 'Not found with id ' + req.params.id,
-						});
-					}
-					return res.status(500).send({
-						message: 'Error updating user with id ' + req.params.id,
-					});
-				});
-		});
-	});
-};
 
 exports.verifyUser = async (req, res) => {
 	try {
@@ -331,18 +304,37 @@ exports.requestPasswordReset = async (req, res) => {
 			return response.notFoundError(res, 'Email not found.');
 		}
 
-		const token = crypto.randomBytes(20).toString('hex');
-		user.resetPasswordToken = token;
-		user.resetPasswordExpiry = Date.now() + 3600000; // 1 hour
 
-		await user.save();
-
-		await sendResetPassword(user, token);
+		await setupPasswordReset(user);
 		return response.success(res, 'Reset password email sent successfully.');
 	} catch (error) {
 		return response.serverError(res, error.message);
 	}
 };
+
+exports.sendResetPassword = async (req, res) => {
+	try {
+		const token = req.headers.authorization.split(' ')[1]; 
+        if (!token) {
+            return response.validationError(res, 'Token is required.');
+        }
+
+        const decoded = jwt.verify(token, keys.secretOrKey);
+
+        const userId = decoded.id;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return response.notFoundError(res, 'User not found.');
+        }
+	
+		await setupPasswordReset(user);
+		return response.success(res, { message: 'Reset password email sent successfully.' });
+	} catch (error) {
+		return response.serverError(res, error.message);
+	}
+};
+
 
 exports.resetPassword = async (req, res) => {
 	try {
@@ -371,3 +363,68 @@ exports.resetPassword = async (req, res) => {
 		return response.serverError(res, error.message);
 	}
 };
+
+exports.userInfo = async (req, res) => {
+	try {
+        const token = req.headers.authorization.split(' ')[1]; 
+        if (!token) {
+            return response.validationError(res, 'Token is required.');
+        }
+
+        const decoded = jwt.verify(token, keys.secretOrKey);
+
+        const userId = decoded.id;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return response.notFoundError(res, 'User not found.');
+        }
+
+        const userData = { 
+            id: user.id,
+            email: user.email,
+			firstName: user.firstName,
+			lastName: user.lastName,
+			role: user.role,
+			phone: user.phone,
+        };
+		return response.success(res, userData);
+    } catch (error) {
+        return response.serverError(res, error.message);
+    }
+}
+
+exports.updateUserInfo = async (req, res) => {
+	try {
+		const { errors, isValid } = validateUserInfoUpdate(req.body);
+		if (!isValid) {
+			return response.validationError(res, errors);
+		}
+		const { email, firstName, lastName, phone } = req.body;
+
+        const token = req.headers.authorization.split(' ')[1]; 
+        if (!token) {
+            return response.validationError(res, 'Token is required.');
+        }
+
+        const decoded = jwt.verify(token, keys.secretOrKey);
+
+        const userId = decoded.id;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return response.notFoundError(res, 'User not found.');
+        }
+
+       
+		user.firstName = firstName;
+		user.lastName = lastName;
+		user.phone = phone;
+		await user.save();
+
+		
+		return response.success(res, { message: 'User updated successfully.' });
+    } catch (error) {
+       return response.serverError(res, error.message);
+    }
+}

@@ -45,7 +45,7 @@ const sendVerificationEmail = async (user, verificationToken) => {
 		});
 };
 
-const sendResetPassword = async (user, token) => {
+const sendResetPasswordEmail = async (user, token) => {
 	const templatePath = path.join(__dirname, '..','templates', 'reset-password-email.html');
 	let htmlTemplate = await fs.readFile(templatePath, 'utf8');
 
@@ -84,4 +84,4 @@ const sendResetPassword = async (user, token) => {
 };
 
 
-module.exports = { sendVerificationEmail, sendResetPassword };
+module.exports = { sendVerificationEmail, sendResetPasswordEmail };
