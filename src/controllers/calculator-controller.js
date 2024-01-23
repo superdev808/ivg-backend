@@ -159,28 +159,29 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
       const quizOutputData = await getQuizData(OutputModel);
       const quizOutputQuery = getQuizQuery(quizOutputData, quiz) || {};
       quizResponse = await getQuizData(OutputModel, quizOutputQuery, true);
-      
-      switch (output) {
-        case OUTPUT_TYPES.DRILL_KIT_AND_SEQUENCE:
-          quizResponse = formatDrillkitAndSequence(quizResponse);
-          break;
-        case OUTPUT_TYPES.BONE_REDUCTION:
-          quizResponse = formatBoneReduction(quizResponse);
-          break;
-        case OUTPUT_TYPES.MASTER_IMPLANT_DRIVER:
-          quizResponse = formatMasterImplantDriver(quizResponse);
-          break;
-        case OUTPUT_TYPES.CHAIR_SIDE_PICK_UP:
-          quizResponse = formatChairSidePickUp(quizResponse);
-          break;
-        case OUTPUT_TYPES.IMPLANT_PURCHASE:
-          quizResponse = formatImplantPurchase(quizResponse);
-          break;
-        case OUTPUT_TYPES.MASTER_SCANBODY:
-          quizResponse = formatScanbodies(quizResponse);
-          break;
-        default:
-          quizResponse = formatCommonResponse(quizResponse, output);
+      if (quizResponse) {
+        switch (output) {
+          case OUTPUT_TYPES.DRILL_KIT_AND_SEQUENCE:
+            quizResponse = formatDrillkitAndSequence(quizResponse);
+            break;
+          case OUTPUT_TYPES.BONE_REDUCTION:
+            quizResponse = formatBoneReduction(quizResponse);
+            break;
+          case OUTPUT_TYPES.MASTER_IMPLANT_DRIVER:
+            quizResponse = formatMasterImplantDriver(quizResponse);
+            break;
+          case OUTPUT_TYPES.CHAIR_SIDE_PICK_UP:
+            quizResponse = formatChairSidePickUp(quizResponse);
+            break;
+          case OUTPUT_TYPES.IMPLANT_PURCHASE:
+            quizResponse = formatImplantPurchase(quizResponse);
+            break;
+          case OUTPUT_TYPES.MASTER_SCANBODY:
+            quizResponse = formatScanbodies(quizResponse);
+            break;
+          default:
+            quizResponse = formatCommonResponse(quizResponse, output);
+        }
       }
     }
 
