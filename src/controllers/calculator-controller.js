@@ -15,7 +15,6 @@ const ScanbodyDriversDirectToImplantsModel = require("../models/scanbody-drivers
 const ScanbodyDriversMUAsModel = require("../models/scanbody-drivers-muas-model");
 const ScanbodyModel = require("../models/scanbody-model");
 const ScanbodyMUAsModel = require("../models/scanbody-mua-model");
-const MasterScanbodyModel = require("../models/master-scanbody-model");
 const StockAbutmentsModel = require("../models/stock-abutments-model");
 const TemporaryCopingsDirectToImplantsModel = require("../models/temporary-copings-direct-to-implants-model");
 const TemporaryCopingsMUAsModel = require("../models/temporary-copings-muas-model");
@@ -37,7 +36,6 @@ const modelMap = {
   ChairSidePickUp: ChairSidePickUpModel,
   DrillKitAndSequence: DrillKitAndSequenceModel,
   Scanbodies: ScanbodyModel,
-  MasterScanbody: MasterScanbodyModel,
   "Crown Materials": CrownMaterialModel,
   RestroativeDirectToImplant: RestroativeDirectToImplantModel,
   RestorativeMultiUnitAbutments: RestorativeMultiUnitAbutmentsModel,
@@ -176,7 +174,7 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
           case OUTPUT_TYPES.IMPLANT_PURCHASE:
             quizResponse = formatImplantPurchase(quizResponse);
             break;
-          case OUTPUT_TYPES.MASTER_SCANBODY:
+          case OUTPUT_TYPES.SCANBODIES:
             quizResponse = formatScanbodies(quizResponse);
             break;
           default:
