@@ -3,11 +3,12 @@ const { Schema } = mongoose;
 
 const schema = new Schema({
   "Implant Brand": { type: String },
-  "Implant Model": { type: String },
+  "Implant System": { type: String },
   "Implant Diameter": { type: String },
   "Implant Platform": { type: String },
   "Authentic or Generic": { type: String },
-  "Height": { type: String },
+  "Abutment Height": { type: String },
+  "Collar Height": { type: String },
   "Emergence Profile": { type: String },
   "Item Name": { type: String },
   "Item Number": { type: String },
