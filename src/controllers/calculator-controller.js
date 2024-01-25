@@ -84,9 +84,9 @@ exports.getCalculatorOptions = async (req, res, next) => {
                 });
 
                 return res;
-            }));
+            })).sort();
         } else {
-            result = _.uniq(data.map((item) => item[fields[0]]));
+            result = _.uniq(data.map((item) => item[fields[0]])).sort();
         }
 
         response.success(res, result);
