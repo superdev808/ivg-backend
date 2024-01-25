@@ -20,7 +20,7 @@ const TemporaryCopingsDirectToImplantsModel = require("../models/temporary-copin
 const TemporaryCopingsMUAsModel = require("../models/temporary-copings-muas-model");
 const TiBasesDirectToImplantsModel = require("../models/ti-bases-direct-to-implant-model");
 const TiBasesMUAsModel = require("../models/ti-bases-muas-model");
-const { OUTPUT_TYPES } = require("../utils/constant");
+const { OUTPUT_TYPES, LABEL_MAPPINGS } = require("../utils/constant");
 const { getQuizData, getUniqueResult, getQuizQuery, getModelByCalculatorType } = require("../utils/helper");
 const { formatDrillkitAndSequence, formatBoneReduction, formatMasterImplantDriver, formatChairSidePickUp, formatImplantPurchase, formatScanbodies, formatCommonResponse } = require("../utils/outputFormatter");
 const response = require("../utils/response");
@@ -178,7 +178,7 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
             quizResponse = formatScanbodies(quizResponse);
             break;
           default:
-            quizResponse = formatCommonResponse(quizResponse, output);
+            quizResponse = formatCommonResponse(quizResponse, LABEL_MAPPINGS[output] || output);
         }
       }
     }
