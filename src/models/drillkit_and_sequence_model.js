@@ -41,6 +41,6 @@ const schema = new Schema({
     "Drill 9 Link to Purchase": { type: String }
 });
 
-const DrillKitAndSequenceModel = mongoose.model('DrillKitAndSequence', schema, "Surgery_DrillKitAndSequence");
+const DrillKitAndSequenceModel = mongoose.model("DrillKitAndSequence", schema, "Surgery_DrillKitAndSequence");
 
 module.exports = DrillKitAndSequenceModel;
