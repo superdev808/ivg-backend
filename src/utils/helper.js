@@ -52,7 +52,7 @@ const getQuizQuery = (quizData, quiz) => {
  */
 const getUniqueResult = (data, fields) => {
   return _.uniq(
-    data.map((item) => {
+    _.sortBy(data.map((item) => {
       if (fields.length > 1) {
         const result = {};
         fields.forEach((field) => {
@@ -62,7 +62,7 @@ const getUniqueResult = (data, fields) => {
       } else {
         return item[fields[0]];
       }
-    })
+    })).filter(Boolean)
   );
 };
 

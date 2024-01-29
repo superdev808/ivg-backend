@@ -3,11 +3,16 @@ const { Schema } = mongoose;
 
 const schema = new Schema({
   "Implant Brand": { type: String },
-  "Implant System": { type: String },
+  "Implant Model": { type: String },
   "Implant Diameter": { type: String },
   "Implant Platform": { type: String },
-  "Authentic or Generic": { type: String },
-  "Abutment Height": { type: String },
+  Material: { type: String },
+  "Impression Type": { type: String },
+  Fixation: { type: String },
+  "Restoration Type": { type: String },
+  "Hexed or Non-Hexed": { type: String },
+  Angulation: { type: String },
+  "Abutment Diameter": { type: String },
   "Collar Height": { type: String },
   "Emergence Profile": { type: String },
   "Item Name": { type: String },
@@ -15,10 +20,10 @@ const schema = new Schema({
   "Link to Purchase": { type: String },
 });
 
-const HealingAbutmentsModel = mongoose.model(
-  "HealingAbutment",
+const StockAbutmentsModel = mongoose.model(
+  "StockAbutments",
   schema,
-  "HealingAbutments"
+  "StockAbutments"
 );
 
-module.exports = HealingAbutmentsModel;
+module.exports = StockAbutmentsModel;

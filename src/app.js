@@ -51,7 +51,8 @@ app.use(
     "/v1/",
     cors({
         optionsSuccessStatus: 200,
-        credentials: true
+        credentials: true,
+        origin: ["https://ig-dev.zensol.app","http://localhost:3000"]
     }),
     router
 );

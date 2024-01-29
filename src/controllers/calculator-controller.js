@@ -6,12 +6,21 @@ const HealingAbutmentsModel = require("../models/healing-abutments-model");
 const ImplantAnalogsModel = require("../models/implant-analog-model");
 const ImplantsModel = require("../models/implant-model");
 const ImplantScrewsModel = require("../models/implant-screw-model");
-const ImplantPurchaseModel = require("../models/implant_purchase_model");
-const MasterImplantDriverModel = require("../models/master_implant_driver_model");
+const ImpressingCopingsDirectToImplantsModel = require("../models/impressing-copings-direct-to-implant-model");
+const ImpressingCopingsMUAsModel = require("../models/impressing-copings-mua-model");
+const MUAsModel = require("../models/mua-model");
 const RestorativeMultiUnitAbutmentsModel = require("../models/restorative-multi-unit-abutments-model");
 const RestroativeDirectToImplantModel = require("../models/restroative-direct-to-implant-model");
+const ScanbodyDriversDirectToImplantsModel = require("../models/scanbody-drivers-direct-to-implants-model");
+const ScanbodyDriversMUAsModel = require("../models/scanbody-drivers-muas-model");
 const ScanbodyModel = require("../models/scanbody-model");
-const { OUTPUT_TYPES } = require("../utils/constant");
+const ScanbodyMUAsModel = require("../models/scanbody-mua-model");
+const StockAbutmentsModel = require("../models/stock-abutments-model");
+const TemporaryCopingsDirectToImplantsModel = require("../models/temporary-copings-direct-to-implants-model");
+const TemporaryCopingsMUAsModel = require("../models/temporary-copings-muas-model");
+const TiBasesDirectToImplantsModel = require("../models/ti-bases-direct-to-implant-model");
+const TiBasesMUAsModel = require("../models/ti-bases-muas-model");
+const { OUTPUT_TYPES, LABEL_MAPPINGS } = require("../utils/constant");
 const { getQuizData, getUniqueResult, getQuizQuery, getModelByCalculatorType } = require("../utils/helper");
 const { sendEmail } = require("../utils/mailer");
 const { formatDrillkitAndSequence, formatBoneReduction, formatMasterImplantDriver, formatChairSidePickUp, formatImplantPurchase } = require("../utils/outputFormatter");
@@ -27,8 +36,6 @@ const modelMap = {
   BoneReduction: BoneReductionModel,
   ChairSidePickUp: ChairSidePickUpModel,
   DrillKitAndSequence: DrillKitAndSequenceModel,
-  ImplantPurchase: ImplantPurchaseModel,
-  MasterImplantDriver: MasterImplantDriverModel,
   Scanbodies: ScanbodyModel,
   "Crown Materials": CrownMaterialModel,
   RestroativeDirectToImplant: RestroativeDirectToImplantModel,
@@ -36,7 +43,18 @@ const modelMap = {
   HealingAbutments: HealingAbutmentsModel,
   ImplantAnalogs: ImplantAnalogsModel,
   ImplantScrews: ImplantScrewsModel,
-  Implants: ImplantsModel
+  Implants: ImplantsModel,
+  ImpressingCopingsDirectToImplants: ImpressingCopingsDirectToImplantsModel,
+  ImpressingCopingsMUAs: ImpressingCopingsMUAsModel,
+  MUAs: MUAsModel,
+  ScanbodyMUAs: ScanbodyMUAsModel,
+  ScanbodyDriversDirectToImplants: ScanbodyDriversDirectToImplantsModel,
+  ScanbodyDriversMUAs: ScanbodyDriversMUAsModel,
+  StockAbutments: StockAbutmentsModel,
+  TemporaryCopingsDirectToImplants: TemporaryCopingsDirectToImplantsModel,
+  TemporaryCopingsMUAs: TemporaryCopingsMUAsModel,
+  TiBasesDirectToImplants: TiBasesDirectToImplantsModel,
+  TiBasesMUAs: TiBasesMUAsModel
 };
 
 exports.getCalculatorOptions = async (req, res, next) => {
@@ -63,9 +81,9 @@ exports.getCalculatorOptions = async (req, res, next) => {
                 });
 
                 return res;
-            }));
+            })).sort();
         } else {
-            result = _.uniq(data.map((item) => item[fields[0]]));
+            result = _.uniq(data.map((item) => item[fields[0]])).sort();
         }
 
         response.success(res, result);
@@ -140,28 +158,36 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
       const quizOutputData = await getQuizData(OutputModel);
       const quizOutputQuery = getQuizQuery(quizOutputData, quiz) || {};
       quizResponse = await getQuizData(OutputModel, quizOutputQuery, true);
-      switch (output) {
-        case OUTPUT_TYPES.DRILL_KIT_AND_SEQUENCE:
-          quizResponse = formatDrillkitAndSequence(quizResponse);
-          break;
-        case OUTPUT_TYPES.BONE_REDUCTION:
-          quizResponse = formatBoneReduction(quizResponse);
-          break;
-        case OUTPUT_TYPES.MASTER_IMPLANT_DRIVER:
-          quizResponse = formatMasterImplantDriver(quizResponse);
-          break;
-        case OUTPUT_TYPES.CHAIR_SIDE_PICK_UP:
-          quizResponse = formatChairSidePickUp(quizResponse);
-          break;
-        case OUTPUT_TYPES.IMPLANT_PURCHASE:
-          quizResponse = formatImplantPurchase(quizResponse);
-          break;
-        default:
-          quizResponse = [];
+      if (quizResponse) {
+        switch (output) {
+          case OUTPUT_TYPES.DRILL_KIT_AND_SEQUENCE:
+            quizResponse = formatDrillkitAndSequence(quizResponse);
+            break;
+          case OUTPUT_TYPES.BONE_REDUCTION:
+            quizResponse = formatBoneReduction(quizResponse);
+            break;
+          case OUTPUT_TYPES.MASTER_IMPLANT_DRIVER:
+            quizResponse = formatMasterImplantDriver(quizResponse);
+            break;
+          case OUTPUT_TYPES.CHAIR_SIDE_PICK_UP:
+            quizResponse = formatChairSidePickUp(quizResponse);
+            break;
+          case OUTPUT_TYPES.IMPLANT_PURCHASE:
+            quizResponse = formatImplantPurchase(quizResponse);
+            break;
+          case OUTPUT_TYPES.SCANBODIES:
+            quizResponse = formatScanbodies(quizResponse);
+            break;
+          default:
+            quizResponse = formatCommonResponse(quizResponse, LABEL_MAPPINGS[output] || output);
+        }
       }
     }
 
     const result = getUniqueResult(data, fields);
+    if (result.length === 0) {
+      result.push("");
+    }
     const resp = { result };
     if (quizResponse) {
       resp["quizResponse"] = quizResponse;
