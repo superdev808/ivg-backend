@@ -21,8 +21,8 @@ const TemporaryCopingsMUAsModel = require("../models/temporary-copings-muas-mode
 const TiBasesDirectToImplantsModel = require("../models/ti-bases-direct-to-implant-model");
 const TiBasesMUAsModel = require("../models/ti-bases-muas-model");
 const { OUTPUT_TYPES, LABEL_MAPPINGS } = require("../utils/constant");
+const { sendAllOnXInfoEmail } = require("../utils/emailService");
 const { getQuizData, getUniqueResult, getQuizQuery, getModelByCalculatorType } = require("../utils/helper");
-const { sendEmail } = require("../utils/mailer");
 const { formatDrillkitAndSequence, formatBoneReduction, formatMasterImplantDriver, formatChairSidePickUp, formatImplantPurchase } = require("../utils/outputFormatter");
 const response = require("../utils/response");
 const _ = require("lodash");
@@ -200,18 +200,13 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
 
 exports.sendAllOnXInfo = async (req, res) => {
   try {
-    const { attachment } = req.body;
-
-    // Check if required fields are provided
-    if (!attachment) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    const pdfBuffer = req.file.buffer;
+    const result = await sendAllOnXInfoEmail(pdfBuffer);
+    if (result.body.Messages[0].Status === 'success') {
+      response.success(res, 'Email sent successfully.');
+    } else {
+      response.serverError(res, { message: 'Failed to send email' });
     }
-  
-    // Call the sendEmail function
-    sendEmail(attachment);
-
-    // Respond with success message
-    response.success(res, 'Email sent successfully');
   } catch (ex) {
     response.serverError(res, { message: ex.message });
   }

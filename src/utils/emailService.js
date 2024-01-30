@@ -83,5 +83,39 @@ const sendResetPasswordEmail = async (user, token) => {
 		});
 };
 
+const sendAllOnXInfoEmail = async (pdfBuffer) => {
+  try {
+    const emailOptions = {
+      Messages: [
+        {
+          From: {
+            Email: process.env.EMAIL_USER || "",
+            Name: "Ivory Guide",
+          },
+          To: [
+            {
+              Email: "himanshu.pal@galaxyweblinks.in",
+              Name: "himanshu",
+            },
+          ],
+          Subject: "PDF Attachment",
+          TextPart: "Please find the attached PDF file.",
+          Attachments: [
+            {
+              ContentType: "application/pdf",
+              Filename: "exported-document.pdf",
+              Base64Content: pdfBuffer.toString("base64"),
+            },
+          ],
+        },
+      ],
+    };
+    return await mailjet
+      .post("send", { version: "v3.1" })
+      .request({ Messages: emailOptions.Messages });
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
 
-module.exports = { sendVerificationEmail, sendResetPasswordEmail };
+module.exports = { sendVerificationEmail, sendResetPasswordEmail, sendAllOnXInfoEmail };
