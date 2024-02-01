@@ -4,7 +4,6 @@ const crypto = require('crypto');
 
 const keys = require('../config/keys');
 const User = require('../models/user');
-const UserAdditional = require('../models/user-additional');
 const { validateRegisterInput, validateLoginInput, validateEmail, validateUserInfoUpdate } = require('../utils/validation');
 const response = require('../utils/response');
 
@@ -79,9 +78,6 @@ exports.registerUser = async (req, res) => {
 		password: req.body.password,
 		verified: false,
 		role: 'User',
-	});
-
-	const newUserAdditional = new UserAdditional({
 		organizationName: req.body.organizationName,
 		organizationRole: req.body.organizationRole,
 		organizationRoleOther: req.body.organizationRoleOther || '',
@@ -92,11 +88,10 @@ exports.registerUser = async (req, res) => {
 		referralSourceOther: req.body.referralSourceOther || '',
 	});
 
+
 	try {
 		newUser.password = await hashPassword(newUser.password);
 		const savedUser = await newUser.save();
-		newUserAdditional.userId = savedUser._id;
-		await newUserAdditional.save();
 
 		await setupVerification(newUser);
 
@@ -183,6 +178,14 @@ exports.getUserInfo = (req, res) => {
 					lastName: user.lastName,
 					role: user.role,
 					phone: user.phone,
+					organizationName: user.organizationName,
+					organizationRole: user.organizationRole,
+					organizationRoleOther: user.organizationRoleOther || '',
+					dentalPracticeRole: user.dentalPracticeRole || '',
+					organizationState: user.organizationState,
+					organizationNumber: user.organizationNumber,
+					referralSource: user.referralSource,
+					referralSourceOther: user.referralSourceOther || '',
 				},
 			});
 		}
@@ -429,36 +432,6 @@ exports.updateUserInfo = async (req, res) => {
     }
 }
 
-exports.userInfoAddtional = async (req, res) => {
-	try {
-        const token = req.headers.authorization.split(' ')[1]; 
-        if (!token) {
-            return response.validationError(res, 'Token is required.');
-        }
-
-        const decoded = jwt.verify(token, keys.secretOrKey);
-
-        const userId = decoded.id;
-
-        const user = await UserAdditional.findOne({userId: userId});
-        if (!user) {
-            return response.notFoundError(res, 'User not found.');
-        }
-
-		const logo = generateSignedUrl(user.logo);
-
-        const userData = { 
-            id: user.id,
-			organizationName: user.organizationName,
-			logo: logo || '',
-
-
-        };
-		return response.success(res, userData);
-    } catch (error) {
-        return response.serverError(res, error.message);
-    }
-}
 
 exports.uploadLogo = async (req, res) => {
 	try {
