@@ -4,12 +4,11 @@ const crypto = require('crypto');
 
 const keys = require('../config/keys');
 const User = require('../models/user');
-const UserAdditional = require('../models/user-additional');
 const { validateRegisterInput, validateLoginInput, validateEmail, validateUserInfoUpdate } = require('../utils/validation');
 const response = require('../utils/response');
 
 const { sendVerificationEmail, sendResetPasswordEmail } = require('../utils/emailService');
-const { has } = require('lodash');
+const {uploadToS3, generateFileKey, generateSignedUrl} = require('../utils/storageService');
 
 async function hashPassword(password) {
 	try {
@@ -79,9 +78,6 @@ exports.registerUser = async (req, res) => {
 		password: req.body.password,
 		verified: false,
 		role: 'User',
-	});
-
-	const newUserAdditional = new UserAdditional({
 		organizationName: req.body.organizationName,
 		organizationRole: req.body.organizationRole,
 		organizationRoleOther: req.body.organizationRoleOther || '',
@@ -92,11 +88,10 @@ exports.registerUser = async (req, res) => {
 		referralSourceOther: req.body.referralSourceOther || '',
 	});
 
+
 	try {
 		newUser.password = await hashPassword(newUser.password);
 		const savedUser = await newUser.save();
-		newUserAdditional.userId = savedUser._id;
-		await newUserAdditional.save();
 
 		await setupVerification(newUser);
 
@@ -183,6 +178,14 @@ exports.getUserInfo = (req, res) => {
 					lastName: user.lastName,
 					role: user.role,
 					phone: user.phone,
+					organizationName: user.organizationName,
+					organizationRole: user.organizationRole,
+					organizationRoleOther: user.organizationRoleOther || '',
+					dentalPracticeRole: user.dentalPracticeRole || '',
+					organizationState: user.organizationState,
+					organizationNumber: user.organizationNumber,
+					referralSource: user.referralSource,
+					referralSourceOther: user.referralSourceOther || '',
 				},
 			});
 		}
@@ -428,3 +431,42 @@ exports.updateUserInfo = async (req, res) => {
        return response.serverError(res, error.message);
     }
 }
+
+
+exports.uploadLogo = async (req, res) => {
+	try {
+        const token = req.headers.authorization.split(' ')[1]; 
+        if (!token) {
+            return response.validationError(res, 'Token is required.');
+        }
+
+        const decoded = jwt.verify(token, keys.secretOrKey);
+
+        const userId = decoded.id;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return response.notFoundError(res, 'User not found.');
+        }
+
+		const upload = uploadToS3(userId, 'user', 'logo').single('image');
+
+		upload(req, res, async function (err) {
+			if (err) {
+				return response.serverError(res, err.message);
+			}
+		
+			const key = generateFileKey(userId, 'user', 'logo', req.file);
+
+			const userAdd = await UserAdditional.findOne({userId: userId});
+	
+			userAdd.logo = key || '';
+			userAdd.save();
+			return response.success(res, { message: 'File uploaded successfully.' });
+		})
+		
+		
+		;} catch (error) {
+		return response.serverError(res, error.message);
+	}
+};
