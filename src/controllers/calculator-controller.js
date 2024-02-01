@@ -200,8 +200,14 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
 
 exports.sendAllOnXInfo = async (req, res) => {
   try {
+    const { name, email} = req.body;
     const pdfBuffer = req.file.buffer;
-    const result = await sendAllOnXInfoEmail(pdfBuffer);
+    const info = {
+      name,
+      email,
+      pdfBuffer
+    }
+    const result = await sendAllOnXInfoEmail(info);
     if (result.body.Messages[0].Status === 'success') {
       response.success(res, 'Email sent successfully.');
     } else {

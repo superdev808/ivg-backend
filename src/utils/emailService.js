@@ -83,8 +83,9 @@ const sendResetPasswordEmail = async (user, token) => {
 		});
 };
 
-const sendAllOnXInfoEmail = async (pdfBuffer) => {
+const sendAllOnXInfoEmail = async (info) => {
   try {
+    const { name, email, pdfBuffer } = info;
     const emailOptions = {
       Messages: [
         {
@@ -94,11 +95,11 @@ const sendAllOnXInfoEmail = async (pdfBuffer) => {
           },
           To: [
             {
-              Email: "himanshu.pal@galaxyweblinks.in",
-              Name: "himanshu",
+              Email: email,
+              Name: name,
             },
           ],
-          Subject: "PDF Attachment",
+          Subject: "IvoryGuide: All-On-X Summary",
           TextPart: "Please find the attached PDF file.",
           Attachments: [
             {
