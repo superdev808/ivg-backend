@@ -458,10 +458,10 @@ exports.uploadLogo = async (req, res) => {
 		
 			const key = generateFileKey(userId, 'user', 'logo', req.file);
 
-			const userAdd = await UserAdditional.findOne({userId: userId});
+			const user = await User.findOne({userId: userId});
 	
-			userAdd.logo = key || '';
-			userAdd.save();
+			user.logo = key || '';
+			user.save();
 			return response.success(res, { message: 'File uploaded successfully.' });
 		})
 		
