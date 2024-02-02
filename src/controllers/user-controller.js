@@ -390,6 +390,15 @@ exports.userInfo = async (req, res) => {
 			lastName: user.lastName,
 			role: user.role,
 			phone: user.phone,
+			organizationName: user.organizationName,
+			organizationRole: user.organizationRole,
+			organizationRoleOther: user.organizationRoleOther || '',
+			dentalPracticeRole: user.dentalPracticeRole || '',
+			organizationState: user.organizationState,
+			organizationNumber: user.organizationNumber,
+			referralSource: user.referralSource,
+			referralSourceOther: user.referralSourceOther || '',
+			logo: user.logo ? generateSignedUrl(user.logo) : '',
         };
 		return response.success(res, userData);
     } catch (error) {
@@ -458,7 +467,6 @@ exports.uploadLogo = async (req, res) => {
 		
 			const key = generateFileKey(userId, 'user', 'logo', req.file);
 
-			const user = await User.findOne({userId: userId});
 	
 			user.logo = key || '';
 			user.save();
