@@ -303,12 +303,12 @@ exports.requestPasswordReset = async (req, res) => {
 		}
 		let user = await User.findOne({ email: email });
 
-		if (!user) {
-			return response.notFoundError(res, 'Email not found.');
+		if (user) {
+			await setupPasswordReset(user);
 		}
+		
 
-
-		await setupPasswordReset(user);
+		
 		return response.success(res, 'Reset password email sent successfully.');
 	} catch (error) {
 		return response.serverError(res, error.message);

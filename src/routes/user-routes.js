@@ -29,7 +29,7 @@ class UserRoutes {
 		router.delete('/delete/:id', checkAccessToken, deleteUser);
 		router.post('/check-email', bodyParser.json(), checkEmail);
 		router.get('/verify-user', verifyUser);
-		router.post('/request-password-reset', checkAccessToken, bodyParser.json(), requestPasswordReset);
+		router.post('/request-password-reset', bodyParser.json(), requestPasswordReset);
 		router.post('/reset-password', bodyParser.json(), resetPassword);
 		router.post('/send-reset-password', bodyParser.json(), sendResetPassword);
 		router.post('/validate-reset-token', bodyParser.json(), validateResetToken);

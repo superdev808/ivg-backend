@@ -50,10 +50,12 @@ const UserSchema = new Schema({
     organizationName: {
         type: String,
         required: true,
+        default: ''
     },
     organizationRole: {
         type: String,
         required: true,
+        default: ''
     },
     organizationRoleOther: {
         type: String,
@@ -66,14 +68,17 @@ const UserSchema = new Schema({
     organizationState: {
         type: String,
         required: true,
+        default: ''
     },
     organizationNumber: {
         type: String,
         required: true,
+        default: ''
     },
     referralSource: {
         type: String,
         required: true,
+        default: ''
     },
     referralSourceOther: {
         type: String,
