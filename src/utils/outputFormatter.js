@@ -184,10 +184,9 @@ const formatChairSidePickUp = (quizResponse = null) => {
         materialLink = "",
     },
   } = quizResponse;
-
-  // Format the final response with labeled information
-  return [
-    {
+  const result = [];
+  if (lutingAgentName) {
+    result.push({
       label: OUTPUT_LABELS.LUTING_AGENT,
       info: [
         {
@@ -197,8 +196,10 @@ const formatChairSidePickUp = (quizResponse = null) => {
           quantity: !!lutingAgentLink ? 1 : null,
         },
       ],
-    },
-    {
+    })
+  }
+  if (teflonTape) {
+    result.push({
       label: OUTPUT_LABELS.TEFLON_TAPE,
       info: [
         {
@@ -208,8 +209,10 @@ const formatChairSidePickUp = (quizResponse = null) => {
           quantity: !!teflonTapeLink ? 1 : null,
         },
       ],
-    },
-    {
+    })
+  }
+  if (materialName) {
+    result.push({
       label: OUTPUT_LABELS.MATERIAL_CLOSE_ACCESS_HOLE,
       info: [
         {
@@ -219,8 +222,9 @@ const formatChairSidePickUp = (quizResponse = null) => {
           quantity: !!materialLink ? 1 : null,
         },
       ],
-    },
-  ];
+    })
+  }
+  return result;
 };
 
 /**

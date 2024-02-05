@@ -47,7 +47,42 @@ const UserSchema = new Schema({
     resetPasswordExpiry: {
         type: Date,
     },
-
+    organizationName: {
+        type: String,
+        required: true,
+    },
+    organizationRole: {
+        type: String,
+        required: true,
+    },
+    organizationRoleOther: {
+        type: String,
+        required: false,
+    },
+    dentalPracticeRole: {
+        type: String,
+        required: false,
+    },
+    organizationState: {
+        type: String,
+        required: true,
+    },
+    organizationNumber: {
+        type: String,
+        required: true,
+    },
+    referralSource: {
+        type: String,
+        required: true,
+    },
+    referralSourceOther: {
+        type: String,
+        required: false,
+    },
+    logo: {
+        type: String,
+        required: false,
+    },
 
 
 });
