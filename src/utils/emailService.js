@@ -85,7 +85,7 @@ const sendResetPasswordEmail = async (user, token) => {
 
 const sendAllOnXInfoEmail = async (info) => {
   try {
-    const { name, email, pdfBuffer } = info;
+    const { name, email, pdfBuffer, calculatorType, filename } = info;
     const emailOptions = {
       Messages: [
         {
@@ -99,12 +99,12 @@ const sendAllOnXInfoEmail = async (info) => {
               Name: name,
             },
           ],
-          Subject: "IvoryGuide: All-On-X Summary",
+          Subject: `IvoryGuide: ${calculatorType} Summary`,
           TextPart: "Please find the attached PDF file.",
           Attachments: [
             {
               ContentType: "application/pdf",
-              Filename: "exported-document.pdf",
+              Filename: filename,
               Base64Content: pdfBuffer.toString("base64"),
             },
           ],

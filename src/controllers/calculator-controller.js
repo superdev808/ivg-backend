@@ -198,23 +198,30 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
   }
 };
 
-exports.sendAllOnXInfo = async (req, res) => {
+exports.sendCalculatorSummary = async (req, res) => {
   try {
-    const { name, email} = req.body;
-    const pdfBuffer = req.file.buffer;
+    const { name, email, calculatorType} = req.body;
+    const pdfBuffer = req.file.buffer || null;
+    if (!email || !name || !calculatorType) {
+      return response.badRequest(res, { message: "Missing required fields." });
+    }
+    const filename = `${name}-${calculatorType
+    }-Summary`;
     const info = {
       name,
       email,
-      pdfBuffer
+      calculatorType,
+      pdfBuffer,
+      filename
     }
     const result = await sendAllOnXInfoEmail(info);
     if (result.body.Messages[0].Status === 'success') {
-      response.success(res, 'Email sent successfully.');
+      return response.success(res, 'Email sent successfully.');
     } else {
-      response.serverError(res, { message: 'Failed to send email' });
+      return response.serverError(res, { message: 'Failed to send email' });
     }
   } catch (ex) {
-    response.serverError(res, { message: ex.message });
+    return response.serverError(res, { message: ex.message });
   }
 }
   
