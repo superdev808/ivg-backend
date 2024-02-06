@@ -23,7 +23,7 @@ const TiBasesMUAsModel = require("../models/ti-bases-muas-model");
 const { OUTPUT_TYPES, LABEL_MAPPINGS } = require("../utils/constant");
 const { sendAllOnXInfoEmail } = require("../utils/emailService");
 const { getQuizData, getUniqueResult, getQuizQuery, getModelByCalculatorType } = require("../utils/helper");
-const { formatDrillkitAndSequence, formatBoneReduction, formatMasterImplantDriver, formatChairSidePickUp, formatImplantPurchase } = require("../utils/outputFormatter");
+const { formatDrillkitAndSequence, formatBoneReduction, formatMasterImplantDriver, formatChairSidePickUp, formatImplantPurchase, formatCommonResponse, formatScanbodies } = require("../utils/outputFormatter");
 const response = require("../utils/response");
 const _ = require("lodash");
 
