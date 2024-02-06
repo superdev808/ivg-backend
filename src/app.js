@@ -10,6 +10,7 @@ const AppRoutes = require("./routes/app-routes");
 const CalculatorRoutes = require("./routes/calculator-routes");
 const WorkflowRoutes = require("./routes/workflow-routes");
 const UserRoutes = require('./routes/user-routes');
+const PublicRoutes = require('./routes/public-routes');
 
 const app = express();
 
@@ -46,6 +47,7 @@ AppRoutes.getRoutes(app, router);
 CalculatorRoutes.getRoutes(app, router);
 WorkflowRoutes.getRoutes(app, router);
 UserRoutes.getRoutes(app, router);
+PublicRoutes.getRoutes(app, router);
 
 app.use(
     "/v1/",
@@ -58,6 +60,7 @@ app.use(
 );
 
 const mongoose = require("mongoose");
+
 if (process.env.CURRENT_ENV !== "prod") {
     mongoose.set("debug", true);
     mongoose.set("debug", { color: false });
