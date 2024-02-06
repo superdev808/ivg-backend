@@ -100,7 +100,7 @@ const sendAllOnXInfoEmail = async (info) => {
             },
           ],
           Subject: `IvoryGuide: ${calculatorType} Summary`,
-          TextPart: "Please find the attached PDF file.",
+          TextPart: `Please see summary for ${calculatorType} calculator in the attached document.`,
           Attachments: [
             {
               ContentType: "application/pdf",
