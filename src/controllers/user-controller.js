@@ -193,7 +193,7 @@ exports.updateUser = async (req, res) => {
 		}
 		const { _id, firstName, lastName, email, role, verified } = req.body;
 
-		const user = await User.findOne({ id: _id, active: true });
+		const user = await User.findOne({ _id: _id, active: true });
 		if (!user) {
 			return response.notFoundError(res, 'User not found.');
 		}
@@ -246,7 +246,7 @@ exports.deactivateUser = async (req, res) => {
 		if (!req.body.id) {
 			return response.validationError(res, 'User id is required.');
 		}
-		const user = await User.findOne({ id: req.body.id, active: true });
+		const user = await User.findOne({ _id: req.body.id, active: true });
 		if (!user) {
 			return response.notFoundError(res, 'User not found.');
 		}
@@ -261,7 +261,7 @@ exports.deactivateUser = async (req, res) => {
 exports.getUserInfo = async (req, res) => {
 	try {
 		const userId = req.user.id;
-		const user = await User.findOne({ id: userId, active: true });
+		const user = await User.findOne({ _id: userId, active: true });
 		if (!user) {
 			return response.notFoundError(res, 'User not found.');
 		}
@@ -299,7 +299,7 @@ exports.updateUserInfo = async (req, res) => {
 
 		const userId = req.user.id;
 
-		const user = await User.findOne({ id: userId, active: true });
+		const user = await User.findOne({ _id: userId, active: true });
 		if (!user) {
 			return response.notFoundError(res, 'User not found.');
 		}
@@ -402,7 +402,7 @@ exports.sendResetPassword = async (req, res) => {
 			userId = req.body.id;
 		}
 
-		const user = await User.findOne({ id: userId, active: true });
+		const user = await User.findOne({ _id: userId, active: true });
 		if (!user) {
 			return response.notFoundError(res, 'User not found.');
 		}
@@ -447,7 +447,7 @@ exports.uploadLogo = async (req, res) => {
 	try {
 		const userId = req.user.id;
 
-		const user = await User.findOne({ id: userId, active: true });
+		const user = await User.findOne({ _id: userId, active: true });
 		if (!user) {
 			return response.notFoundError(res, 'User not found.');
 		}
