@@ -64,7 +64,7 @@ exports.registerUser = async (req, res) => {
 		return response.validationError(res, errors);
 	}
 
-	const user = await User.findOne({ email: req.body.email });
+	const user = await User.findOne({ active: true, email: req.body.email });
 	if (user) {
 		return response.conflict(res, { message: 'Email already exists' });
 	}
@@ -106,7 +106,7 @@ exports.sendVerification = async (req, res) => {
 		if (!email) {
 			return response.validationError(res, 'Email is required.');
 		}
-		const user = await User.findOne({ email: email });
+		const user = await User.findOne({ active: true, email: email });
 		if (!user) {
 			return response.notFoundError(res, 'User not found.');
 		}
@@ -124,9 +124,9 @@ exports.loginUser = (req, res) => {
 	}
 	const email = req.body.email;
 	const password = req.body.password;
-	User.findOne({ email }).then((user) => {
+	User.findOne({ active: true, email }).then((user) => {
 		if (!user) {
-			return res.status(404).json({ message: 'Email not found' });
+			return res.status(404).json({ message: 'Credentials incorrect. Please try again.' });
 		}
 		if (!user.verified) {
 			return res.status(401).json({ message: 'Account not verified. Please check your email to verify your account.' });
@@ -158,7 +158,7 @@ exports.loginUser = (req, res) => {
 					}
 				);
 			} else {
-				return res.status(400).json({ message: 'Password incorrect' });
+				return res.status(400).json({ message: 'Credentials incorrect. Please try again.' });
 			}
 		});
 	});
@@ -193,7 +193,7 @@ exports.updateUser = async (req, res) => {
 		}
 		const { _id, firstName, lastName, email, role, verified } = req.body;
 
-		const user = await User.findById(_id);
+		const user = await User.findOne({ id: _id, active: true });
 		if (!user) {
 			return response.notFoundError(res, 'User not found.');
 		}
@@ -246,7 +246,7 @@ exports.deactivateUser = async (req, res) => {
 		if (!req.body.id) {
 			return response.validationError(res, 'User id is required.');
 		}
-		const user = await User.findById(req.body.id);
+		const user = await User.findOne({ id: req.body.id, active: true });
 		if (!user) {
 			return response.notFoundError(res, 'User not found.');
 		}
@@ -261,7 +261,7 @@ exports.deactivateUser = async (req, res) => {
 exports.getUserInfo = async (req, res) => {
 	try {
 		const userId = req.user.id;
-		const user = await User.findById(userId);
+		const user = await User.findOne({ id: userId, active: true });
 		if (!user) {
 			return response.notFoundError(res, 'User not found.');
 		}
@@ -299,7 +299,7 @@ exports.updateUserInfo = async (req, res) => {
 
 		const userId = req.user.id;
 
-		const user = await User.findById(userId);
+		const user = await User.findOne({ id: userId, active: true });
 		if (!user) {
 			return response.notFoundError(res, 'User not found.');
 		}
@@ -324,6 +324,7 @@ exports.verifyUser = async (req, res) => {
 		}
 
 		const query = {
+			active: true,
 			verificationToken: token,
 			verificationTokenExpiry: { $gt: Date.now() },
 		};
@@ -358,6 +359,7 @@ exports.validateResetToken = async (req, res) => {
 		}
 
 		const query = {
+			active: true,
 			resetPasswordToken: token,
 			resetPasswordExpiry: { $gt: Date.now() },
 		};
@@ -380,13 +382,11 @@ exports.requestPasswordReset = async (req, res) => {
 		if (!email) {
 			return response.validationError(res, 'Email is required.');
 		}
-		let user = await User.findOne({ email: email });
+		let user = await User.findOne({ active: true, email: email });
 
 		if (!user) {
 			return response.notFoundError(res, 'Email not found.');
 		}
-
-		await setupPasswordReset(user);
 		return response.success(res, 'Reset password email sent successfully.');
 	} catch (error) {
 		return response.serverError(res, error.message);
@@ -402,7 +402,7 @@ exports.sendResetPassword = async (req, res) => {
 			userId = req.body.id;
 		}
 
-		const user = await User.findById(userId);
+		const user = await User.findOne({ id: userId, active: true });
 		if (!user) {
 			return response.notFoundError(res, 'User not found.');
 		}
@@ -422,6 +422,7 @@ exports.resetPassword = async (req, res) => {
 		}
 
 		const user = await User.findOne({
+			active: true,
 			resetPasswordToken: token,
 			resetPasswordExpiry: { $gt: Date.now() },
 		});
@@ -446,7 +447,7 @@ exports.uploadLogo = async (req, res) => {
 	try {
 		const userId = req.user.id;
 
-		const user = await User.findById(userId);
+		const user = await User.findOne({ id: userId, active: true });
 		if (!user) {
 			return response.notFoundError(res, 'User not found.');
 		}
