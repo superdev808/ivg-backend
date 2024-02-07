@@ -24,7 +24,6 @@ async function setupVerification(user) {
 	const token = crypto.randomBytes(20).toString('hex');
 	user.verificationToken = token;
 	user.verificationTokenExpiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
-	console.log('user', user);
 	await user.save();
 
 	await sendVerificationEmail(user, token);
