@@ -11,9 +11,13 @@ exports.checkAccessToken = (req, res, next) => {
         }
 
         const token = beaerToken.split(' ')[1];
+
+        
         let decoded = jwt.verify(token, keys.secretOrKey);
+
         const validToken = isValidToken(decoded.exp);
         if (validToken) {
+            req.user = decoded;
             next();
         } else {
             return res.status(401).json({ status: 'Error', message: 'Server Unauthorized' });
