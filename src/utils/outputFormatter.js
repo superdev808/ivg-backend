@@ -89,7 +89,7 @@ const formatBoneReduction = (quizResponse = null) => {
   const {
     _doc: {
       "Bur Kit Name (Bone Reduction)": burKitName = "",
-      "Item Code": burKitItemNumber = "",
+      "Item Number": burKitItemNumber = "",
       "Link to Purchase": linkToBurKit = "",
       "Bur Kit (Denture Conversion) Name": surgicalBurKitName = "",
       "Bur Link to Purchase": surgicalBurKitLink = ""

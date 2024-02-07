@@ -7,6 +7,8 @@ const schema = new Schema({
   "Implant Diameter": { type: String },
   "Implant Platform": { type: String },
   "Implant Length": { type: String },
+  "Implant Form": { type: String },
+  "Mount Option": { type: String },
   "Implant Surface Treatment": { type: String },
   "Do you need to purchase an implant?": { type: String },
   "Item Name": { type: String },
