@@ -17,6 +17,7 @@ const {
 	sendVerification,
 	deactivateUser,
 	verifyToken,
+	activateUser,
 } = require('../controllers/user-controller');
 const bodyParser = require('body-parser');
 
@@ -28,6 +29,7 @@ class UserRoutes {
 		router.post('/create', checkAccessToken, registerUser);
 		router.delete('/delete/:id', checkAccessToken, deleteUser);
 		router.post('/deactivate-user', checkAccessToken, bodyParser.json(), deactivateUser);
+		router.post('/activate-user', checkAccessToken, bodyParser.json(), activateUser);
 		router.get('/users-list', checkAccessToken, getAllUsers);
 		router.get('/user-info', checkAccessToken, getUserInfo);
 		router.put('/update-user', checkAccessToken, bodyParser.json(), updateUser);

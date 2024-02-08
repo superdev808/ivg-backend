@@ -169,7 +169,7 @@ exports.getAllUsers = (req, res) => {
 		return response.serverUnauthorized(res, 'Unauthorized');
 	}
 
-	User.find({ active: true })
+	User.find()
 		.select('_id firstName lastName email role active verified')
 		.then((result) => {
 			return res.json(result);
@@ -257,7 +257,25 @@ exports.deactivateUser = async (req, res) => {
 		return response.serverError(res, error.message);
 	}
 };
-
+exports.activateUser = async (req, res) => {
+	try {
+		if (req.user.role !== 'Admin') {
+			return response.serverUnauthorized(res, 'Unauthorized');
+		}
+		if (!req.body.id) {
+			return response.validationError(res, 'User id is required.');
+		}
+		const user = await User.findOne({ _id: req.body.id });
+		if (!user) {
+			return response.notFoundError(res, 'User not found.');
+		}
+		user.active = true;
+		await user.save();
+		return response.success(res, { message: 'User activated successfully.' });
+	} catch (error) {
+		return response.serverError(res, error.message);
+	}
+};
 exports.getUserInfo = async (req, res) => {
 	try {
 		const userId = req.user.id;
