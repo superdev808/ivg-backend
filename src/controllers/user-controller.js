@@ -517,8 +517,8 @@ exports.saveResult = async (req, res) => {
     }
 
     if (user.savedResults) {
-      const { questionsAnswers } = data;
-      const existingResult = find(user.savedResults, questionsAnswers);
+      const { quiz } = data;
+      const existingResult = find(user.savedResults, quiz);
 
       if (existingResult) {
         return response.success(res, {
