@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const find = require("lodash/find");
+const mongoose = require("mongoose");
 
 const keys = require("../config/keys");
 const User = require("../models/user");
@@ -526,6 +527,7 @@ exports.saveResult = async (req, res) => {
       }
     }
 
+    data.id = new mongoose.Types.ObjectId();
     data.date = new Date();
 
     user.savedResults = user.savedResults
