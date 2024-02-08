@@ -21,8 +21,9 @@ const TemporaryCopingsMUAsModel = require("../models/temporary-copings-muas-mode
 const TiBasesDirectToImplantsModel = require("../models/ti-bases-direct-to-implant-model");
 const TiBasesMUAsModel = require("../models/ti-bases-muas-model");
 const { OUTPUT_TYPES, LABEL_MAPPINGS } = require("../utils/constant");
+const { sendAllOnXInfoEmail } = require("../utils/emailService");
 const { getQuizData, getUniqueResult, getQuizQuery, getModelByCalculatorType } = require("../utils/helper");
-const { formatDrillkitAndSequence, formatBoneReduction, formatMasterImplantDriver, formatChairSidePickUp, formatImplantPurchase, formatScanbodies, formatCommonResponse } = require("../utils/outputFormatter");
+const { formatDrillkitAndSequence, formatBoneReduction, formatMasterImplantDriver, formatChairSidePickUp, formatImplantPurchase, formatCommonResponse, formatScanbodies } = require("../utils/outputFormatter");
 const response = require("../utils/response");
 const _ = require("lodash");
 
@@ -196,3 +197,31 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
     response.serverError(res, { message: ex.message });
   }
 };
+
+exports.sendCalculatorSummary = async (req, res) => {
+  try {
+    const { name, email, calculatorName, filename} = req.body;
+    const pdfBuffer = req.file.buffer || null;
+    if (!email || !name || !calculatorName || !filename) {
+      return response.badRequest(res, { message: "Missing required fields." });
+    }
+
+    const info = {
+      name,
+      email,
+      calculatorName,
+      pdfBuffer,
+      filename
+    }
+    const result = await sendAllOnXInfoEmail(info);
+    if (result.body.Messages[0].Status === 'success') {
+      return response.success(res, 'Email sent successfully.');
+    } else {
+      return response.serverError(res, { message: 'Failed to send email' });
+    }
+  } catch (ex) {
+    return response.serverError(res, { message: ex.message });
+  }
+}
+  
+  
