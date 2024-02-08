@@ -85,8 +85,8 @@ const sendResetPasswordEmail = async (user, token) => {
 
 const sendAllOnXInfoEmail = async (info) => {
   try {
-	const { name, email, pdfBuffer, calculatorType, filename } = info;
-	const text = `Please see summary for ${calculatorType} calculator in the attached document.`;
+	const { name, email, pdfBuffer, calculatorName, filename } = info;
+	const text = `Please see summary for ${calculatorName} calculator in the attached document.`;
 	const templatePath = path.join(__dirname, '..','templates', 'summary-email.html');
 	let htmlTemplate = await fs.readFile(templatePath, 'utf8');
 
@@ -108,8 +108,7 @@ const sendAllOnXInfoEmail = async (info) => {
               Name: name,
             },
           ],
-          Subject: `IvoryGuide: ${calculatorType} Summary`,
-          TextPart: `Please see summary for ${calculatorType} calculator in the attached document.`,
+          Subject: `IvoryGuide: ${calculatorName} Summary`,
 		  HTMLPart: htmlTemplate,
           Attachments: [
             {
