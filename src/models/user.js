@@ -84,7 +84,7 @@ const UserSchema = new Schema({
         required: false,
         default: '',
     },
-    results: {
+    savedResults: {
         type: Array,
         required: false,
         default: [],
