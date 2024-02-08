@@ -19,10 +19,6 @@ const schema = new Schema({
   "Link to Purchase": { type: String },
 });
 
-const TiBasesMUAsModel = mongoose.model(
-  "TiBasesMUA",
-  schema,
-  "TiBasesMUAs"
-);
+const TiBasesMUAsModel = mongoose.model("TiBasesMUA", schema, "TiBasesMUAs");
 
 module.exports = TiBasesMUAsModel;

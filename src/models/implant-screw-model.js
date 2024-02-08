@@ -11,7 +11,7 @@ const schema = new Schema({
   "Design": { type: String },
   "Restoration Connection Type": { type: String },
   "Restoration Type": { type: String },
-  "Anterior or Posterior": { type: String },
+  "Anterior or Posterior":{ type: String },
   "Screw Length": { type: String },
   "Screw Material": { type: String },
   "Abutment Angulation": { type: String },

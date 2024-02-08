@@ -10,7 +10,6 @@ const schema = new Schema({
   "Implant Form": { type: String },
   "Mount Option": { type: String },
   "Implant Surface Treatment": { type: String },
-  "Do you need to purchase an implant?": { type: String },
   "Item Name": { type: String },
   "Item Number": { type: String },
   "Link to Purchase": { type: String },

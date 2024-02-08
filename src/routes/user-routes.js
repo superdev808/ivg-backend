@@ -15,7 +15,8 @@ const {
 	updateUserInfo,
 	sendResetPassword,
 	userInfoAddtional,
-	uploadLogo
+	uploadLogo,
+	saveResult,
 } = require('../controllers/user-controller');
 const bodyParser = require('body-parser');
 
@@ -36,6 +37,7 @@ class UserRoutes {
 		router.get('/user-info', checkAccessToken, userInfo);
 		router.put('/update-user-info', checkAccessToken, bodyParser.json(), updateUserInfo);
 		router.post('/upload-logo', checkAccessToken, bodyParser.json(), uploadLogo);
+    router.post("/saveResult", checkAccessToken, bodyParser.json(), saveResult);
 	}
 }
 

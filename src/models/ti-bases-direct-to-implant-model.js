@@ -13,7 +13,7 @@ const schema = new Schema({
   "Abutment Type": { type: String },
   "Abutment Height": { type: String },
   "Cementable Area": { type: String },
-  Material: { type: String },
+  "Material": { type: String },
   "Collar Height": { type: String },
   "Item Name": { type: String },
   "Item Number": { type: String },
