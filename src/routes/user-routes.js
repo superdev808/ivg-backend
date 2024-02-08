@@ -5,17 +5,17 @@ const {
 	getUserInfo,
 	getAllUsers,
 	deleteUser,
-	// updateUser,
 	checkEmail,
 	verifyUser,
-    requestPasswordReset,
+	requestPasswordReset,
 	validateResetToken,
 	resetPassword,
 	userInfo,
 	updateUserInfo,
 	sendResetPassword,
-	userInfoAddtional,
-	uploadLogo
+	uploadLogo,
+	saveResult,
+	deleteSavedResult,
 } = require('../controllers/user-controller');
 const bodyParser = require('body-parser');
 
@@ -36,6 +36,8 @@ class UserRoutes {
 		router.get('/user-info', checkAccessToken, userInfo);
 		router.put('/update-user-info', checkAccessToken, bodyParser.json(), updateUserInfo);
 		router.post('/upload-logo', checkAccessToken, bodyParser.json(), uploadLogo);
+		router.post('/saveResult', checkAccessToken, bodyParser.json(), saveResult);
+		router.delete('/savedResult/:id', checkAccessToken, bodyParser.json(), deleteSavedResult);
 	}
 }
 
