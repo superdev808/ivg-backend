@@ -8,6 +8,7 @@ const schema = new Schema({
   "Implant Platform": { type: String },
   "Authentic or Generic": { type: String },
   "Digital or Lab Analog": { type: String },
+  "Abutment Height": { type: String },
   "Item Name": { type: String },
   "Item Number": { type: String },
   "Link to Purchase": { type: String },
