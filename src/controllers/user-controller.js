@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const find = require('lodash/find');
 
 const keys = require('../config/keys');
 const User = require('../models/user');
@@ -477,4 +478,39 @@ exports.uploadLogo = async (req, res) => {
 		;} catch (error) {
 		return response.serverError(res, error.message);
 	}
+};
+
+exports.saveResult = async (req, res) => {
+  const data = req.body;
+
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(token, keys.secretOrKey);
+    const userId = decoded.id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return response.notFoundError(res, "User not found.");
+    }
+
+    if (user.results) {
+      const { questionsAnswers } = data;
+      const existingResult = find(user.results, questionsAnswers);
+
+      if (existingResult) {
+        return response.success(res, {
+          message: "Saved result successfully.",
+        });
+      }
+    }
+
+    data.date = new Date();
+
+    user.results = user.results ? [...user.results, data] : [data];
+    await user.save();
+
+    return response.success(res, { message: "Saved result successfully." });
+  } catch (error) {
+    return response.badRequest(res, { message: "Failed to save result." });
+  }
 };

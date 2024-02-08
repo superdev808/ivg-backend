@@ -84,8 +84,11 @@ const UserSchema = new Schema({
         required: false,
         default: '',
     },
-
-
+    results: {
+        type: Array,
+        required: false,
+        default: [],
+    },
 });
 
 UserSchema.plugin(mongoosePagniate);
