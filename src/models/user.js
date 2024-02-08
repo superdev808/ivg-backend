@@ -82,6 +82,7 @@ const UserSchema = new Schema({
     logo: {
         type: String,
         required: false,
+        default: '',
     },
 
 
