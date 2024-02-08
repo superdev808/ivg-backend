@@ -21,16 +21,34 @@ const TemporaryCopingsMUAsModel = require("../models/temporary-copings-muas-mode
 const TiBasesDirectToImplantsModel = require("../models/ti-bases-direct-to-implant-model");
 const TiBasesMUAsModel = require("../models/ti-bases-muas-model");
 const { OUTPUT_TYPES, LABEL_MAPPINGS } = require("../utils/constant");
-const { sendAllOnXInfoEmail } = require("../utils/emailService");
-const { getQuizData, getUniqueResult, getQuizQuery, getModelByCalculatorType } = require("../utils/helper");
-const { formatDrillkitAndSequence, formatBoneReduction, formatMasterImplantDriver, formatChairSidePickUp, formatImplantPurchase, formatCommonResponse, formatScanbodies } = require("../utils/outputFormatter");
+const { sendCalculatorSummaryEmail } = require("../utils/emailService");
+const {
+  getQuizData,
+  getUniqueResult,
+  getQuizQuery,
+  getModelByCalculatorType,
+} = require("../utils/helper");
+const {
+  formatDrillkitAndSequence,
+  formatBoneReduction,
+  formatMasterImplantDriver,
+  formatChairSidePickUp,
+  formatImplantPurchase,
+  formatCommonResponse,
+  formatScanbodies,
+} = require("../utils/outputFormatter");
 const response = require("../utils/response");
 const _ = require("lodash");
 
 const fieldsToSearch = {
-    'Scanbodies': ["Implant Brand", "Implant System", "Scanbody Item Number", "Manufacturer"],
-    'Crown Materials': []
-}
+  Scanbodies: [
+    "Implant Brand",
+    "Implant System",
+    "Scanbody Item Number",
+    "Manufacturer",
+  ],
+  "Crown Materials": [],
+};
 
 const modelMap = {
   BoneReduction: BoneReductionModel,
@@ -54,70 +72,77 @@ const modelMap = {
   TemporaryCopingsDirectToImplants: TemporaryCopingsDirectToImplantsModel,
   TemporaryCopingsMUAs: TemporaryCopingsMUAsModel,
   TiBasesDirectToImplants: TiBasesDirectToImplantsModel,
-  TiBasesMUAs: TiBasesMUAsModel
+  TiBasesMUAs: TiBasesMUAsModel,
 };
 
 exports.getCalculatorOptions = async (req, res, next) => {
-    const { type, quiz, fields } = req.body;
+  const { type, quiz, fields } = req.body;
 
-    const calculatorType = decodeURIComponent(type);
+  const calculatorType = decodeURIComponent(type);
 
-    let Model = getModelByCalculatorType(modelMap, calculatorType);
+  const Model = getModelByCalculatorType(modelMap, calculatorType);
 
-    if (!Model) {
-        response.notFoundError(res, `${type} data is not existing`);
-        return;
+  if (!Model) {
+    response.notFoundError(res, `${type} data is not existing`);
+    return;
+  }
+
+  try {
+    const query = quiz;
+    const data = await Model.find(query);
+
+    let result = [];
+
+    if (fields.length > 1) {
+      result = _.uniq(
+        data.map((item) => {
+          const res = {};
+          fields.forEach((field) => {
+            res[field] = item[field];
+          });
+
+          return res;
+        })
+      ).sort();
+    } else {
+      result = _.uniq(data.map((item) => item[fields[0]])).sort();
     }
 
-    try {
-        const query = quiz;
-        const data = await Model.find(query);
-        let result = [];
-        if (fields.length > 1) {
-            result = _.uniq(data.map((item) => {
-                const res = {};
-                fields.forEach(field => {
-                    res[field] = item[field];
-                });
-
-                return res;
-            })).sort();
-        } else {
-            result = _.uniq(data.map((item) => item[fields[0]])).sort();
-        }
-
-        response.success(res, result);
-    } catch (ex) {
-        response.serverError(res, { message: ex.message });
-    }
-}
+    response.success(res, result);
+  } catch (ex) {
+    response.serverError(res, { message: ex.message });
+  }
+};
 
 exports.searchCalculator = async (req, res, next) => {
-    const { text } = req.query;
-    const modelNameMap = {'Scanbodies': ScanbodyModel, 'Crown Materials': CrownMaterialModel};
+  const { text } = req.query;
+  const modelNameMap = {
+    Scanbodies: ScanbodyModel,
+    "Crown Materials": CrownMaterialModel,
+  };
 
-    try {
-        const modelNames = [];
-        for (const modelName of Object.keys(modelNameMap)) {
-            const orFields = fieldsToSearch[modelName].map((field) => ({
-                [field]: { $regex: new RegExp(text, 'i') }
-            }));
+  try {
+    const modelNames = [];
+    for (const modelName of Object.keys(modelNameMap)) {
+      const orFields = fieldsToSearch[modelName].map((field) => ({
+        [field]: { $regex: new RegExp(text, "i") },
+      }));
 
-            if (orFields.length) {
-                const results = await modelNameMap[modelName].find({
-                    $or: orFields
-                });
+      if (orFields.length) {
+        const results = await modelNameMap[modelName].find({
+          $or: orFields,
+        });
 
-                if (results.length) {
-                    modelNames.push(modelName)
-                }
-            }
+        if (results.length) {
+          modelNames.push(modelName);
         }
-        return response.success(res, modelNames);
-    } catch (ex) {
-        response.serverError(res, { message: ex.message });
+      }
     }
-}
+    return response.success(res, modelNames);
+  } catch (ex) {
+    response.serverError(res, { message: ex.message });
+  }
+};
 
 /**
  * Controller function to get options based on a specific calculator type.
@@ -145,7 +170,9 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
     const quizQuery = getQuizQuery(quizData, quiz) || {};
     // Fetch data from the selected model based on the quiz
     const data = await Model.find(quizQuery);
+
     let quizResponse = null;
+
     if (output) {
       const OutputModel = getModelByCalculatorType(modelMap, output);
 
@@ -157,7 +184,9 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
       }
       const quizOutputData = await getQuizData(OutputModel);
       const quizOutputQuery = getQuizQuery(quizOutputData, quiz) || {};
+
       quizResponse = await getQuizData(OutputModel, quizOutputQuery, true);
+
       if (quizResponse) {
         switch (output) {
           case OUTPUT_TYPES.DRILL_KIT_AND_SEQUENCE:
@@ -179,7 +208,10 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
             quizResponse = formatScanbodies(quizResponse);
             break;
           default:
-            quizResponse = formatCommonResponse(quizResponse, LABEL_MAPPINGS[output] || output);
+            quizResponse = formatCommonResponse(
+              quizResponse,
+              LABEL_MAPPINGS[output] || output
+            );
         }
       }
     }
@@ -188,10 +220,13 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
     if (result.length === 0) {
       result.push("");
     }
+
     const resp = { result };
+
     if (quizResponse) {
       resp["quizResponse"] = quizResponse;
     }
+
     response.success(res, resp);
   } catch (ex) {
     response.serverError(res, { message: ex.message });
@@ -200,8 +235,9 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
 
 exports.sendCalculatorSummary = async (req, res) => {
   try {
-    const { name, email, calculatorName, filename} = req.body;
+    const { name, email, calculatorName, filename } = req.body;
     const pdfBuffer = req.file.buffer || null;
+
     if (!email || !name || !calculatorName || !filename) {
       return response.badRequest(res, { message: "Missing required fields." });
     }
@@ -211,17 +247,17 @@ exports.sendCalculatorSummary = async (req, res) => {
       email,
       calculatorName,
       pdfBuffer,
-      filename
+      filename,
+    };
+
+    const result = await sendCalculatorSummaryEmail(info);
+
+    if (result.body.Messages[0].Status === "success") {
+      return response.success(res, "Email sent successfully.");
     }
-    const result = await sendAllOnXInfoEmail(info);
-    if (result.body.Messages[0].Status === 'success') {
-      return response.success(res, 'Email sent successfully.');
-    } else {
-      return response.serverError(res, { message: 'Failed to send email' });
-    }
+
+    return response.serverError(res, { message: "Failed to send email" });
   } catch (ex) {
     return response.serverError(res, { message: ex.message });
   }
-}
-  
-  
+};
