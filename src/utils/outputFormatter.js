@@ -35,24 +35,27 @@ const formatDrillkitAndSequence = (quizResponse = null) => {
   
   // Initialize an array to store the converted drill information
   const convertedDrillsArray = [];
-
-  // Iterate over the drill data
-  for (let i = 1; drillsData[`Drill ${i} Name`]; i++) {
-    const nameKey = `Drill ${i}`;
-    const linkKey = `${nameKey} Link to Purchase`;
-    const itemNumberKey = `${nameKey} Item Number`;
-
-    // Extract individual drill details
-    const itemName = _.trim(drillsData[`Drill ${i} Name`]) || "";
-    const link =  _.trim(drillsData[linkKey]) || "";
-    const itemNumber = drillsData[itemNumberKey] || "";
-    const quantity = !!link && link !== "-" ? 1 : null;
-
-    // Check if the name is not null and not "No Drill Sequence" before adding to the array
-    if (itemName !== null && itemName !== "No Drill Sequence") {
-      convertedDrillsArray.push({ itemName, link, itemNumber, quantity });
+  const arr = ["(Extra Short)", "(Short)", "(Standard / Medium)", "(Long)"];
+  arr.map((value) => {
+    // Iterate over the drill data
+    for (let i = 1; drillsData[`Drill ${i} ${value} Name`]; i++) {
+      const itemKey = `Drill ${i} ${value}`;
+      const nameKey = `${itemKey} Name`;
+      const linkKey = `${itemKey} Link to Purchase`;
+      const itemNumberKey = `${itemKey} Item Number`;
+      const manfacturerKey = `${itemKey} Manufacturer Recommendations`;
+      // Extract individual drill details
+      const itemName = _.trim(drillsData[nameKey]) || "";
+      const link = _.trim(drillsData[linkKey]) || "";
+      const itemNumber = drillsData[itemNumberKey] || "";
+      const quantity = !!link && link !== "-" ? 1 : null;
+      const recommendations = _.trim(drillsData[manfacturerKey]) || "";
+      // Check if the name is not null and not "No Drill Sequence" before adding to the array
+      if (itemName !== null && itemName !== "No Drill Sequence") {
+        convertedDrillsArray.push({ itemName, link, itemNumber, quantity, recommendations });
+      }
     }
-  }
+  });
 
   // Format the final response with labeled information
   return [
