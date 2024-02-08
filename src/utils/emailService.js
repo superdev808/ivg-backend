@@ -85,7 +85,16 @@ const sendResetPasswordEmail = async (user, token) => {
 
 const sendAllOnXInfoEmail = async (info) => {
   try {
-    const { name, email, pdfBuffer, calculatorType, filename } = info;
+	const { name, email, pdfBuffer, calculatorType, filename } = info;
+	const text = `Please see summary for ${calculatorType} calculator in the attached document.`;
+	const templatePath = path.join(__dirname, '..','templates', 'summary-email.html');
+	let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+
+	// Replace the placeholders with the actual values
+	htmlTemplate = htmlTemplate.replace(/{{NAME}}/g, name);
+	htmlTemplate = htmlTemplate.replace(/{{FRONTEND_URL}}/g, process.env.FRONTEND_URL);
+	htmlTemplate = htmlTemplate.replace(/{{TEXT}}/g, text);
+    
     const emailOptions = {
       Messages: [
         {
@@ -101,6 +110,7 @@ const sendAllOnXInfoEmail = async (info) => {
           ],
           Subject: `IvoryGuide: ${calculatorType} Summary`,
           TextPart: `Please see summary for ${calculatorType} calculator in the attached document.`,
+		  HTMLPart: htmlTemplate,
           Attachments: [
             {
               ContentType: "application/pdf",
