@@ -540,3 +540,35 @@ exports.saveResult = async (req, res) => {
     return response.badRequest(res, { message: "Failed to save result." });
   }
 };
+
+exports.deleteSavedResult = async (req, res) => {
+  const { id } = req.params;
+
+  const successMessage = { message: "Deleted saved result successfully." };
+
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(token, keys.secretOrKey);
+    const userId = decoded.id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return response.notFoundError(res, "User not found.");
+    }
+
+    if (!user.savedResults) {
+      return response.success(res, successMessage);
+    }
+
+    user.savedResults = user.savedResults.filter(
+      (result) => String(result.id) !== id
+    );
+    await user.save();
+
+    return response.success(res, successMessage);
+  } catch {
+    return response.badRequest(res, {
+      message: "Failed to delete saved result.",
+    });
+  }
+};
