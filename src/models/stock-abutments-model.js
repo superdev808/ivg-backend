@@ -14,6 +14,7 @@ const schema = new Schema({
   Angulation: { type: String },
   "Abutment Diameter": { type: String },
   "Collar Height": { type: String },
+  "Abutment Height": { type: String },
   "Emergence Profile": { type: String },
   "Item Name": { type: String },
   "Item Number": { type: String },

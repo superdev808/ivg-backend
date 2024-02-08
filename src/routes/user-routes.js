@@ -18,6 +18,8 @@ const {
 	deactivateUser,
 	verifyToken,
 	activateUser,
+	saveResult,
+	deleteSavedResult,
 } = require('../controllers/user-controller');
 const bodyParser = require('body-parser');
 
@@ -25,7 +27,6 @@ class UserRoutes {
 	static getRoutes(app, router) {
 		router.post('/register', bodyParser.json(), registerUser);
 		router.post('/login', bodyParser.json(), loginUser);
-
 		router.post('/create', checkAccessToken, registerUser);
 		router.delete('/delete/:id', checkAccessToken, deleteUser);
 		router.post('/deactivate-user', checkAccessToken, bodyParser.json(), deactivateUser);
@@ -43,6 +44,8 @@ class UserRoutes {
 		router.post('/validate-reset-token', bodyParser.json(), validateResetToken);
 		router.post('/send-verification-email', checkAccessToken, bodyParser.json(), sendVerification);
 		router.post('/verify-token', checkAccessToken, verifyToken);
+		router.post('/saveResult', checkAccessToken, bodyParser.json(), saveResult);
+		router.delete('/savedResult/:id', checkAccessToken, bodyParser.json(), deleteSavedResult);
 	}
 }
 

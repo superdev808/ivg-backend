@@ -11,7 +11,7 @@ const OUTPUT_LABELS = {
   IMPLANT_DRILL_KIT: "Implant Drill Kit Name",
   DRILL_SEQUENCE: "Drill Sequence",
   BUR_KIT: "Bur Kit Name (Bone Reduction)",
-  SURGICAL_BUR_KIT: "Surgical Bur Kit (Denture)",
+  SURGICAL_BUR_KIT: "Bur Kit (Denture Conversion) Name",
   IMPLANT_DRIVER: "Master Implant Driver ",
   LUTING_AGENT: "Luting Agent",
   TEFLON_TAPE: "Teflon Tape",

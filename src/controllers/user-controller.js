@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const find = require('lodash/find');
+const mongoose = require('mongoose');
 
 const keys = require('../config/keys');
 const User = require('../models/user');
@@ -42,17 +44,18 @@ async function setupPasswordReset(user) {
 exports.checkEmail = async (req, res) => {
 	const data = req.body;
 	const { errors, isValid } = validateEmail(data);
+
 	if (!isValid) {
 		return response.validationError(res, errors.email);
 	}
+
 	try {
 		const user = await User.findOne({ email: data.email });
 
-		if (user) {
-			return response.conflict(res, { available: false, message: 'Email already exists' });
-		} else {
-			return response.success(res, { message: 'Email is available.', available: true });
-		}
+		return response.success(res, {
+			message: user ? 'Email already exists' : 'Email is available.',
+			available: !user,
+		});
 	} catch (error) {
 		return response.serverError(res, error.message);
 	}
@@ -64,7 +67,7 @@ exports.registerUser = async (req, res) => {
 		return response.validationError(res, errors);
 	}
 
-	const user = await User.findOne({ active: true, email: req.body.email });
+	const user = await User.findOne({ email: req.body.email });
 	if (user) {
 		return response.conflict(res, { message: 'Email already exists' });
 	}
@@ -75,7 +78,6 @@ exports.registerUser = async (req, res) => {
 		email: req.body.email,
 		phone: req.body.phone,
 		password: req.body.password,
-		active: true,
 		verified: false,
 		role: 'User',
 		organizationName: req.body.organizationName,
@@ -94,7 +96,10 @@ exports.registerUser = async (req, res) => {
 
 		await setupVerification(newUser);
 
-		return response.success(res, { message: 'User registered, please check your email to verify your account.', userId: savedUser.Id });
+		return response.success(res, {
+			message: 'User registered, please check your email to verify your account.',
+			userId: savedUser.Id,
+		});
 	} catch (err) {
 		return response.serverError(res, err.message);
 	}
@@ -213,25 +218,20 @@ exports.updateUser = async (req, res) => {
 
 exports.deleteUser = (req, res) => {
 	if (!req.params.id) {
-		console.log('400 response');
 		return res.status(400).send({
 			message: 'Invalid Request',
 		});
 	}
 
-	const { email, firstName, lastName } = req.body;
-	const userName = firstName + ' ' + lastName;
-
 	User.findByIdAndRemove(req.params.id)
-		.then(() => {
-			return res.json(req.body);
-		})
+		.then(() => res.json(req.body))
 		.catch((err) => {
 			if (err.kind === 'ObjectId') {
 				return res.status(404).send({
 					message: 'Not found with id ' + req.params.id,
 				});
 			}
+
 			return res.status(500).send({
 				message: 'Error deleting user with id ' + req.params.id,
 			});
@@ -300,6 +300,7 @@ exports.getUserInfo = async (req, res) => {
 			referralSource: user.referralSource,
 			referralSourceOther: user.referralSourceOther || '',
 			logo: user.logo ? generateSignedUrl(user.logo) : '',
+			savedResults: user.savedResults || [],
 		};
 		return response.success(res, userData);
 	} catch (error) {
@@ -361,10 +362,12 @@ exports.verifyUser = async (req, res) => {
 		return response.success(res, { message: 'Account verified successfully.' });
 	} catch (error) {
 		if (error instanceof jwt.TokenExpiredError) {
-			return response.badRequest(res, { message: 'Token has expired. Please request a new verification link.' });
-		} else {
-			return response.serverError(res, { message: error });
+			return response.badRequest(res, {
+				message: 'Token has expired. Please request a new verification link.',
+			});
 		}
+
+		return response.serverError(res, { message: error });
 	}
 };
 
@@ -384,11 +387,7 @@ exports.validateResetToken = async (req, res) => {
 
 		const user = await User.findOne(query);
 
-		if (user) {
-			return response.success(res, { valid: true });
-		} else {
-			return response.success(res, { valid: false });
-		}
+		return response.success(res, { valid: Boolean(user) });
 	} catch (error) {
 		return response.serverError(res, error.message);
 	}
@@ -436,7 +435,9 @@ exports.resetPassword = async (req, res) => {
 	try {
 		const { token, password } = req.body;
 		if (!token || !password) {
-			return response.validationError(res, { message: 'Token and password are required.' });
+			return response.validationError(res, {
+				message: 'Token and password are required.',
+			});
 		}
 
 		const user = await User.findOne({
@@ -455,7 +456,7 @@ exports.resetPassword = async (req, res) => {
 
 		await user.save();
 
-		response.success(res, { message: 'Password reset successfully.' });
+		return response.success(res, { message: 'Password reset successfully.' });
 	} catch (error) {
 		return response.serverError(res, error.message);
 	}
@@ -485,6 +486,72 @@ exports.uploadLogo = async (req, res) => {
 		});
 	} catch (error) {
 		return response.serverError(res, error.message);
+	}
+};
+
+exports.saveResult = async (req, res) => {
+	const data = req.body;
+
+	try {
+		const token = req.headers.authorization.split(' ')[1];
+		const decoded = jwt.verify(token, keys.secretOrKey);
+		const userId = decoded.id;
+		const user = await User.findById(userId);
+
+		if (!user) {
+			return response.notFoundError(res, 'User not found.');
+		}
+
+		if (user.savedResults) {
+			const { quiz } = data;
+			const existingResult = find(user.savedResults, quiz);
+
+			if (existingResult) {
+				return response.success(res, {
+					message: 'Saved result successfully.',
+				});
+			}
+		}
+
+		data.id = new mongoose.Types.ObjectId();
+		data.date = new Date();
+
+		user.savedResults = user.savedResults ? [...user.savedResults, data] : [data];
+		await user.save();
+
+		return response.success(res, { message: 'Saved result successfully.' });
+	} catch (error) {
+		return response.badRequest(res, { message: 'Failed to save result.' });
+	}
+};
+
+exports.deleteSavedResult = async (req, res) => {
+	const { id } = req.params;
+
+	const successMessage = { message: 'Deleted saved result successfully.' };
+
+	try {
+		const token = req.headers.authorization.split(' ')[1];
+		const decoded = jwt.verify(token, keys.secretOrKey);
+		const userId = decoded.id;
+		const user = await User.findById(userId);
+
+		if (!user) {
+			return response.notFoundError(res, 'User not found.');
+		}
+
+		if (!user.savedResults) {
+			return response.success(res, successMessage);
+		}
+
+		user.savedResults = user.savedResults.filter((result) => String(result.id) !== id);
+		await user.save();
+
+		return response.success(res, successMessage);
+	} catch {
+		return response.badRequest(res, {
+			message: 'Failed to delete saved result.',
+		});
 	}
 };
 
