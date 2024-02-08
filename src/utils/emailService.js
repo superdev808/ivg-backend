@@ -8,7 +8,7 @@ const mailjet = new Mailjet({
 });
 
 const sendVerificationEmail = async (user, verificationToken) => {
-	const templatePath = path.join(__dirname, '..','templates', 'verification-email.html');
+	const templatePath = path.join(__dirname, '..', 'templates', 'verification-email.html');
 	let htmlTemplate = await fs.readFile(templatePath, 'utf8');
 	htmlTemplate = htmlTemplate.replace(/{{FIRST_NAME}}/g, user.firstName);
 	htmlTemplate = htmlTemplate.replace(/{{FRONTEND_URL}}/g, process.env.FRONTEND_URL);
@@ -35,16 +35,14 @@ const sendVerificationEmail = async (user, verificationToken) => {
 	});
 
 	request
-		.then((result) => {
-			return result;
-		})
+		.then((result) => result)
 		.catch((err) => {
 			throw new Error(err.message);
 		});
 };
 
 const sendResetPasswordEmail = async (user, token) => {
-	const templatePath = path.join(__dirname, '..','templates', 'reset-password-email.html');
+	const templatePath = path.join(__dirname, '..', 'templates', 'reset-password-email.html');
 	let htmlTemplate = await fs.readFile(templatePath, 'utf8');
 
 	htmlTemplate = htmlTemplate.replace(/{{FIRST_NAME}}/g, user.firstName);
@@ -72,16 +70,14 @@ const sendResetPasswordEmail = async (user, token) => {
 	});
 
 	request
-		.then((result) => {
-			return result;
-		})
+		.then((result) => result)
 		.catch((err) => {
 			throw new Error(err.message);
 		});
 };
 
 const sendContactNotification = async (name, email, phone, zip, role, message) => {
-	const templatePath = path.join(__dirname, '..','templates', 'contact-notification.html');
+	const templatePath = path.join(__dirname, '..', 'templates', 'contact-notification.html');
 	let htmlTemplate = await fs.readFile(templatePath, 'utf8');
 
 	htmlTemplate = htmlTemplate.replace(/{{name}}/g, name);
@@ -90,7 +86,6 @@ const sendContactNotification = async (name, email, phone, zip, role, message) =
 	htmlTemplate = htmlTemplate.replace(/{{zip}}/g, zip);
 	htmlTemplate = htmlTemplate.replace(/{{role}}/g, role);
 	htmlTemplate = htmlTemplate.replace(/{{message}}/g, message);
-	
 
 	const request = mailjet.post('send', { version: 'v3.1' }).request({
 		Messages: [
@@ -127,5 +122,53 @@ const sendContactNotification = async (name, email, phone, zip, role, message) =
 		});
 };
 
-
 module.exports = { sendVerificationEmail, sendResetPasswordEmail, sendContactNotification };
+const sendCalculatorSummaryEmail = async (info) => {
+	try {
+		const { name, email, pdfBuffer, calculatorName, filename } = info;
+		const text = `Please see summary for ${calculatorName} calculator in the attached document.`;
+		const templatePath = path.join(__dirname, '..', 'templates', 'summary-email.html');
+		let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+
+		// Replace the placeholders with the actual values
+		htmlTemplate = htmlTemplate.replace(/{{NAME}}/g, name);
+		htmlTemplate = htmlTemplate.replace(/{{FRONTEND_URL}}/g, process.env.FRONTEND_URL);
+		htmlTemplate = htmlTemplate.replace(/{{TEXT}}/g, text);
+
+		const emailOptions = {
+			Messages: [
+				{
+					From: {
+						Email: process.env.EMAIL_USER || '',
+						Name: 'Ivory Guide',
+					},
+					To: [
+						{
+							Email: email,
+							Name: name,
+						},
+					],
+					Subject: `IvoryGuide: ${calculatorName} Summary`,
+					HTMLPart: htmlTemplate,
+					Attachments: [
+						{
+							ContentType: 'application/pdf',
+							Filename: filename,
+							Base64Content: pdfBuffer.toString('base64'),
+						},
+					],
+				},
+			],
+		};
+
+		return await mailjet.post('send', { version: 'v3.1' }).request({ Messages: emailOptions.Messages });
+	} catch (err) {
+		throw new Error(err.message);
+	}
+};
+
+module.exports = {
+	sendVerificationEmail,
+	sendResetPasswordEmail,
+	sendCalculatorSummaryEmail,
+};
