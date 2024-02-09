@@ -31,9 +31,7 @@ const {
 const {
   formatDrillkitAndSequence,
   formatBoneReduction,
-  formatMasterImplantDriver,
   formatChairSidePickUp,
-  formatImplantPurchase,
   formatCommonResponse,
   formatScanbodies,
 } = require("../utils/outputFormatter");
@@ -186,7 +184,6 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
       const quizOutputQuery = getQuizQuery(quizOutputData, quiz) || {};
 
       quizResponse = await getQuizData(OutputModel, quizOutputQuery, true);
-
       if (quizResponse) {
         switch (output) {
           case OUTPUT_TYPES.DRILL_KIT_AND_SEQUENCE:
@@ -195,14 +192,8 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
           case OUTPUT_TYPES.BONE_REDUCTION:
             quizResponse = formatBoneReduction(quizResponse);
             break;
-          case OUTPUT_TYPES.MASTER_IMPLANT_DRIVER:
-            quizResponse = formatMasterImplantDriver(quizResponse);
-            break;
           case OUTPUT_TYPES.CHAIR_SIDE_PICK_UP:
             quizResponse = formatChairSidePickUp(quizResponse);
-            break;
-          case OUTPUT_TYPES.IMPLANT_PURCHASE:
-            quizResponse = formatImplantPurchase(quizResponse);
             break;
           case OUTPUT_TYPES.SCANBODIES:
             quizResponse = formatScanbodies(quizResponse);
