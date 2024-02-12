@@ -1,6 +1,8 @@
 const Validator = require('validator');
 const isEmpty = require('is-empty');
 
+const isBoolean = (value) => value === true || value === false || value === 'true' || value === 'false';
+
 exports.validateEmail = (data) => {
 	data.email = !isEmpty(data.email) ? data.email : '';
 	let errors = {};
@@ -120,43 +122,91 @@ exports.isValidToken = (expiresUnixTimestamp) => {
 	return new Date(new Date()) - new Date(expiresUnixTimestamp * 1000) < 0;
 };
 
-
 exports.validateContactForm = (data) => {
 	let errors = {};
 	data.name = !isEmpty(data.name) ? data.name : '';
 	data.email = !isEmpty(data.email) ? data.email : '';
-    data.phone = !isEmpty(data.phone) ? data.phone : '';
-    data.zip = !isEmpty(data.zip) ? data.zip : '';
-    data.role = !isEmpty(data.role) ? data.role : '';
-    data.message = !isEmpty(data.message) ? data.message : '';
-    data.token = !isEmpty( data.token) ?  data.token : '';
+	data.phone = !isEmpty(data.phone) ? data.phone : '';
+	data.zip = !isEmpty(data.zip) ? data.zip : '';
+	data.role = !isEmpty(data.role) ? data.role : '';
+	data.message = !isEmpty(data.message) ? data.message : '';
+	data.token = !isEmpty(data.token) ? data.token : '';
 
-    if (Validator.isEmpty(data.name)) {
-        errors.name = 'Name field is required';
-    }
-    if (Validator.isEmpty(data.email)) {
-        errors.email = 'Email field is requied';
-    } else if (!Validator.isEmail(data.email)) {
-        errors.email = 'Email is invalid';
-    }
-    if (Validator.isEmpty(data.phone)) {
-        errors.phone = 'Phone field is required';
-    }
-    if (Validator.isEmpty(data.zip)) {
-        errors.zip = 'Zip field is required';
-    }
-    if (Validator.isEmpty(data.role)) {
-        errors.role = 'Role field is required';
-    }
-    if (Validator.isEmpty(data.message)) {
-        errors.message = 'Message field is required';
-    }
-    if (Validator.isEmpty( data.token)) {
-        errors.token = 'Invalid captcha';
-    }
+	if (Validator.isEmpty(data.name)) {
+		errors.name = 'Name field is required';
+	}
+	if (Validator.isEmpty(data.email)) {
+		errors.email = 'Email field is requied';
+	} else if (!Validator.isEmail(data.email)) {
+		errors.email = 'Email is invalid';
+	}
+	if (Validator.isEmpty(data.phone)) {
+		errors.phone = 'Phone field is required';
+	}
+	if (Validator.isEmpty(data.zip)) {
+		errors.zip = 'Zip field is required';
+	}
+	if (Validator.isEmpty(data.role)) {
+		errors.role = 'Role field is required';
+	}
+	if (Validator.isEmpty(data.message)) {
+		errors.message = 'Message field is required';
+	}
+	if (Validator.isEmpty(data.token)) {
+		errors.token = 'Invalid captcha';
+	}
+	return {
+		errors,
+		isValid: isEmpty(errors),
+	};
+};
+
+exports.validateUserInfoUpdate = (data) => {
+	let errors = {};
+	data.firstName = !isEmpty(data.firstName) ? data.firstName : '';
+	data.lastName = !isEmpty(data.lastName) ? data.lastName : '';
+	data.phone = !isEmpty(data.phone) ? data.phone : '';
+
+	if (Validator.isEmpty(data.firstName) || Validator.isEmpty(data.lastName)) {
+		errors.name = 'Name field is required';
+	}
+
+	if (Validator.isEmpty(data.phone)) {
+		errors.phone = 'Phone field is required';
+	}
 
 	return {
 		errors,
 		isValid: isEmpty(errors),
 	};
+};
+
+exports.validateUserUpdate = (data) => {
+	let errors = {};
+	data.firstName = !isEmpty(data.firstName) ? data.firstName : '';
+	data.lastName = !isEmpty(data.lastName) ? data.lastName : '';
+	data.email = !isEmpty(data.email) ? data.email : '';
+	data.role = !isEmpty(data.role) ? data.role : '';
+
+	if (Validator.isEmpty(data.firstName) || Validator.isEmpty(data.lastName)) {
+		errors.name = 'Name field is required';
+	}
+	if (Validator.isEmpty(data.email)) {
+		errors.email = 'Email field is requied';
+	}
+	if (Validator.isEmpty(data.role)) {
+		errors.role = 'Role field is required';
+	}
+	if (!isBoolean(data.verified)) {
+		errors.verified = 'Verified field is required';
+	}
+
+	return {
+		errors,
+		isValid: isEmpty(errors),
+	};
+};
+
+exports.isValidToken = (expiresUnixTimestamp) => {
+	return new Date(new Date()) - new Date(expiresUnixTimestamp * 1000) < 0;
 };

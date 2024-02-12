@@ -153,7 +153,7 @@ const sendCalculatorSummaryEmail = async (info) => {
 					Attachments: [
 						{
 							ContentType: 'application/pdf',
-							Filename: filename,
+							Filename: `${filename}.pdf`,
 							Base64Content: pdfBuffer.toString('base64'),
 						},
 					],
