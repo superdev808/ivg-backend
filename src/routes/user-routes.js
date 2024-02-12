@@ -10,10 +10,15 @@ const {
 	requestPasswordReset,
 	validateResetToken,
 	resetPassword,
-	userInfo,
+	getUserInfo,
 	updateUserInfo,
+	updateUser,
 	sendResetPassword,
 	uploadLogo,
+	sendVerification,
+	deactivateUser,
+	verifyToken,
+	activateUser,
 	saveResult,
 	deleteSavedResult,
 } = require('../controllers/user-controller');
@@ -27,15 +32,21 @@ class UserRoutes {
 		router.get('/allUsers/:role', getAllUsers);
 		router.post('/create', checkAccessToken, registerUser);
 		router.delete('/delete/:id', checkAccessToken, deleteUser);
+		router.post('/deactivate-user', checkAccessToken, bodyParser.json(), deactivateUser);
+		router.post('/activate-user', checkAccessToken, bodyParser.json(), activateUser);
+		router.get('/users-list', checkAccessToken, getAllUsers);
+		router.get('/user-info', checkAccessToken, getUserInfo);
+		router.put('/update-user', checkAccessToken, bodyParser.json(), updateUser);
+		router.put('/update-user-info', checkAccessToken, bodyParser.json(), updateUserInfo);
+		router.post('/upload-logo', checkAccessToken, bodyParser.json(), uploadLogo);
 		router.post('/check-email', bodyParser.json(), checkEmail);
 		router.get('/verify-user', verifyUser);
 		router.post('/request-password-reset', bodyParser.json(), requestPasswordReset);
 		router.post('/reset-password', bodyParser.json(), resetPassword);
-		router.post('/send-reset-password', bodyParser.json(), sendResetPassword);
+		router.post('/send-reset-password', checkAccessToken, bodyParser.json(), sendResetPassword);
 		router.post('/validate-reset-token', bodyParser.json(), validateResetToken);
-		router.get('/user-info', checkAccessToken, userInfo);
-		router.put('/update-user-info', checkAccessToken, bodyParser.json(), updateUserInfo);
-		router.post('/upload-logo', checkAccessToken, bodyParser.json(), uploadLogo);
+		router.post('/send-verification-email', checkAccessToken, bodyParser.json(), sendVerification);
+		router.post('/verify-token', checkAccessToken, verifyToken);
 		router.post('/saveResult', checkAccessToken, bodyParser.json(), saveResult);
 		router.delete('/savedResult/:id', checkAccessToken, bodyParser.json(), deleteSavedResult);
 	}

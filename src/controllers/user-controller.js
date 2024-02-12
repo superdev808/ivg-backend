@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 
 const keys = require('../config/keys');
 const User = require('../models/user');
-const { validateRegisterInput, validateLoginInput, validateEmail, validateUserInfoUpdate } = require('../utils/validation');
+const { validateRegisterInput, validateLoginInput, validateEmail, validateUserInfoUpdate, validateUserUpdate } = require('../utils/validation');
 const response = require('../utils/response');
 
 const { sendVerificationEmail, sendResetPasswordEmail } = require('../utils/emailService');
@@ -26,7 +26,6 @@ async function setupVerification(user) {
 	const token = crypto.randomBytes(20).toString('hex');
 	user.verificationToken = token;
 	user.verificationTokenExpiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
-
 	await user.save();
 
 	await sendVerificationEmail(user, token);
@@ -112,17 +111,12 @@ exports.sendVerification = async (req, res) => {
 		if (!email) {
 			return response.validationError(res, 'Email is required.');
 		}
-
-		const user = User.findOne({ email: email });
+		const user = await User.findOne({ active: true, email: email });
 		if (!user) {
 			return response.notFoundError(res, 'User not found.');
 		}
-
-		await setupVerification(newUser);
-
-		return response.success(res, {
-			message: 'Verification email sent successfully.',
-		});
+		await setupVerification(user);
+		return response.success(res, { message: 'Verification email sent successfully.' });
 	} catch (error) {
 		return response.serverError(res, error.message);
 	}
@@ -133,26 +127,22 @@ exports.loginUser = (req, res) => {
 	if (!isValid) {
 		return res.status(400).json(errors);
 	}
-
 	const email = req.body.email;
 	const password = req.body.password;
-
-	User.findOne({ email }).then((user) => {
+	User.findOne({ active: true, email }).then((user) => {
 		if (!user) {
-			return res.status(404).json({ message: 'Email not found' });
+			return res.status(404).json({ message: 'Credentials incorrect. Please try again.' });
 		}
-
 		if (!user.verified) {
-			return res.status(401).json({
-				message: 'Account not verified. Please check your email to verify your account.',
-			});
+			return res.status(401).json({ message: 'Account not verified. Please check your email to verify your account.' });
 		}
-
 		bcrypt.compare(password, user.password).then((isMatch) => {
 			if (isMatch) {
 				const payload = {
 					id: user.id,
 					name: user.name,
+					email: user.email,
+					role: user.role,
 				};
 				jwt.sign(
 					payload,
@@ -174,54 +164,57 @@ exports.loginUser = (req, res) => {
 					}
 				);
 			} else {
-				return res.status(400).json({ message: 'Password incorrect' });
+				return res.status(400).json({ message: 'Credentials incorrect. Please try again.' });
 			}
 		});
 	});
 };
 
-exports.getUserInfo = (req, res) => {
-	const email = req.body.email;
-
-	User.findOne({ email }).then((user) => {
-		if (!user) {
-			return res.status(404).json({ message: 'No user found' });
-		}
-
-		return res.json({
-			success: true,
-			user: {
-				email: user.email,
-				firstName: user.firstName,
-				lastName: user.lastName,
-				role: user.role,
-				phone: user.phone,
-				organizationName: user.organizationName,
-				organizationRole: user.organizationRole,
-				organizationRoleOther: user.organizationRoleOther || '',
-				dentalPracticeRole: user.dentalPracticeRole || '',
-				organizationState: user.organizationState,
-				organizationNumber: user.organizationNumber,
-				referralSource: user.referralSource,
-				referralSourceOther: user.referralSourceOther || '',
-				savedResults: user.savedResults || [],
-			},
-		});
-	});
-};
-
 exports.getAllUsers = (req, res) => {
-	if (req.params.role === 'Client') {
-		return res.status(500).send({ message: "Client can't access to the user list" });
+	if (req.user.role !== 'Admin') {
+		return response.serverUnauthorized(res, 'Unauthorized');
 	}
 
-	User.find({})
-		.then((result) => res.json(result))
-		.catch((err) =>
-			res.status(500).send({
-				message: err.message || 'Error occurred while reading the users.',
-			})
-		);
+	User.find()
+		.select('_id firstName lastName email role active verified')
+		.then((result) => {
+			return res.json(result);
+		})
+		.catch((err) => {
+			console.log(err);
+			return res.status(500).send({ message: err.message || 'Error occurred while reading the users.' });
+		});
+};
+
+exports.updateUser = async (req, res) => {
+	try {
+		if (req.user.role !== 'Admin') {
+			return response.serverUnauthorized(res, 'Unauthorized');
+		}
+
+		const { errors, isValid } = validateUserUpdate(req.body);
+
+		if (!isValid) {
+			return response.validationError(res, errors);
+		}
+		const { _id, firstName, lastName, email, role, verified } = req.body;
+
+		const user = await User.findOne({ _id: _id, active: true });
+		if (!user) {
+			return response.notFoundError(res, 'User not found.');
+		}
+
+		user.firstName = firstName;
+		user.lastName = lastName;
+		user.email = email;
+		user.role = role;
+		user.verified = verified;
+		await user.save();
+
+		return response.success(res, { message: 'User updated successfully.' });
+	} catch (error) {
+		return response.serverError(res, error.message);
+	}
 };
 
 exports.deleteUser = (req, res) => {
@@ -246,6 +239,102 @@ exports.deleteUser = (req, res) => {
 		});
 };
 
+exports.deactivateUser = async (req, res) => {
+	try {
+		if (req.user.role !== 'Admin') {
+			return response.serverUnauthorized(res, 'Unauthorized');
+		}
+		if (!req.body.id) {
+			return response.validationError(res, 'User id is required.');
+		}
+		const user = await User.findOne({ _id: req.body.id, active: true });
+		if (!user) {
+			return response.notFoundError(res, 'User not found.');
+		}
+		user.active = false;
+		await user.save();
+		return response.success(res, { message: 'User deactivated successfully.' });
+	} catch (error) {
+		return response.serverError(res, error.message);
+	}
+};
+exports.activateUser = async (req, res) => {
+	try {
+		if (req.user.role !== 'Admin') {
+			return response.serverUnauthorized(res, 'Unauthorized');
+		}
+		if (!req.body.id) {
+			return response.validationError(res, 'User id is required.');
+		}
+		const user = await User.findOne({ _id: req.body.id });
+		if (!user) {
+			return response.notFoundError(res, 'User not found.');
+		}
+		user.active = true;
+		await user.save();
+		return response.success(res, { message: 'User activated successfully.' });
+	} catch (error) {
+		return response.serverError(res, error.message);
+	}
+};
+exports.getUserInfo = async (req, res) => {
+	try {
+		const userId = req.user.id;
+		const user = await User.findOne({ _id: userId, active: true });
+		if (!user) {
+			return response.notFoundError(res, 'User not found.');
+		}
+
+		const userData = {
+			id: user.id,
+			email: user.email,
+			firstName: user.firstName,
+			lastName: user.lastName,
+			role: user.role,
+			phone: user.phone,
+			organizationName: user.organizationName,
+			organizationRole: user.organizationRole,
+			organizationRoleOther: user.organizationRoleOther || '',
+			dentalPracticeRole: user.dentalPracticeRole || '',
+			organizationState: user.organizationState,
+			organizationNumber: user.organizationNumber,
+			referralSource: user.referralSource,
+			referralSourceOther: user.referralSourceOther || '',
+			logo: user.logo ? generateSignedUrl(user.logo) : '',
+			savedResults: user.savedResults || [],
+		};
+		return response.success(res, userData);
+	} catch (error) {
+		return response.serverError(res, error.message);
+	}
+};
+
+exports.updateUserInfo = async (req, res) => {
+	try {
+		const { errors, isValid } = validateUserInfoUpdate(req.body);
+		if (!isValid) {
+			return response.validationError(res, errors);
+		}
+		const { firstName, lastName, phone } = req.body;
+
+		const userId = req.user.id;
+
+		const user = await User.findOne({ _id: userId, active: true });
+		if (!user) {
+			return response.notFoundError(res, 'User not found.');
+		}
+
+		user.firstName = firstName;
+		user.lastName = lastName;
+		user.phone = phone;
+		await user.save();
+
+		return response.success(res, { message: 'User updated successfully.' });
+	} catch (error) {
+		return response.serverError(res, error.message);
+	}
+};
+
 exports.verifyUser = async (req, res) => {
 	try {
 		const { token } = req.query;
@@ -255,6 +344,7 @@ exports.verifyUser = async (req, res) => {
 		}
 
 		const query = {
+			active: true,
 			verificationToken: token,
 			verificationTokenExpiry: { $gt: Date.now() },
 		};
@@ -291,6 +381,7 @@ exports.validateResetToken = async (req, res) => {
 		}
 
 		const query = {
+			active: true,
 			resetPasswordToken: token,
 			resetPasswordExpiry: { $gt: Date.now() },
 		};
@@ -309,11 +400,11 @@ exports.requestPasswordReset = async (req, res) => {
 		if (!email) {
 			return response.validationError(res, 'Email is required.');
 		}
-		const user = await User.findOne({ email: email });
-		if (user) {
-			await setupPasswordReset(user);
-		}
+		let user = await User.findOne({ active: true, email: email });
 
+		if (!user) {
+			return response.notFoundError(res, 'Email not found.');
+		}
 		return response.success(res, 'Reset password email sent successfully.');
 	} catch (error) {
 		return response.serverError(res, error.message);
@@ -322,25 +413,20 @@ exports.requestPasswordReset = async (req, res) => {
 
 exports.sendResetPassword = async (req, res) => {
 	try {
-		const token = req.headers.authorization.split(' ')[1];
-		if (!token) {
-			return response.validationError(res, 'Token is required.');
+		let userId = req.user.id;
+		if (req.user.role !== 'Admin' && req.body.id) {
+			return response.serverUnauthorized(res, 'Unauthorized');
+		} else if (req.user.role === 'Admin' && req.body.id) {
+			userId = req.body.id;
 		}
 
-		const decoded = jwt.verify(token, keys.secretOrKey);
-
-		const userId = decoded.id;
-
-		const user = await User.findById(userId);
+		const user = await User.findOne({ _id: userId, active: true });
 		if (!user) {
 			return response.notFoundError(res, 'User not found.');
 		}
 
 		await setupPasswordReset(user);
-
-		return response.success(res, {
-			message: 'Reset password email sent successfully.',
-		});
+		return response.success(res, { message: 'Reset password email sent successfully.' });
 	} catch (error) {
 		return response.serverError(res, error.message);
 	}
@@ -356,6 +442,7 @@ exports.resetPassword = async (req, res) => {
 		}
 
 		const user = await User.findOne({
+			active: true,
 			resetPasswordToken: token,
 			resetPasswordExpiry: { $gt: Date.now() },
 		});
@@ -376,92 +463,11 @@ exports.resetPassword = async (req, res) => {
 	}
 };
 
-exports.userInfo = async (req, res) => {
-	try {
-		const token = req.headers.authorization.split(' ')[1];
-		if (!token) {
-			return response.validationError(res, 'Token is required.');
-		}
-
-		const decoded = jwt.verify(token, keys.secretOrKey);
-
-		const userId = decoded.id;
-
-		const user = await User.findById(userId);
-		if (!user) {
-			return response.notFoundError(res, 'User not found.');
-		}
-
-		const userData = {
-			id: user.id,
-			email: user.email,
-			firstName: user.firstName,
-			lastName: user.lastName,
-			role: user.role,
-			phone: user.phone,
-			organizationName: user.organizationName,
-			organizationRole: user.organizationRole,
-			organizationRoleOther: user.organizationRoleOther || '',
-			dentalPracticeRole: user.dentalPracticeRole || '',
-			organizationState: user.organizationState,
-			organizationNumber: user.organizationNumber,
-			referralSource: user.referralSource,
-			referralSourceOther: user.referralSourceOther || '',
-			logo: user.logo ? generateSignedUrl(user.logo) : '',
-			savedResults: user.savedResults || [],
-		};
-		return response.success(res, userData);
-	} catch (error) {
-		return response.serverError(res, error.message);
-	}
-};
-
-exports.updateUserInfo = async (req, res) => {
-	try {
-		const { errors, isValid } = validateUserInfoUpdate(req.body);
-		if (!isValid) {
-			return response.validationError(res, errors);
-		}
-
-		const { firstName, lastName, phone } = req.body;
-
-		const token = req.headers.authorization.split(' ')[1];
-		if (!token) {
-			return response.validationError(res, 'Token is required.');
-		}
-
-		const decoded = jwt.verify(token, keys.secretOrKey);
-
-		const userId = decoded.id;
-
-		const user = await User.findById(userId);
-		if (!user) {
-			return response.notFoundError(res, 'User not found.');
-		}
-
-		user.firstName = firstName;
-		user.lastName = lastName;
-		user.phone = phone;
-		await user.save();
-
-		return response.success(res, { message: 'User updated successfully.' });
-	} catch (error) {
-		return response.serverError(res, error.message);
-	}
-};
-
 exports.uploadLogo = async (req, res) => {
 	try {
-		const token = req.headers.authorization.split(' ')[1];
-		if (!token) {
-			return response.validationError(res, 'Token is required.');
-		}
+		const userId = req.user.id;
 
-		const decoded = jwt.verify(token, keys.secretOrKey);
-
-		const userId = decoded.id;
-
-		const user = await User.findById(userId);
+		const user = await User.findOne({ _id: userId, active: true });
 		if (!user) {
 			return response.notFoundError(res, 'User not found.');
 		}
@@ -547,5 +553,13 @@ exports.deleteSavedResult = async (req, res) => {
 		return response.badRequest(res, {
 			message: 'Failed to delete saved result.',
 		});
+	}
+};
+
+exports.verifyToken = async (req, res) => {
+	try {
+		return response.success(res, { valid: true });
+	} catch (error) {
+		return response.badRequest(res, { valid: false });
 	}
 };

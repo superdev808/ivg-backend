@@ -64,7 +64,7 @@ const sendResetPasswordEmail = async (user, token) => {
 						Name: `${user.firstName} ${user.lastName}`,
 					},
 				],
-				Subject: 'Verify Your Email',
+				Subject: 'Reset your password',
 				TextPart: `Reset your Ivory Guide account password by clicking this line: ${process.env.FRONTEND_URL}/reset-password?token=${token}`,
 				HTMLPart: htmlTemplate,
 			},
@@ -108,7 +108,7 @@ const sendCalculatorSummaryEmail = async (info) => {
 					Attachments: [
 						{
 							ContentType: 'application/pdf',
-							Filename: filename,
+							Filename: `${filename}.pdf`,
 							Base64Content: pdfBuffer.toString('base64'),
 						},
 					],
