@@ -21,17 +21,28 @@ const OUTPUT_LABELS = {
 };
 
 const LABEL_MAPPINGS = {
-  ScanbodyDriversDirectToImplants: "Scanbody Driver",
-  ImpressingCopingsDirectToImplants: "Impression Copings",
-  TemporaryCopingsDirectToImplants: "Temporary Copings",
-  TiBasesDirectToImplants: "Ti Base",
-  ScanbodyMUAs: "Master MUA Scanbody",
-  ScanbodyDriversMUAs: "MUA Scanbody Driver",
-  ImpressingCopingsMUAs: "MUA Impression Copings",
-  TemporaryCopingsMUAs: "MUA Temporary Copings",
-  TiBasesMUAs: "Ti Base (MUA)",
-  MUAs: "MUA",
-  RestorativeMultiUnitAbutments: "MUA Driver",
+  DrillKitAndSequence: "Drill Kits and Drill Sequences",
+  BoneReduction: "Bone Reduction Instruments",
+  RestroativeDirectToImplant: "Drivers (Restorative, Direct to Implant)",
+  ChairSidePickUp: "Chairside Pick-Up Materials",
+  Implants: "Implants",
+  Scanbodies: "Scanbodies (Single Unit)",
+  ScanbodyDriversDirectToImplants: "Scanbody Drivers (Direct to Implant)",
+  ImpressingCopingsDirectToImplants: "Impression Copings (Direct to Implant)",
+  TemporaryCopingsDirectToImplants: "Temporary Copings (Direct to Implant)",
+  TiBasesDirectToImplants: "Ti Bases (Direct to Implant)",
+  ScanbodyMUAs: "Scanbodies (Mult-Unit Abutments)",
+  ScanbodyDriversMUAs: "Scanbody Drivers (MUAs)",
+  ImpressingCopingsMUAs: "Impression Copings (Multi-Unit Abutments)",
+  TemporaryCopingsMUAs: "Temporary Copings (Multi-Unit Abutments)",
+  TiBasesMUAs: "Ti Bases (Multi-Unit Abutments)",
+  MUAs: "Multi-Unit Abutments",
+  RestorativeMultiUnitAbutments:
+    "Drivers (Restorative, on Multi-Unit Abutments)",
+  ImplantAnalogs: "Implant Analogs",
+  ImplantScrews: "Implant Screws",
+  HealingAbutments: "Healing Abutments",
+  StockAbutments: "Stock Abutments",
 };
 
 module.exports = {

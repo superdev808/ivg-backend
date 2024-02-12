@@ -93,19 +93,15 @@ const formatBoneReduction = (quizResponse = null) => {
     _doc: {
       "Bur Kit Name (Bone Reduction)": burKitName = "",
       "Item Number": burKitItemNumber = "",
-      "Link to Purchase": linkToBurKit = "",
+      "Bur Kit (Bone Reduction) Link to Purchase": linkToBurKit = "",
       "Bur Kit (Denture Conversion) Name": surgicalBurKitName = "",
-      "Bur Link to Purchase": surgicalBurKitLink = ""
+      "Bur Kit (Denture Conversion) Link to Purchase": surgicalBurKitLink = ""
     },
   } = quizResponse;
-
-  if (!(burKitName && surgicalBurKitName)) {
-    return [];
-  }
-
-  // Format and return the bone reduction information
-  return [
-    {
+  const result = [];
+ 
+  if(!!burKitName) {
+    result.push({
       label: OUTPUT_LABELS.BUR_KIT,
       info: [
         {
@@ -115,8 +111,11 @@ const formatBoneReduction = (quizResponse = null) => {
           quantity: !!linkToBurKit ? 1 : null,
         },
       ],
-    },
-    {
+    });
+  }
+
+  if (!!surgicalBurKitName){ 
+    result.push({
       label: OUTPUT_LABELS.SURGICAL_BUR_KIT,
       info: [
         {
@@ -126,43 +125,9 @@ const formatBoneReduction = (quizResponse = null) => {
           quantity: !!surgicalBurKitLink ? 1 : null,
         },
       ],
-    },
-  ];
-};
-
-/**
- * Formats the quiz response containing information about the master implant driver.
- * @param {Object} quizResponse - The quiz response object.
- * @returns {Array} - Formatted quiz response with labeled information or [] if the input is invalid.
- */
-const formatMasterImplantDriver = (quizResponse = null) => {
-  // Check if the quizResponse is valid
-  if (!validateQuizResponse(quizResponse)) {
-    return [];
+    })
   }
-
-  const {
-    _doc: {
-      "Item Name": itemName = "",
-      "Item Number": itemNumber = "",
-      "Link to Purchase": link = "",
-    },
-  } = quizResponse;
-
-  // Format the final response with labeled information
-  return [
-    {
-      label: OUTPUT_LABELS.IMPLANT_DRIVER,
-      info: [
-        {
-          itemName,
-          itemNumber,
-          link,
-          quantity: !!link ? 1 : null,
-        },
-      ],
-    },
-  ];
+  return result;
 };
 
 /**
@@ -182,8 +147,8 @@ const formatChairSidePickUp = (quizResponse = null) => {
       "Luting Agent Link to Purchase": lutingAgentLink = "",
       "Teflon Tape": teflonTape = "",
       "Teflon Tape Link to Purchase": teflonTapeLink = "",
-      "Material to close screw access hole Name": materialName = "",
-      "Material to close screw access hole link to purchase":
+      "Material to Close Screw Access Hole Name": materialName = "",
+      "Material to Close Screw Access Hole Link to Purchase":
         materialLink = "",
     },
   } = quizResponse;
@@ -230,44 +195,6 @@ const formatChairSidePickUp = (quizResponse = null) => {
   return result;
 };
 
-/**
- * Formats the quiz response containing information about implant purchase.
- * @param {Object} quizResponse - The quiz response object.
- * @returns {Array} - Formatted quiz response with labeled information or [] if the input is invalid.
- */
-const formatImplantPurchase = (quizResponse = null) => {
-  // Check if the quizResponse is valid
-  if (!validateQuizResponse(quizResponse)) {
-    return [];
-  }
-
-  const {
-    _doc: {
-      "Item Name": implantName = "",
-      "Link to Purchase": link = "",
-      "Item Number": itemNumber = "",
-    },
-  } = quizResponse;
-
-  if (!(implantName && link && itemNumber)) {
-    return [];
-  }
-
-  // Format the final response with labeled information
-  return [
-    {
-      label: OUTPUT_LABELS.IMPLANT,
-      info: [
-        {
-          itemName: _.trim(implantName),
-          itemNumber,
-          link,
-          quantity: !!link ? 1 : null,
-        },
-      ],
-    },
-  ];
-};
 
 /**
  * Formats the quiz response containing information about implant purchase.
@@ -285,12 +212,7 @@ const formatScanbodies = (quizResponse = null) => {
       Manufacturer= "",
       "Link to Purchase": link = "",
       "Item Name": itemName = "",
-      "Scanbody Item Number": itemNumber = "",
-      "Notes": notes = "",
-      "Interface/ Cross-Compatibility": interface = "",
-      Rx = "" ,
-      Driver = "",
-      Screw = ""
+      "Scanbody Item Number": itemNumber = "",    
     },
   } = quizResponse;
 
@@ -304,12 +226,7 @@ const formatScanbodies = (quizResponse = null) => {
           itemNumber,
           link,
           quantity: !!link ? 1 : null,
-          Manufacturer,
-          "Notes": notes,
-          "Interface/ Cross-Compatibility": interface,
-          "RX" : Rx,
-          Driver,
-          Screw
+          Manufacturer
         },
       ],
     },
@@ -330,7 +247,7 @@ const formatCommonResponse = (quizResponse = null, labelName = "") => {
     },
   } = quizResponse;
 
-  if (!(itemName && link && itemNumber)) {
+  if (!(itemName)) {
     return [];
   }
 
@@ -354,9 +271,7 @@ module.exports = {
   validateQuizResponse,
   formatDrillkitAndSequence,
   formatBoneReduction,
-  formatMasterImplantDriver,
   formatChairSidePickUp,
-  formatImplantPurchase,
   formatScanbodies,
   formatCommonResponse
 };
