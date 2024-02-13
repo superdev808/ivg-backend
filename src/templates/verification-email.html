@@ -87,7 +87,6 @@
 			a {
 				color: #023932;
                 font-weight: bold;
-                text-decoration: ;
 			}
 			img {
 				height: auto;
@@ -178,7 +177,9 @@
 								align="left"
 								bgcolor="#ffffff"
 								style="padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; border-top: 3px solid #83b899">
-								<h1 style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -1px; line-height: 48px">Hi {{FIRST_NAME}},</h1>
+								<h1 style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -1px; line-height: 48px">
+									Thanks for registering with Ivory Guide!
+								</h1>
 							</td>
 						</tr>
 					</table>
@@ -214,7 +215,8 @@
 								bgcolor="#ffffff"
 								style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px">
 								<p style="margin: 0">
-									Thank you for signing up with <a href="{{FRONTEND_URL}}">Ivory Guide</a>. Click the button below to verify your account.
+									We’re excited to start improving your dental experience! Now, let’s complete the final step of registration by clicking the link
+									below to confirm your email and set your password. You will then have full access to our platform.
 								</p>
 							</td>
 						</tr>
@@ -256,7 +258,7 @@
 																text-decoration: none;
 																border-radius: 25px;
 															"
-															>Verify your email</a
+															>Complete Registration</a
 														>
 													</td>
 												</tr>
@@ -269,21 +271,41 @@
 						<!-- end button -->
 
 						<!-- start copy -->
-						<tr>
-							<td
-								align="left"
-								bgcolor="#ffffff"
-								style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px">
-								<p style="margin: 0">If that doesn't work, copy and paste the following link in your browser:</p>
-								<p style="margin: 0">
-									<a
-										href="{{FRONTEND_URL}}/verify?token={{VERIFICATION_TOKEN}}"
-										target="_blank"
-										>{{FRONTEND_URL}}/verify?token={{VERIFICATION_TOKEN}}</a
-									>
-								</p>
-							</td>
-						</tr>
+			
+									<tr>
+										<td
+											align="left"
+											bgcolor="#ffffff"
+											style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px">
+											<p style="margin: 0">
+												Remember, your account is FREE. You will not be asked to provide payment or billing details. As you use the platform, if you
+												have any feedback, ideas, or suggestions to make your experience better, please send us an email at
+											
+												<a
+													href="mailto:feedback@ivoryguide.com"
+													target="_blank"
+													>feedback@ivoryguide.com</a
+												>.
+											</p>
+										</td>
+									</tr>
+									<tr>
+										<td
+											align="left"
+											bgcolor="#ffffff"
+											style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px">
+											<p style="margin: 0">
+												If you have any questions, or issues with registration, please do not reply to this email. Contact us directly at 
+								
+												<a
+													href="mailto:feedback@ivoryguide.com"
+													target="_blank"
+													>support@ivoryguide.com</a
+												>.
+											</p>
+										</td>
+									</tr>
+
 						<!-- end copy -->
 
 						<!-- start copy -->
@@ -351,8 +373,6 @@
 							</td>
 						</tr>
 						<!-- end permission -->
-
-					
 					</table>
 					<!--[if (gte mso 9)|(IE)]>
         </td>
