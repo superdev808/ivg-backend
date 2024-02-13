@@ -78,6 +78,53 @@ const sendResetPasswordEmail = async (user, token) => {
 		});
 };
 
+const sendContactNotification = async (name, email, phone, zip, role, message) => {
+	const templatePath = path.join(__dirname, '..', 'templates', 'contact-notification.html');
+	let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+
+	htmlTemplate = htmlTemplate.replace(/{{name}}/g, name);
+	htmlTemplate = htmlTemplate.replace(/{{email}}/g, email);
+	htmlTemplate = htmlTemplate.replace(/{{phone}}/g, phone);
+	htmlTemplate = htmlTemplate.replace(/{{zip}}/g, zip);
+	htmlTemplate = htmlTemplate.replace(/{{role}}/g, role);
+	htmlTemplate = htmlTemplate.replace(/{{message}}/g, message);
+
+	const request = mailjet.post('send', { version: 'v3.1' }).request({
+		Messages: [
+			{
+				From: {
+					Email: process.env.EMAIL_USER || '',
+					Name: 'Ivory Guide',
+				},
+				To: [
+					{
+						Email: 'kenethhu.dev@gmail.com' || '',
+						Name: 'Ivory Guide',
+					},
+				],
+				Subject: `[Contact Us] New Message from ${name}`,
+				TextPart: `Hello Team, We've received a new message. Here are the details of the submission for your review and action:
+				Name: {{name}} |
+				Email: {{email}} |
+				Phone: {{phone}} |
+				Zip Code: {{zip}} |
+				Role: {{role}} |
+				Message: {{message}}`,
+				HTMLPart: htmlTemplate,
+			},
+		],
+	});
+
+	request
+		.then((result) => {
+			return result;
+		})
+		.catch((err) => {
+			throw new Error(err.message);
+		});
+};
+
+module.exports = { sendVerificationEmail, sendResetPasswordEmail, sendContactNotification };
 const sendCalculatorSummaryEmail = async (info) => {
 	try {
 		const { name, email, pdfBuffer, calculatorName, filename } = info;
