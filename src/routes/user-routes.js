@@ -10,7 +10,6 @@ const {
 	requestPasswordReset,
 	validateResetToken,
 	resetPassword,
-	getUserInfo,
 	updateUserInfo,
 	updateUser,
 	sendResetPassword,
