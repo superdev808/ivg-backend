@@ -114,20 +114,16 @@ exports.getCalculatorOptions = async (req, res, next) => {
 
 exports.searchCalculator = async (req, res, next) => {
   const { text } = req.query;
-  const modelNameMap = {
-    Scanbodies: ScanbodyModel,
-    "Crown Materials": CrownMaterialModel,
-  };
 
   try {
     const modelNames = [];
-    for (const modelName of Object.keys(modelNameMap)) {
+    for (const modelName of Object.keys(modelMap)) {
       const orFields = fieldsToSearch[modelName].map((field) => ({
         [field]: { $regex: new RegExp(text, "i") },
       }));
 
       if (orFields.length) {
-        const results = await modelNameMap[modelName].find({
+        const results = await modelMap[modelName].find({
           $or: orFields,
         });
 
