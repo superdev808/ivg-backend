@@ -229,7 +229,8 @@ exports.sendCalculatorSummary = async (req, res) => {
       return response.badRequest(res, { message: "Missing required fields." });
     }
 
-    const emails = recipientsList.split("|");
+    const emails = [...new Set(recipientsList.split("|"))];
+
     const info = {
       name,
       emails,
