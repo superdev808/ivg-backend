@@ -222,16 +222,17 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
 
 exports.sendCalculatorSummary = async (req, res) => {
   try {
-    const { name, email, calculatorName, filename } = req.body;
+    const { name, recipientsList, calculatorName, filename } = req.body;
     const pdfBuffer = req.file.buffer || null;
 
-    if (!email || !name || !calculatorName || !filename) {
+    if (!recipientsList || !name || !calculatorName || !filename) {
       return response.badRequest(res, { message: "Missing required fields." });
     }
 
+    const emails = recipientsList.split("|");
     const info = {
       name,
-      email,
+      emails,
       calculatorName,
       pdfBuffer,
       filename,
