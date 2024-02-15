@@ -1,7 +1,6 @@
 const Mailjet = require("node-mailjet");
 const fs = require("fs").promises;
 const path = require("path");
-
 const mailjet = new Mailjet({
   apiKey: process.env.MJ_APIKEY_PUBLIC || "",
   apiSecret: process.env.MJ_APIKEY_PRIVATE || "",
@@ -208,9 +207,133 @@ const sendCalculatorSummaryEmail = async (info) => {
   }
 };
 
+const sendCalculatorFeedbackEmail = async (info) => {
+  try {
+    const {
+      name,
+      feedbackCategory,
+      message,
+      imageBuffer,
+      timestamp,
+	  fileName
+    } = info;
+
+    const templatePath = path.join(
+      __dirname,
+      "..",
+      "templates",
+      "feedback-email.html"
+    );
+    let htmlTemplate = await fs.readFile(templatePath, "utf8");
+
+    // Replace the placeholders with the actual values
+    htmlTemplate = htmlTemplate.replace(/{{NAME}}/g, name);
+	htmlTemplate = htmlTemplate.replace(/{{TIMESTAMP}}/g, timestamp);
+	htmlTemplate = htmlTemplate.replace(/{{FEEDBACK_CATEGORY}}/g, feedbackCategory);
+    htmlTemplate = htmlTemplate.replace(
+      /{{FRONTEND_URL}}/g,
+      process.env.FRONTEND_URL
+    );
+    htmlTemplate = htmlTemplate.replace(/{{TEXT}}/g, message);
+
+	const attachments = imageBuffer ? [
+		{
+		  ContentType: "image/*",
+		  Filename: fileName,
+		  Base64Content: imageBuffer.toString("base64"),
+		}
+	] : [];
+
+    const emailOptions = {
+      Messages: [
+        {
+          From: {
+            Email: process.env.EMAIL_USER || "",
+            Name: name,
+          },
+          To: [
+            {
+              Email: "feedback@ivoryguide.com",
+              Name: "Ivory Guide Feedback",
+            },
+          ],
+          Subject: `IvoryGuide: Feedback`,
+          HTMLPart: htmlTemplate,
+          Attachments: attachments,
+        },
+      ],
+    };
+
+    return await mailjet
+      .post("send", { version: "v3.1" })
+      .request({ Messages: emailOptions.Messages });
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
+
+const sendCalculatorHelpfulFeedbackEmail = async (info) => {
+	try {
+	  const {
+		name,
+		feedbackCategory,
+		message,
+		timestamp,
+		calculatorName
+	  } = info;
+  
+	  const templatePath = path.join(
+		__dirname,
+		"..",
+		"templates",
+		"feedback-helpful-email.html"
+	  );
+	  let htmlTemplate = await fs.readFile(templatePath, "utf8");
+  
+	  // Replace the placeholders with the actual values
+	  htmlTemplate = htmlTemplate.replace(/{{NAME}}/g, name);
+	  htmlTemplate = htmlTemplate.replace(/{{TIMESTAMP}}/g, timestamp);
+	  htmlTemplate = htmlTemplate.replace(/{{FEEDBACK_CATEGORY}}/g, feedbackCategory);
+	  htmlTemplate = htmlTemplate.replace(/{{CALC_NAME}}/g, calculatorName);
+	  htmlTemplate = htmlTemplate.replace(
+		/{{FRONTEND_URL}}/g,
+		process.env.FRONTEND_URL
+	  );
+	  htmlTemplate = htmlTemplate.replace(/{{TEXT}}/g, message);
+
+	  const emailOptions = {
+		Messages: [
+		  {
+			From: {
+			  Email: process.env.EMAIL_USER || "",
+			  Name: name,
+			},
+			To: [
+			  {
+				Email: "feedback@ivoryguide.com",
+				Name: "Ivory Guide Feedback",
+			  },
+			],
+			Subject: `IvoryGuide: ${calculatorName} Feedback`,
+			HTMLPart: htmlTemplate,
+			Attachments: [],
+		  },
+		],
+	  };
+
+	  return await mailjet
+		.post("send", { version: "v3.1" })
+		.request({ Messages: emailOptions.Messages });
+	} catch (err) {
+	  throw new Error(err.message);
+	}
+  };
+
 module.exports = {
   sendVerificationEmail,
   sendResetPasswordEmail,
   sendCalculatorSummaryEmail,
   sendContactNotification,
+  sendCalculatorFeedbackEmail,
+  sendCalculatorHelpfulFeedbackEmail
 };
