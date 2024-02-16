@@ -21,7 +21,7 @@ const TemporaryCopingsMUAsModel = require("../models/temporary-copings-muas-mode
 const TiBasesDirectToImplantsModel = require("../models/ti-bases-direct-to-implant-model");
 const TiBasesMUAsModel = require("../models/ti-bases-muas-model");
 const { OUTPUT_TYPES, LABEL_MAPPINGS } = require("../utils/constant");
-const { sendCalculatorSummaryEmail } = require("../utils/emailService");
+const { sendCalculatorSummaryEmail, sendCalculatorFeedbackEmail, sendCalculatorHelpfulFeedbackEmail } = require("../utils/emailService");
 const {
   getQuizData,
   getUniqueResult,
@@ -240,6 +240,65 @@ exports.sendCalculatorSummary = async (req, res) => {
     };
 
     const result = await sendCalculatorSummaryEmail(info);
+
+    if (result.body.Messages[0].Status === "success") {
+      return response.success(res, "Email sent successfully.");
+    }
+
+    return response.serverError(res, { message: "Failed to send email" });
+  } catch (ex) {
+    return response.serverError(res, { message: ex.message });
+  }
+};
+
+
+exports.sendCalculatorFeedback = async (req, res) => {
+  try {
+    const { name, feedbackCategory, message, timestamp, fileName } = req.body;
+    const imageBuffer = req.file?.buffer || null;
+
+    if (!name || !feedbackCategory || !message) {
+      return response.badRequest(res, { message: "Missing required fields." });
+    }
+
+    const info = {
+      name,
+      feedbackCategory,
+      message,
+      imageBuffer,
+      timestamp,
+      fileName
+    };
+
+    const result = await sendCalculatorFeedbackEmail(info);
+
+    if (result.body.Messages[0].Status === "success") {
+      return response.success(res, "Email sent successfully.");
+    }
+
+    return response.serverError(res, { message: "Failed to send email" });
+  } catch (ex) {
+    return response.serverError(res, { message: ex.message });
+  }
+};
+
+
+exports.sendCalculatorHelpfulFeedback = async (req, res) => {
+  try {
+    const { name, feedbackCategory, calculatorName, message, timestamp } = req.body;
+    if (!name || !feedbackCategory || !calculatorName) {
+      return response.badRequest(res, { message: "Missing required fields." });
+    }
+
+    const info = {
+      name,
+      calculatorName,
+      feedbackCategory,
+      message,
+      timestamp,
+    };
+
+    const result = await sendCalculatorHelpfulFeedbackEmail(info);
 
     if (result.body.Messages[0].Status === "success") {
       return response.success(res, "Email sent successfully.");

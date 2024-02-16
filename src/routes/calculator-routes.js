@@ -7,6 +7,8 @@ const {
   searchCalculator,
   getAllOnXCalculatorOptions,
   sendCalculatorSummary,
+  sendCalculatorFeedback,
+  sendCalculatorHelpfulFeedback,
 } = require("../controllers/calculator-controller");
 
 class CalculatorRoutes {
@@ -22,6 +24,16 @@ class CalculatorRoutes {
       "/sendCalculatorSummary",
       upload.single("attachment"),
       sendCalculatorSummary
+    );
+    router.post(
+      "/sendCalculatorFeedback",
+      upload.single("attachment"),
+      sendCalculatorFeedback
+    );
+    router.post(
+      "/sendHelpfulFeedback",
+      bodyParser.json(),
+      sendCalculatorHelpfulFeedback
     );
   }
 }
