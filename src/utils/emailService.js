@@ -155,13 +155,12 @@ const sendContactNotification = async (
 
 const sendCalculatorSummaryEmail = async (info) => {
 	try {
-		const { name, emails, pdfBuffer, calculatorName, filename } = info;
+		const { emails, pdfBuffer, calculatorName, filename } = info;
 		const text = `Please see summary for ${calculatorName} calculator in the attached document.`;
 		const templatePath = path.join(__dirname, '..', 'templates', 'summary-email.html');
 		let htmlTemplate = await fs.readFile(templatePath, 'utf8');
 
 		// Replace the placeholders with the actual values
-		htmlTemplate = htmlTemplate.replace(/{{NAME}}/g, name);
 		htmlTemplate = htmlTemplate.replace(/{{FRONTEND_URL}}/g, process.env.FRONTEND_URL);
 		htmlTemplate = htmlTemplate.replace(/{{TEXT}}/g, text);
 
