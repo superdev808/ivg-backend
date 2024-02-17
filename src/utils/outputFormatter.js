@@ -32,7 +32,7 @@ const formatDrillkitAndSequence = (quizResponse = null) => {
 
   // Copy the remaining drill data into a new object
   const drillsData = { ...restDrills };
-  
+
   // Initialize an array to store the converted drill information
   const convertedDrillsArray = [];
   const arr = ["(Extra Short)", "(Short)", "(Standard / Medium)", "(Long)"];
@@ -52,7 +52,13 @@ const formatDrillkitAndSequence = (quizResponse = null) => {
       const recommendations = _.trim(drillsData[manfacturerKey]) || "";
       // Check if the name is not null and not "No Drill Sequence" before adding to the array
       if (itemName !== null && itemName !== "No Drill Sequence") {
-        convertedDrillsArray.push({ itemName, link, itemNumber, quantity, recommendations });
+        convertedDrillsArray.push({
+          itemName,
+          link,
+          itemNumber,
+          quantity,
+          recommendations,
+        });
       }
     }
   });
@@ -95,37 +101,37 @@ const formatBoneReduction = (quizResponse = null) => {
       "Item Number": burKitItemNumber = "",
       "Bur Kit (Bone Reduction) Link to Purchase": linkToBurKit = "",
       "Bur Kit (Denture Conversion) Name": surgicalBurKitName = "",
-      "Bur Kit (Denture Conversion) Link to Purchase": surgicalBurKitLink = ""
+      "Bur Kit (Denture Conversion) Link to Purchase": surgicalBurKitLink = "",
     },
   } = quizResponse;
   const result = [];
- 
-  if(!!burKitName) {
+
+  if (!!burKitName) {
     result.push({
       label: OUTPUT_LABELS.BUR_KIT,
       info: [
         {
-          itemName:  _.trim(burKitName),
+          itemName: _.trim(burKitName),
           itemNumber: burKitItemNumber,
-          link:  _.trim(linkToBurKit),
+          link: _.trim(linkToBurKit),
           quantity: !!linkToBurKit ? 1 : null,
         },
       ],
     });
   }
 
-  if (!!surgicalBurKitName){ 
+  if (!!surgicalBurKitName) {
     result.push({
       label: OUTPUT_LABELS.SURGICAL_BUR_KIT,
       info: [
         {
-          itemName:  _.trim(surgicalBurKitName),
+          itemName: _.trim(surgicalBurKitName),
           itemNumber: null,
-          link:  _.trim(surgicalBurKitLink),
+          link: _.trim(surgicalBurKitLink),
           quantity: !!surgicalBurKitLink ? 1 : null,
         },
       ],
-    })
+    });
   }
   return result;
 };
@@ -148,8 +154,7 @@ const formatChairSidePickUp = (quizResponse = null) => {
       "Teflon Tape": teflonTape = "",
       "Teflon Tape Link to Purchase": teflonTapeLink = "",
       "Material to Close Screw Access Hole Name": materialName = "",
-      "Material to Close Screw Access Hole Link to Purchase":
-        materialLink = "",
+      "Material to Close Screw Access Hole Link to Purchase": materialLink = "",
     },
   } = quizResponse;
   const result = [];
@@ -164,7 +169,7 @@ const formatChairSidePickUp = (quizResponse = null) => {
           quantity: !!lutingAgentLink ? 1 : null,
         },
       ],
-    })
+    });
   }
   if (!!teflonTape) {
     result.push({
@@ -177,7 +182,7 @@ const formatChairSidePickUp = (quizResponse = null) => {
           quantity: !!teflonTapeLink ? 1 : null,
         },
       ],
-    })
+    });
   }
   if (!!materialName) {
     result.push({
@@ -190,11 +195,10 @@ const formatChairSidePickUp = (quizResponse = null) => {
           quantity: !!materialLink ? 1 : null,
         },
       ],
-    })
+    });
   }
   return result;
 };
-
 
 /**
  * Formats the quiz response containing information about implant purchase.
@@ -209,10 +213,11 @@ const formatScanbodies = (quizResponse = null) => {
 
   const {
     _doc: {
-      Manufacturer= "",
+      "Manufacturer Name": manufacturerName = "",
+      Manufacturer: manufacturer = "",
       "Link to Purchase": link = "",
       "Item Name": itemName = "",
-      "Scanbody Item Number": itemNumber = "",    
+      "Scanbody Item Number": itemNumber = "",
     },
   } = quizResponse;
 
@@ -222,11 +227,11 @@ const formatScanbodies = (quizResponse = null) => {
       label: OUTPUT_LABELS.SCANBODIES,
       info: [
         {
-          itemName:  _.trim(itemName),
+          itemName: _.trim(itemName),
           itemNumber,
           link,
           quantity: !!link ? 1 : null,
-          Manufacturer
+          manufacturer: manufacturer || manufacturerName,
         },
       ],
     },
@@ -247,7 +252,7 @@ const formatCommonResponse = (quizResponse = null, labelName = "") => {
     },
   } = quizResponse;
 
-  if (!(itemName)) {
+  if (!itemName) {
     return [];
   }
 
@@ -273,5 +278,5 @@ module.exports = {
   formatBoneReduction,
   formatChairSidePickUp,
   formatScanbodies,
-  formatCommonResponse
+  formatCommonResponse,
 };

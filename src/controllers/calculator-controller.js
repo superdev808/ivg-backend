@@ -21,7 +21,11 @@ const TemporaryCopingsMUAsModel = require("../models/temporary-copings-muas-mode
 const TiBasesDirectToImplantsModel = require("../models/ti-bases-direct-to-implant-model");
 const TiBasesMUAsModel = require("../models/ti-bases-muas-model");
 const { OUTPUT_TYPES, LABEL_MAPPINGS } = require("../utils/constant");
-const { sendCalculatorSummaryEmail, sendCalculatorFeedbackEmail, sendCalculatorHelpfulFeedbackEmail } = require("../utils/emailService");
+const {
+  sendCalculatorSummaryEmail,
+  sendCalculatorFeedbackEmail,
+  sendCalculatorHelpfulFeedbackEmail,
+} = require("../utils/emailService");
 const {
   getQuizData,
   getUniqueResult,
@@ -192,6 +196,7 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
             quizResponse = formatChairSidePickUp(quizResponse);
             break;
           case OUTPUT_TYPES.SCANBODIES:
+          case OUTPUT_TYPES.SCANBODYMUAS:
             quizResponse = formatScanbodies(quizResponse);
             break;
           default:
@@ -251,7 +256,6 @@ exports.sendCalculatorSummary = async (req, res) => {
   }
 };
 
-
 exports.sendCalculatorFeedback = async (req, res) => {
   try {
     const { name, feedbackCategory, message, timestamp, fileName } = req.body;
@@ -267,7 +271,7 @@ exports.sendCalculatorFeedback = async (req, res) => {
       message,
       imageBuffer,
       timestamp,
-      fileName
+      fileName,
     };
 
     const result = await sendCalculatorFeedbackEmail(info);
@@ -282,10 +286,10 @@ exports.sendCalculatorFeedback = async (req, res) => {
   }
 };
 
-
 exports.sendCalculatorHelpfulFeedback = async (req, res) => {
   try {
-    const { name, feedbackCategory, calculatorName, message, timestamp } = req.body;
+    const { name, feedbackCategory, calculatorName, message, timestamp } =
+      req.body;
     if (!name || !feedbackCategory || !calculatorName) {
       return response.badRequest(res, { message: "Missing required fields." });
     }
