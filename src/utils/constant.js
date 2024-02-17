@@ -5,6 +5,7 @@ const OUTPUT_TYPES = {
   CHAIR_SIDE_PICK_UP: "ChairSidePickUp",
   IMPLANT_PURCHASE: "Implants",
   SCANBODIES: "Scanbodies",
+  SCANBODYMUAS: "ScanbodyMUAs",
 };
 
 const OUTPUT_LABELS = {
