@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
 const find = require("lodash/find");
 const omit = require("lodash/omit");
 const mongoose = require("mongoose");
@@ -8,23 +8,22 @@ const mongoose = require("mongoose");
 const keys = require("../config/keys");
 const User = require("../models/user");
 const {
-  validateRegisterInput,
-  validateLoginInput,
+  sendResetPasswordEmail,
+  sendVerificationEmail,
+} = require("../utils/emailService");
+const response = require("../utils/response");
+const {
+  generateFileKey,
+  generateSignedUrl,
+  uploadToS3,
+} = require("../utils/storageService");
+const {
   validateEmail,
+  validateLoginInput,
+  validateRegisterInput,
   validateUserInfoUpdate,
   validateUserUpdate,
 } = require("../utils/validation");
-const response = require("../utils/response");
-
-const {
-  sendVerificationEmail,
-  sendResetPasswordEmail,
-} = require("../utils/emailService");
-const {
-  uploadToS3,
-  generateFileKey,
-  generateSignedUrl,
-} = require("../utils/storageService");
 
 async function hashPassword(password) {
   try {
@@ -126,11 +125,14 @@ exports.sendVerification = async (req, res) => {
     if (!email) {
       return response.validationError(res, "Email is required.");
     }
+
     const user = await User.findOne({ active: true, email: email });
     if (!user) {
       return response.notFoundError(res, "User not found.");
     }
+
     await setupVerification(user);
+
     return response.success(res, {
       message: "Verification email sent successfully.",
     });
@@ -144,20 +146,23 @@ exports.loginUser = (req, res) => {
   if (!isValid) {
     return res.status(400).json(errors);
   }
-  const email = req.body.email;
-  const password = req.body.password;
+
+  const { email, password } = req.body;
+
   User.findOne({ active: true, email }).then((user) => {
     if (!user) {
       return res
         .status(404)
         .json({ message: "Credentials incorrect. Please try again." });
     }
+
     if (!user.verified) {
       return res.status(401).json({
         message:
           "Account not verified. Please check your email to verify your account.",
       });
     }
+
     bcrypt.compare(password, user.password).then((isMatch) => {
       if (isMatch) {
         const payload = {
@@ -166,6 +171,7 @@ exports.loginUser = (req, res) => {
           email: user.email,
           role: user.role,
         };
+
         jwt.sign(
           payload,
           keys.secretOrKey,
@@ -201,9 +207,7 @@ exports.getAllUsers = (req, res) => {
 
   User.find()
     .select("_id firstName lastName email role active verified")
-    .then((result) => {
-      return res.json(result);
-    })
+    .then((result) => res.json(result))
     .catch((err) => {
       console.log(err);
       return res.status(500).send({
@@ -270,43 +274,54 @@ exports.deactivateUser = async (req, res) => {
     if (req.user.role !== "Admin") {
       return response.serverUnauthorized(res, "Unauthorized");
     }
+
     if (!req.body.id) {
       return response.validationError(res, "User id is required.");
     }
+
     const user = await User.findOne({ _id: req.body.id, active: true });
     if (!user) {
       return response.notFoundError(res, "User not found.");
     }
+
     user.active = false;
     await user.save();
+
     return response.success(res, { message: "User deactivated successfully." });
   } catch (error) {
     return response.serverError(res, error.message);
   }
 };
+
 exports.activateUser = async (req, res) => {
   try {
     if (req.user.role !== "Admin") {
       return response.serverUnauthorized(res, "Unauthorized");
     }
+
     if (!req.body.id) {
       return response.validationError(res, "User id is required.");
     }
+
     const user = await User.findOne({ _id: req.body.id });
     if (!user) {
       return response.notFoundError(res, "User not found.");
     }
+
     user.active = true;
     await user.save();
+
     return response.success(res, { message: "User activated successfully." });
   } catch (error) {
     return response.serverError(res, error.message);
   }
 };
+
 exports.getUserInfo = async (req, res) => {
   try {
     const userId = req.user.id;
     const user = await User.findOne({ _id: userId, active: true });
+
     if (!user) {
       return response.notFoundError(res, "User not found.");
     }
@@ -329,6 +344,7 @@ exports.getUserInfo = async (req, res) => {
       logo: user.logo ? generateSignedUrl(user.logo) : "",
       savedResults: user.savedResults || [],
     };
+
     return response.success(res, userData);
   } catch (error) {
     return response.serverError(res, error.message);
@@ -341,7 +357,8 @@ exports.updateUserInfo = async (req, res) => {
     if (!isValid) {
       return response.validationError(res, errors);
     }
-    const { firstName, lastName, phone } = req.body;
+
+    const { firstName, lastName, phone, organizationName } = req.body;
 
     const userId = req.user.id;
 
@@ -353,6 +370,8 @@ exports.updateUserInfo = async (req, res) => {
     user.firstName = firstName;
     user.lastName = lastName;
     user.phone = phone;
+    user.organizationName = organizationName;
+
     await user.save();
 
     return response.success(res, { message: "User updated successfully." });
@@ -426,11 +445,12 @@ exports.requestPasswordReset = async (req, res) => {
     if (!email) {
       return response.validationError(res, "Email is required.");
     }
-    let user = await User.findOne({ active: true, email: email });
+    const user = await User.findOne({ active: true, email: email });
 
     if (!user) {
       return response.notFoundError(res, "Email not found.");
     }
+
     return response.success(res, "Reset password email sent successfully.");
   } catch (error) {
     return response.serverError(res, error.message);
@@ -440,6 +460,7 @@ exports.requestPasswordReset = async (req, res) => {
 exports.sendResetPassword = async (req, res) => {
   try {
     let userId = req.user.id;
+
     if (req.user.role !== "Admin" && req.body.id) {
       return response.serverUnauthorized(res, "Unauthorized");
     } else if (req.user.role === "Admin" && req.body.id) {
@@ -452,6 +473,7 @@ exports.sendResetPassword = async (req, res) => {
     }
 
     await setupPasswordReset(user);
+
     return response.success(res, {
       message: "Reset password email sent successfully.",
     });
