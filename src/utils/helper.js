@@ -66,9 +66,32 @@ const getUniqueResult = (data, fields) => {
   );
 };
 
+const sortCalculatorOptions = (a, b) => {
+  const priotizedBrands = ["Straumann", "Neodent", "ZimVie", "Nobel Biocare", "Dentsply Sirona", "Biohorizons"];
+
+  const aBrandIndex = priotizedBrands.findIndex(value => a === value) || -1;
+  const bBrandIndex = priotizedBrands.findIndex(value => b === value) || -1;
+
+  if (aBrandIndex >= 0 || bBrandIndex >= 0) {
+    return aBrandIndex - bBrandIndex;
+  }
+
+  const aFloatValue = parseFloat(a);
+  const bFloatValue = parseFloat(b);
+
+  if (aFloatValue < bFloatValue) {
+    return -1;
+  } else if (aFloatValue > bFloatValue) {
+    return 1;
+  } else {
+    return a.localeCompare(b);
+  }
+}
+
 module.exports = {
   getModelByCalculatorType,
   getQuizData,
   getQuizQuery,
   getUniqueResult,
+  sortCalculatorOptions
 };

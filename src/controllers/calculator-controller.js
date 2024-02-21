@@ -31,6 +31,7 @@ const {
   getUniqueResult,
   getQuizQuery,
   getModelByCalculatorType,
+  sortCalculatorOptions
 } = require("../utils/helper");
 const {
   formatDrillkitAndSequence,
@@ -105,9 +106,9 @@ exports.getCalculatorOptions = async (req, res, next) => {
 
           return res;
         })
-      ).sort();
+      ).sort(sortCalculatorOptions);
     } else {
-      result = _.uniq(data.map((item) => item[fields[0]])).sort();
+      result = _.uniq(data.map((item) => item[fields[0]])).sort(sortCalculatorOptions);
     }
 
     response.success(res, result);
