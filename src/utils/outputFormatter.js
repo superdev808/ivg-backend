@@ -34,37 +34,9 @@ const formatDrillkitAndSequence = (quizResponse = null) => {
   const drillsData = { ...restDrills };
 
   // Initialize an array to store the converted drill information
-  const convertedDrillsArray = [];
   const arr = ["(Extra Short)", "(Short)", "(Standard / Medium)", "(Long)"];
-  arr.map((value) => {
-    // Iterate over the drill data
-    for (let i = 1; drillsData[`Drill ${i} ${value} Name`]; i++) {
-      const itemKey = `Drill ${i} ${value}`;
-      const nameKey = `${itemKey} Name`;
-      const linkKey = `${itemKey} Link to Purchase`;
-      const itemNumberKey = `${itemKey} Item Number`;
-      const manfacturerKey = `${itemKey} Manufacturer Recommendations`;
-      // Extract individual drill details
-      const itemName = _.trim(drillsData[nameKey]) || "";
-      const link = _.trim(drillsData[linkKey]) || "";
-      const itemNumber = drillsData[itemNumberKey] || "";
-      const quantity = !!link && link !== "-" ? 1 : null;
-      const recommendations = _.trim(drillsData[manfacturerKey]) || "";
-      // Check if the name is not null and not "No Drill Sequence" before adding to the array
-      if (itemName !== null && itemName !== "No Drill Sequence") {
-        convertedDrillsArray.push({
-          itemName,
-          link,
-          itemNumber,
-          quantity,
-          recommendations,
-        });
-      }
-    }
-  });
 
-  // Format the final response with labeled information
-  return [
+  const response = [
     {
       label: OUTPUT_LABELS.IMPLANT_DRILL_KIT,
       info: [
@@ -76,11 +48,40 @@ const formatDrillkitAndSequence = (quizResponse = null) => {
         },
       ],
     },
-    {
-      label: OUTPUT_LABELS.DRILL_SEQUENCE,
-      info: convertedDrillsArray,
-    },
   ];
+
+  for (let i = 1; i <= 20; i++) {
+    arr.forEach((size) => {
+      // Iterate over the drill data
+      const itemKey = `Drill ${i} ${size}`;
+      const linkKey = `${itemKey} Link to Purchase`;
+      const itemNumberKey = `${itemKey} Item Number`;
+      const manfacturerKey = `${itemKey} Manufacturer Recommendations`;
+      // Extract individual drill details
+      const link = _.trim(drillsData[linkKey]) || "";
+      const itemNumber = drillsData[itemNumberKey] || "";
+      const quantity = !!link && link !== "-" ? 1 : null;
+      const recommendations = _.trim(drillsData[manfacturerKey]) || "";
+
+      if (itemNumber) {
+        response.push({
+          label: itemKey,
+          info: [
+            {
+              itemName: itemKey,
+              itemNumber,
+              link,
+              manufacturerRecommendations: recommendations,
+              quantity,
+            },
+          ],
+        });
+      }
+    });
+  }
+
+  // Format the final response with labeled information
+  return response;
 };
 
 /**
