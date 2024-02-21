@@ -156,7 +156,8 @@ const sendContactNotification = async (
 const sendCalculatorSummaryEmail = async (info) => {
   try {
     const { emails, pdfBuffer, calculatorName, filename } = info;
-    const text = `Please see summary for ${calculatorName} calculator in the attached document.`;
+    const text = `Please see summary of ${calculatorName} in the attached document.`;
+
     const templatePath = path.join(
       __dirname,
       "..",
