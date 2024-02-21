@@ -288,7 +288,7 @@ exports.sendCalculatorFeedback = async (req, res) => {
 
 exports.sendCalculatorHelpfulFeedback = async (req, res) => {
   try {
-    const { name, feedbackCategory, calculatorName, message, timestamp } =
+    const { name, feedbackCategory, calculatorName, message, timestamp, quiz } =
       req.body;
     if (!name || !feedbackCategory || !calculatorName) {
       return response.badRequest(res, { message: "Missing required fields." });
@@ -300,6 +300,7 @@ exports.sendCalculatorHelpfulFeedback = async (req, res) => {
       feedbackCategory,
       message,
       timestamp,
+      quiz
     };
 
     const result = await sendCalculatorHelpfulFeedbackEmail(info);
