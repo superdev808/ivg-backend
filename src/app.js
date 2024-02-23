@@ -60,6 +60,8 @@ app.use(
 			'https://igdevelopment.app',
 			'https://ivoryguide.com',
 			'https://staging.ivoryguide.com',
+			'https://www.ivoryguide.com',
+			'https://www.igdevelopment.app'
 		],
 	}),
 	router
