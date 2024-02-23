@@ -67,13 +67,15 @@ const getUniqueResult = (data, fields) => {
 };
 
 const sortCalculatorOptions = (a, b) => {
-  const priotizedBrands = ["Straumann", "Neodent", "ZimVie", "Nobel Biocare", "Dentsply Sirona", "Biohorizons"];
+  if (typeof a !== 'string' || typeof b !== 'string') {
+    return 0;
+  }
+  const priotizedBrands = ["straumann", "neodent", "zimvie", "nobel biocare", "dentsply sirona", "biohorizons"];
 
-  const aBrandIndex = priotizedBrands.findIndex(value => a === value) || -1;
-  const bBrandIndex = priotizedBrands.findIndex(value => b === value) || -1;
-
-  if (aBrandIndex >= 0 || bBrandIndex >= 0) {
-    return aBrandIndex - bBrandIndex;
+  if (priotizedBrands.includes(a.toLowerCase()) && !priotizedBrands.includes(b.toLowerCase())) {
+    return -1;
+  } else if (!priotizedBrands.includes(a.toLowerCase()) && priotizedBrands.includes(b.toLowerCase())) {
+    return 1;
   }
 
   const aFloatValue = parseFloat(a);

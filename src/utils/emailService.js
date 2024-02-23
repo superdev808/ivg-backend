@@ -129,7 +129,7 @@ const sendContactNotification = async (
         },
         To: [
           {
-            Email: "kenethhu.dev@gmail.com" || "",
+            Email: "support@ivoryguide.com",
             Name: "Ivory Guide",
           },
         ],
@@ -317,7 +317,7 @@ const sendCalculatorHelpfulFeedbackEmail = async (info) => {
           },
           To: [
             {
-              Email: "feedback@ivoryguide.com",
+              Email: "joseguardiadev@gmail.com",
               Name: "Ivory Guide Feedback",
             },
           ],
