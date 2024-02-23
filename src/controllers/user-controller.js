@@ -553,9 +553,8 @@ exports.saveResult = async (req, res) => {
       return response.notFoundError(res, "User not found.");
     }
 
-    if (user.savedResults) {
-      const { quiz } = data;
-      const existingResult = find(user.savedResults, quiz);
+    if (user.savedResults && data.quiz) {
+      const existingResult = find(user.savedResults, data.quiz);
 
       if (existingResult) {
         return response.success(res, {
