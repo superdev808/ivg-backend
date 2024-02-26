@@ -78,7 +78,7 @@ const modelMap = {
   TiBasesMUAs: TiBasesMUAsModel,
 };
 
-exports.getCalculatorOptions = async (req, res, next) => {
+exports.getCalculatorOptions = async (req, res) => {
   const { type, quiz, fields } = req.body;
 
   const calculatorType = decodeURIComponent(type);
@@ -119,7 +119,7 @@ exports.getCalculatorOptions = async (req, res, next) => {
   }
 };
 
-exports.searchCalculator = async (req, res, next) => {
+exports.searchCalculator = async (req, res) => {
   const { text } = req.query;
 
   try {

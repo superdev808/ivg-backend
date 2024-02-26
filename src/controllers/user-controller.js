@@ -63,7 +63,7 @@ exports.checkEmail = async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({ email: data.email });
+    const user = await User.findOne({ email: data.email.toLowerCase() });
 
     return response.success(res, {
       message: user ? "Email already exists" : "Email is available.",
@@ -80,7 +80,7 @@ exports.registerUser = async (req, res) => {
     return response.validationError(res, errors);
   }
 
-  const user = await User.findOne({ email: req.body.email });
+  const user = await User.findOne({ email: req.body.email.toLowerCase() });
   if (user) {
     return response.conflict(res, { message: "Email already exists" });
   }
@@ -88,7 +88,7 @@ exports.registerUser = async (req, res) => {
   const newUser = new User({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
-    email: req.body.email,
+    email: req.body.email.toLowerCase(),
     phone: req.body.phone,
     password: req.body.password,
     verified: false,
@@ -126,7 +126,10 @@ exports.sendVerification = async (req, res) => {
       return response.validationError(res, "Email is required.");
     }
 
-    const user = await User.findOne({ active: true, email: email });
+    const user = await User.findOne({
+      active: true,
+      email: email.toLowerCase(),
+    });
     if (!user) {
       return response.notFoundError(res, "User not found.");
     }
@@ -149,7 +152,7 @@ exports.loginUser = (req, res) => {
 
   const { email, password } = req.body;
 
-  User.findOne({ active: true, email }).then((user) => {
+  User.findOne({ active: true, email: email.toLowerCase() }).then((user) => {
     if (!user) {
       return res
         .status(404)
@@ -209,7 +212,6 @@ exports.getAllUsers = (req, res) => {
     .select("_id firstName lastName email role active verified")
     .then((result) => res.json(result))
     .catch((err) => {
-      console.log(err);
       return res.status(500).send({
         message: err.message || "Error occurred while reading the users.",
       });
@@ -236,7 +238,7 @@ exports.updateUser = async (req, res) => {
 
     user.firstName = firstName;
     user.lastName = lastName;
-    user.email = email;
+    user.email = email.toLowerCase();
     user.role = role;
     user.verified = verified;
     await user.save();
@@ -328,7 +330,7 @@ exports.getUserInfo = async (req, res) => {
 
     const userData = {
       id: user.id,
-      email: user.email,
+      email: user.email.toLowerCase(),
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
@@ -445,7 +447,10 @@ exports.requestPasswordReset = async (req, res) => {
     if (!email) {
       return response.validationError(res, "Email is required.");
     }
-    const user = await User.findOne({ active: true, email: email });
+    const user = await User.findOne({
+      active: true,
+      email: email.toLowerCase(),
+    });
 
     if (!user) {
       return response.notFoundError(res, "Email not found.");
