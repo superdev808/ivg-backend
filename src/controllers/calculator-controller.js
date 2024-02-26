@@ -31,7 +31,7 @@ const {
   getUniqueResult,
   getQuizQuery,
   getModelByCalculatorType,
-  sortCalculatorOptions
+  sortCalculatorOptions,
 } = require("../utils/helper");
 const {
   formatDrillkitAndSequence,
@@ -108,7 +108,9 @@ exports.getCalculatorOptions = async (req, res, next) => {
         })
       ).sort(sortCalculatorOptions);
     } else {
-      result = _.uniq(data.map((item) => item[fields[0]])).sort(sortCalculatorOptions);
+      result = _.uniq(data.map((item) => item[fields[0]])).sort(
+        sortCalculatorOptions
+      );
     }
 
     response.success(res, result);
@@ -230,17 +232,16 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
 
 exports.sendCalculatorSummary = async (req, res) => {
   try {
-    const { name, recipientsList, calculatorName, filename } = req.body;
+    const { recipientsList, calculatorName, filename } = req.body;
     const pdfBuffer = req.file.buffer || null;
 
-    if (!recipientsList || !name || !calculatorName || !filename) {
+    if (!recipientsList || !calculatorName || !filename) {
       return response.badRequest(res, { message: "Missing required fields." });
     }
 
     const emails = [...new Set(recipientsList.split("|"))];
 
     const info = {
-      name,
       emails,
       calculatorName,
       pdfBuffer,
@@ -303,7 +304,7 @@ exports.sendCalculatorHelpfulFeedback = async (req, res) => {
       feedbackCategory,
       message,
       timestamp,
-      quiz
+      quiz,
     };
 
     const result = await sendCalculatorHelpfulFeedbackEmail(info);
