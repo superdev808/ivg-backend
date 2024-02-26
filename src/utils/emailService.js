@@ -35,7 +35,7 @@ const sendVerificationEmail = async (user, verificationToken) => {
         },
         To: [
           {
-            Email: user.email,
+            Email: user.email.toLowerCase(),
             Name: `${user.firstName} ${user.lastName}`,
           },
         ],
@@ -79,7 +79,7 @@ const sendResetPasswordEmail = async (user, token) => {
         },
         To: [
           {
-            Email: user.email,
+            Email: user.email.toLowerCase(),
             Name: `${user.firstName} ${user.lastName}`,
           },
         ],
@@ -114,7 +114,7 @@ const sendContactNotification = async (
   let htmlTemplate = await fs.readFile(templatePath, "utf8");
 
   htmlTemplate = htmlTemplate.replace(/{{name}}/g, name);
-  htmlTemplate = htmlTemplate.replace(/{{email}}/g, email);
+  htmlTemplate = htmlTemplate.replace(/{{email}}/g, email.toLowerCase());
   htmlTemplate = htmlTemplate.replace(/{{phone}}/g, phone);
   htmlTemplate = htmlTemplate.replace(/{{zip}}/g, zip);
   htmlTemplate = htmlTemplate.replace(/{{role}}/g, role);
@@ -181,7 +181,7 @@ const sendCalculatorSummaryEmail = async (info) => {
         },
         To: [
           {
-            Email: email,
+            Email: email.toLowerCase(),
           },
         ],
         Subject: `IvoryGuide: ${calculatorName} Summary`,
