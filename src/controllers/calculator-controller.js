@@ -123,17 +123,19 @@ exports.searchCalculator = async (req, res, next) => {
   try {
     const modelNames = [];
     for (const modelName of Object.keys(modelMap)) {
-      const orFields = fieldsToSearch[modelName].map((field) => ({
-        [field]: { $regex: new RegExp(text, "i") },
-      }));
+      if (fieldsToSearch[modelName]) {
+        const orFields = fieldsToSearch[modelName].map((field) => ({
+          [field]: { $regex: new RegExp(text, "i") },
+        }));
 
-      if (orFields.length) {
-        const results = await modelMap[modelName].find({
-          $or: orFields,
-        });
+        if (orFields.length) {
+          const results = await modelMap[modelName].find({
+            $or: orFields,
+          });
 
-        if (results.length) {
-          modelNames.push(modelName);
+          if (results.length) {
+            modelNames.push(modelName);
+          }
         }
       }
     }
@@ -209,7 +211,7 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
       }
     }
 
-    const result = getUniqueResult(data, fields);
+    const result = getUniqueResult(data, fields).sort(sortCalculatorOptions);
     if (result.length === 0) {
       result.push("");
     }
