@@ -209,7 +209,7 @@ exports.getAllUsers = (req, res) => {
   }
 
   User.find()
-    .select("_id firstName lastName email role active verified")
+    .select("_id firstName lastName email role active verified organizationName")
     .then((result) => res.json(result))
     .catch((err) => {
       return res.status(500).send({
