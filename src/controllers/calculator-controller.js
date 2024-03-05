@@ -6,6 +6,7 @@ const HealingAbutmentsModel = require("../models/healing-abutments-model");
 const ImplantAnalogsModel = require("../models/implant-analog-model");
 const ImplantsModel = require("../models/implant-model");
 const ImplantScrewsModel = require("../models/implant-screw-model");
+const ImplantTorquesModel = require("../models/implant-torque-model");
 const ImpressingCopingsDirectToImplantsModel = require("../models/impressing-copings-direct-to-implant-model");
 const ImpressingCopingsMUAsModel = require("../models/impressing-copings-mua-model");
 const MUAsModel = require("../models/mua-model");
@@ -64,6 +65,7 @@ const modelMap = {
   HealingAbutments: HealingAbutmentsModel,
   ImplantAnalogs: ImplantAnalogsModel,
   ImplantScrews: ImplantScrewsModel,
+  ImplantTorques: ImplantTorquesModel,
   Implants: ImplantsModel,
   ImpressingCopingsDirectToImplants: ImpressingCopingsDirectToImplantsModel,
   ImpressingCopingsMUAs: ImpressingCopingsMUAsModel,
