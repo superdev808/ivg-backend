@@ -327,7 +327,7 @@ const sendCalculatorHelpfulFeedbackEmail = async (info) => {
           },
           To: [
             {
-              Email: "joseguardiadev@gmail.com",
+              Email: "feedback@ivoryguide.com",
               Name: "Ivory Guide Feedback",
             },
           ],
