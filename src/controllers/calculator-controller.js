@@ -294,19 +294,22 @@ exports.sendCalculatorFeedback = async (req, res) => {
 
 exports.sendCalculatorHelpfulFeedback = async (req, res) => {
   try {
-    const { name, feedbackCategory, calculatorName, message, timestamp, quiz } =
+    const { name, feedbackCategory, calculatorName, message, timestamp, quiz, fileName } =
       req.body;
     if (!name || !feedbackCategory || !calculatorName) {
       return response.badRequest(res, { message: "Missing required fields." });
     }
 
+    const imageBuffer = req.file?.buffer || null;
     const info = {
       name,
       calculatorName,
       feedbackCategory,
       message,
       timestamp,
-      quiz,
+      quiz: JSON.parse(quiz),
+      fileName,
+      imageBuffer
     };
 
     const result = await sendCalculatorHelpfulFeedbackEmail(info);

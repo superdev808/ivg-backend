@@ -32,7 +32,7 @@ class CalculatorRoutes {
     );
     router.post(
       "/sendHelpfulFeedback",
-      bodyParser.json(),
+      upload.single("attachment"),
       sendCalculatorHelpfulFeedback
     );
   }

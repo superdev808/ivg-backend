@@ -275,7 +275,7 @@ const sendCalculatorFeedbackEmail = async (info) => {
 
 const sendCalculatorHelpfulFeedbackEmail = async (info) => {
   try {
-    const { name, feedbackCategory, message, timestamp, calculatorName, quiz } =
+    const { name, feedbackCategory, message, timestamp, calculatorName, quiz, fileName, imageBuffer } =
       info;
 
     const templatePath = path.join(
@@ -308,6 +308,16 @@ const sendCalculatorHelpfulFeedbackEmail = async (info) => {
     );
     htmlTemplate = htmlTemplate.replace(/{{TEXT}}/g, message);
 
+    const attachments = imageBuffer
+      ? [
+          {
+            ContentType: "image/*",
+            Filename: fileName,
+            Base64Content: imageBuffer.toString("base64"),
+          },
+        ]
+      : [];
+
     const emailOptions = {
       Messages: [
         {
@@ -323,7 +333,7 @@ const sendCalculatorHelpfulFeedbackEmail = async (info) => {
           ],
           Subject: `IvoryGuide: ${calculatorName} Feedback`,
           HTMLPart: htmlTemplate,
-          Attachments: [],
+          Attachments: attachments,
         },
       ],
     };
