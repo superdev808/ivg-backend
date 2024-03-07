@@ -39,6 +39,7 @@ async function setupVerification(user) {
   const token = crypto.randomBytes(20).toString("hex");
   user.verificationToken = token;
   user.verificationTokenExpiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
+  user.verificationEmailSent = Date.now();
   await user.save();
 
   await sendVerificationEmail(user, token);
@@ -209,7 +210,9 @@ exports.getAllUsers = (req, res) => {
   }
 
   User.find()
-    .select("_id firstName lastName email role active verified organizationName")
+    .select(
+      "_id firstName lastName email role active verified organizationName verificationEmailSent"
+    )
     .then((result) => res.json(result))
     .catch((err) => {
       return res.status(500).send({
