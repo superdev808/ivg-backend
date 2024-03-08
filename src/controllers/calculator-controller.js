@@ -21,6 +21,7 @@ const TemporaryCopingsDirectToImplantsModel = require("../models/temporary-copin
 const TemporaryCopingsMUAsModel = require("../models/temporary-copings-muas-model");
 const TiBasesDirectToImplantsModel = require("../models/ti-bases-direct-to-implant-model");
 const TiBasesMUAsModel = require("../models/ti-bases-muas-model");
+const AnnouncementsModel = require("../models/announcement-model");
 const { OUTPUT_TYPES, LABEL_MAPPINGS } = require("../utils/constant");
 const {
   sendCalculatorSummaryEmail,
@@ -323,3 +324,46 @@ exports.sendCalculatorHelpfulFeedback = async (req, res) => {
     return response.serverError(res, { message: ex.message });
   }
 };
+
+exports.getAnnouncements = async (req, res) => {
+  if (req.user.role !== "Admin") {
+    return response.serverUnauthorized(res, "Unauthorized");
+  }
+
+  try {
+    const results = await AnnouncementsModel.find({})
+    return response.success(res, results);
+  } catch (ex) {
+    response.serverError(res, { message: ex.message });
+  }
+}
+
+exports.createAnnouncement = async (req, res) => {
+  if (req.user.role !== "Admin") {
+    return response.serverUnauthorized(res, "Unauthorized");
+  }
+  try {
+    const { content } = req.body;
+    const announcement = new AnnouncementsModel({ content });
+    const result = await announcement.save();
+    return response.success(res, result);
+  } catch (ex) {
+    response.serverError(res, { message: ex.message });
+  }
+}
+
+exports.getLatestAnnouncement = async (req, res) => {
+  if (req.user.role !== "Admin") {
+    return response.serverUnauthorized(res, "Unauthorized");
+  }
+  try {
+    const latest = await AnnouncementsModel.findOne({  }, {}, { sort: { 'published_at' : -1 } }).exec()
+    // 7 days = 7 * 24 * 60 * 60 * 1000 ms
+    const expiredMs = 7 * 24 * 60 * 60 * 1000;
+    if (latest.published_at < new Date(new Date() - expiredMs))
+      return response.success(res, null);
+    return response.success(res, latest);
+  } catch (ex) {
+    response.serverError(res, { message: ex.message });
+  }
+}
