@@ -346,7 +346,6 @@ exports.createAnnouncement = async (req, res) => {
     const { content } = req.body;
     const announcement = new AnnouncementsModel({ content });
     const result = await announcement.save();
-    console.log(result.toObject());
     return response.success(res, result);
   } catch (ex) {
     response.serverError(res, { message: ex.message });
@@ -358,9 +357,7 @@ exports.getLatestAnnouncement = async (req, res) => {
     return response.serverUnauthorized(res, "Unauthorized");
   }
   try {
-    
     const latest = await AnnouncementsModel.findOne({  }, {}, { sort: { 'published_at' : -1 } }).exec()
-    console.log(latest)
     // 7 days = 7 * 24 * 60 * 60 * 1000 ms
     const expiredMs = 7 * 24 * 60 * 60 * 1000;
     if (latest.published_at < new Date(new Date() - expiredMs))
