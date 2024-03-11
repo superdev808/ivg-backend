@@ -343,8 +343,14 @@ exports.createAnnouncement = async (req, res) => {
     return response.serverUnauthorized(res, "Unauthorized");
   }
   try {
-    const { content } = req.body;
-    const announcement = new AnnouncementsModel({ content });
+    const { content, _id } = req.body;
+    let announcement;
+    if (_id != undefined)
+      announcement = await AnnouncementsModel.findById(_id);
+    else
+      announcement = new AnnouncementsModel({ content });
+    announcement.content = content;
+    announcement.published_at = new Date();
     const result = await announcement.save();
     return response.success(res, result);
   } catch (ex) {
@@ -363,6 +369,19 @@ exports.getLatestAnnouncement = async (req, res) => {
     if (latest.published_at < new Date(new Date() - expiredMs))
       return response.success(res, null);
     return response.success(res, latest);
+  } catch (ex) {
+    response.serverError(res, { message: ex.message });
+  }
+}
+
+exports.deleteAnnouncement = async (req, res) => {
+  if (req.user.role !== "Admin") {
+    return response.serverUnauthorized(res, "Unauthorized");
+  }
+  try {
+    const {  _id } = req.body;
+    const result = await AnnouncementsModel.findByIdAndDelete(_id)
+    return response.success(res, result);
   } catch (ex) {
     response.serverError(res, { message: ex.message });
   }
