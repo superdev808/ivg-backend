@@ -15,6 +15,7 @@ const schema = new Schema({
   "Cementable Area": { type: String },
   "Material": { type: String },
   "Collar Height": { type: String },
+  "Hexed or Non-Hexed": { type: String },
   "Item Name": { type: String },
   "Item Number": { type: String },
   "Link to Purchase": { type: String },
