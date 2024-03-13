@@ -13,12 +13,13 @@ const schema = new Schema({
   "Abutment Type": { type: String },
   "Abutment Height": { type: String },
   "Cementable Area": { type: String },
-  "Material": { type: String },
+  Material: { type: String },
   "Collar Height": { type: String },
   "Hexed or Non-Hexed": { type: String },
   "Item Name": { type: String },
   "Item Number": { type: String },
   "Link to Purchase": { type: String },
+  Notes: { type: String },
 });
 
 const TiBasesDirectToImplantsModel = mongoose.model(

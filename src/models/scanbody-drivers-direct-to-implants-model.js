@@ -7,11 +7,12 @@ const schema = new Schema({
   "Implant Diameter": { type: String },
   "Implant Platform": { type: String },
   "Implant Form": { type: String },
-  "Design": { type: String },
+  Design: { type: String },
   "Driver Length": { type: String },
   "Item Name": { type: String },
   "Item Number": { type: String },
   "Link to Purchase": { type: String },
+  Notes: { type: String },
 });
 
 const ScanbodyDriversDirectToImplantsModel = mongoose.model(

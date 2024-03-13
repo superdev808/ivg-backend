@@ -11,8 +11,15 @@ const schema = mongoose.Schema({
   "Teflon Tape Link to Purchase": { type: String },
   "Material to Close Screw Access Hole Name": { type: String },
   "Material to Close Screw Access Hole Link to Purchase": { type: String },
+  Notes: { type: String },
+  Notes_1: { type: String },
+  Notes_2: { type: String },
 });
 
-const ChairSidePickUpModel = mongoose.model('ChairSidePickUpMaterial', schema, "ChairSidePickUpMaterials");
+const ChairSidePickUpModel = mongoose.model(
+  "ChairSidePickUpMaterial",
+  schema,
+  "ChairSidePickUpMaterials"
+);
 
 module.exports = ChairSidePickUpModel;
