@@ -129,7 +129,7 @@
                   border-top: 3px solid #83b899;
                 "
               >
-                <h2
+                <h1
                   style="
                     margin: 0;
                     font-weight: 700;
@@ -138,8 +138,8 @@
                   "
                 >
                   Feedback submitted from {{NAME}}
-                </h2>
-                <p>{{TIMESTAMP}}</p>
+                </h1>
+                <p style="margin: 0;"><small>{{TIMESTAMP}}</small></p>
               </td>
             </tr>
           </table>
@@ -166,7 +166,10 @@
                   line-height: 24px;
                 "
               >
-                <p style="margin: 0">{{FEEDBACK_CATEGORY}}</p>
+                <h3 style="margin: 0;">{{FEEDBACK_CATEGORY}}</h3>
+                <hr />
+                <p style="margin: auto">{{TEXT}}</p>
+                <img src="{{IMG_SCREENSHOT}}" width="100%" height="100%" style="margin-top: 1rem;">
               </td>
             </tr>
             <tr>
@@ -180,7 +183,22 @@
                   line-height: 24px;
                 "
               >
-                <p style="margin: 0">{{TEXT}}</p>
+              </td>
+            </tr>
+            <tr>
+              <td
+                align="left"
+                bgcolor="#ffffff"
+                style="
+                  padding: 24px;
+                  font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif;
+                  font-size: 16px;
+                  line-height: 24px;
+                "
+              >
+                <h3 style="margin: 0;">{{NAME}} selected following answers from {{CALCULATOR_NAME}} calculator.</h3>
+                <hr />
+                {{USER_ANSWERS}}
               </td>
             </tr>
             <!-- end copy -->

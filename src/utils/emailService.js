@@ -1,6 +1,7 @@
 const Mailjet = require("node-mailjet");
 const fs = require("fs").promises;
 const path = require("path");
+const { imageToDataURI } = require('./helper')
 const mailjet = new Mailjet({
   apiKey: process.env.MJ_APIKEY_PUBLIC || "",
   apiSecret: process.env.MJ_APIKEY_PRIVATE || "",
@@ -212,6 +213,8 @@ const sendCalculatorFeedbackEmail = async (info) => {
       imageBuffer,
       timestamp,
       fileName,
+      calculatorName,
+      userAnswers
     } = info;
 
     const templatePath = path.join(
@@ -234,7 +237,15 @@ const sendCalculatorFeedbackEmail = async (info) => {
       process.env.FRONTEND_URL
     );
     htmlTemplate = htmlTemplate.replace(/{{TEXT}}/g, message);
-
+    htmlTemplate = htmlTemplate.replace(/{{CALCULATOR_NAME}}/g, calculatorName);
+    const userAnswersHTML = userAnswers.map(({ name, text, answer}) => `
+<p style="margin: auto">
+  <b>${answer ? text : `<del>${text}</del>`}</b> : ${answer || ''}
+</p>
+`).join('')
+    htmlTemplate = htmlTemplate.replace(/{{USER_ANSWERS}}/g, userAnswersHTML);
+    htmlTemplate = htmlTemplate.replace(/{{IMG_SCREENSHOT}}/g, imageToDataURI(imageBuffer, fileName));
+    await fs.writeFile("../ttt.html", htmlTemplate);
     const attachments = imageBuffer
       ? [
           {
