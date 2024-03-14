@@ -19,10 +19,10 @@ const schema = new Schema({
   Notes: { type: String },
 });
 
-const RestroativeDirectToImplantModel = mongoose.model(
-  "RestroativeDirectToImplantMaterial",
+const RestorativeDirectToImplantModel = mongoose.model(
+  "RestorativeDirectToImplantMaterial",
   schema,
-  "RestroativeDirectToImplantMaterials"
+  "RestorativeDirectToImplantMaterials"
 );
 
-module.exports = RestroativeDirectToImplantModel;
+module.exports = RestorativeDirectToImplantModel;

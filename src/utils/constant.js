@@ -1,7 +1,7 @@
 const OUTPUT_TYPES = {
   DRILL_KIT_AND_SEQUENCE: "DrillKitAndSequence",
   BONE_REDUCTION: "BoneReduction",
-  MASTER_IMPLANT_DRIVER: "RestroativeDirectToImplant",
+  MASTER_IMPLANT_DRIVER: "RestorativeDirectToImplant",
   CHAIR_SIDE_PICK_UP: "ChairSidePickUp",
   IMPLANT_PURCHASE: "Implants",
   SCANBODIES: "Scanbodies",
@@ -24,7 +24,7 @@ const OUTPUT_LABELS = {
 const LABEL_MAPPINGS = {
   DrillKitAndSequence: "Drill Kits and Drill Sequences",
   BoneReduction: "Bone Reduction Instruments",
-  RestroativeDirectToImplant: "Drivers (Restorative, Direct to Implant)",
+  RestorativeDirectToImplant: "Drivers (Restorative, Direct to Implant)",
   ChairSidePickUp: "Chairside Pick-Up Materials",
   Implants: "Implants",
   Scanbodies: "Scanbodies (Single Unit)",
