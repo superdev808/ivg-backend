@@ -17,12 +17,9 @@ const schema = new Schema({
   "Item Name": { type: String },
   "Item Number": { type: String },
   "Link to Purchase": { type: String },
+  Notes: { type: String },
 });
 
-const MUAsModel = mongoose.model(
-  "MUA",
-  schema,
-  "MUAs"
-);
+const MUAsModel = mongoose.model("MUA", schema, "MUAs");
 
 module.exports = MUAsModel;

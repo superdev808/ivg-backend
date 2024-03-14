@@ -13,12 +13,9 @@ const schema = new Schema({
   "Item Name": { type: String },
   "Item Number": { type: String },
   "Link to Purchase": { type: String },
+  Notes: { type: String },
 });
 
-const ImplantsModel = mongoose.model(
-  "Implant",
-  schema,
-  "Implants"
-);
+const ImplantsModel = mongoose.model("Implant", schema, "Implants");
 
 module.exports = ImplantsModel;

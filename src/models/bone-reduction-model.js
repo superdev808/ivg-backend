@@ -11,6 +11,8 @@ const schema = new Schema({
   "Bur Kit (Bone Reduction) Link to Purchase": { type: String },
   "Bur Kit (Denture Conversion) Name": { type: String },
   "Bur Kit (Denture Conversion) Link to Purchase": { type: String },
+  Notes: { type: String },
+  Notes_1: { type: String },
 });
 
 const BoneReductionModel = mongoose.model(

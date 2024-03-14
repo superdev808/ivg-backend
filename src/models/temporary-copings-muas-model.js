@@ -8,7 +8,7 @@ const schema = new Schema({
   "Implant Platform": { type: String },
   "Abutment Diameter": { type: String },
   "Abutment Type": { type: String },
-  "Angulation": { type: String },
+  Angulation: { type: String },
   "Restoration Type": { type: String },
   Material: { type: String },
   Length: { type: String },
@@ -17,6 +17,7 @@ const schema = new Schema({
   "Item Name": { type: String },
   "Item Number": { type: String },
   "Link to Purchase": { type: String },
+  Notes: { type: String },
 });
 
 const TemporaryCopingsMUAsModel = mongoose.model(

@@ -15,11 +15,12 @@ const schema = new Schema({
   "Abutment Diameter": { type: String },
   "Collar Height": { type: String },
   "Abutment Height": { type: String },
-  "Engaging": { type: String },
+  Engaging: { type: String },
   "Emergence Profile": { type: String },
   "Item Name": { type: String },
   "Item Number": { type: String },
   "Link to Purchase": { type: String },
+  Notes: { type: String },
 });
 
 const StockAbutmentsModel = mongoose.model(

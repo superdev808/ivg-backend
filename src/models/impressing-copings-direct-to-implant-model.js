@@ -7,7 +7,7 @@ const schema = new Schema({
   "Implant Diameter": { type: String },
   "Implant Platform": { type: String },
   "Open or Closed Tray": { type: String },
-  "Angulation": { type: String },
+  Angulation: { type: String },
   "Impression Coping Diameter": { type: String },
   "Impression Coping Design": { type: String },
   "Impression Coping Length": { type: String },
@@ -17,6 +17,7 @@ const schema = new Schema({
   "Item Name": { type: String },
   "Item Number": { type: String },
   "Link to Purchase": { type: String },
+  Notes: { type: String },
 });
 
 const ImpressingCopingsDirectToImplantsModel = mongoose.model(

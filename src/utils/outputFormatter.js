@@ -103,6 +103,8 @@ const formatBoneReduction = (quizResponse = null) => {
       "Bur Kit (Bone Reduction) Link to Purchase": linkToBurKit = "",
       "Bur Kit (Denture Conversion) Name": surgicalBurKitName = "",
       "Bur Kit (Denture Conversion) Link to Purchase": surgicalBurKitLink = "",
+      Notes: notes = "",
+      Notes_1: notes1 = "",
     },
   } = quizResponse;
   const result = [];
@@ -116,6 +118,7 @@ const formatBoneReduction = (quizResponse = null) => {
           itemNumber: burKitItemNumber,
           link: _.trim(linkToBurKit),
           quantity: !!linkToBurKit ? 1 : null,
+          notes,
         },
       ],
     });
@@ -130,6 +133,7 @@ const formatBoneReduction = (quizResponse = null) => {
           itemNumber: null,
           link: _.trim(surgicalBurKitLink),
           quantity: !!surgicalBurKitLink ? 1 : null,
+          notes: notes1,
         },
       ],
     });
@@ -156,6 +160,9 @@ const formatChairSidePickUp = (quizResponse = null) => {
       "Teflon Tape Link to Purchase": teflonTapeLink = "",
       "Material to Close Screw Access Hole Name": materialName = "",
       "Material to Close Screw Access Hole Link to Purchase": materialLink = "",
+      Notes: notes = "",
+      Notes_1: notes1 = "",
+      Notes_2: notes2 = "",
     },
   } = quizResponse;
   const result = [];
@@ -168,6 +175,7 @@ const formatChairSidePickUp = (quizResponse = null) => {
           itemNumber: "",
           link: _.trim(lutingAgentLink),
           quantity: !!lutingAgentLink ? 1 : null,
+          notes,
         },
       ],
     });
@@ -181,6 +189,7 @@ const formatChairSidePickUp = (quizResponse = null) => {
           itemNumber: "",
           link: _.trim(teflonTapeLink),
           quantity: !!teflonTapeLink ? 1 : null,
+          notes: notes1,
         },
       ],
     });
@@ -194,6 +203,7 @@ const formatChairSidePickUp = (quizResponse = null) => {
           itemNumber: "",
           link: _.trim(materialLink),
           quantity: !!materialLink ? 1 : null,
+          notes: notes2,
         },
       ],
     });
@@ -219,6 +229,7 @@ const formatScanbodies = (quizResponse = null) => {
       "Link to Purchase": link = "",
       "Item Name": itemName = "",
       "Scanbody Item Number": itemNumber = "",
+      Notes: notes = "",
     },
   } = quizResponse;
 
@@ -233,6 +244,7 @@ const formatScanbodies = (quizResponse = null) => {
           link,
           quantity: !!link ? 1 : null,
           manufacturer: manufacturer || manufacturerName,
+          notes,
         },
       ],
     },
@@ -250,6 +262,7 @@ const formatCommonResponse = (quizResponse = null, labelName = "") => {
       "Item Name": itemName = "",
       "Link to Purchase": link = "",
       "Item Number": itemNumber = "",
+      Notes: notes = "",
     },
   } = quizResponse;
 
@@ -267,6 +280,7 @@ const formatCommonResponse = (quizResponse = null, labelName = "") => {
           itemNumber,
           link: _.trim(link),
           quantity: !!link ? 1 : null,
+          notes,
         },
       ],
     },
