@@ -90,10 +90,25 @@ const sortCalculatorOptions = (a, b) => {
   }
 }
 
+// Function to convert image data to Data URI
+const imageToDataURI = (bitmap, fileName) => {
+  // Convert binary data to base64 encoded string
+  const base64Image = Buffer.from(bitmap).toString('base64');
+
+  // Get image file extension
+  const ext = fileName.split('.').pop();
+
+  // Construct Data URI
+  const uri = `data:image/${ext};base64,${base64Image}`;
+
+  return uri;
+};
+
 module.exports = {
   getModelByCalculatorType,
   getQuizData,
   getQuizQuery,
   getUniqueResult,
-  sortCalculatorOptions
+  sortCalculatorOptions,
+  imageToDataURI
 };

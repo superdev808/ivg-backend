@@ -265,7 +265,15 @@ exports.sendCalculatorSummary = async (req, res) => {
 
 exports.sendCalculatorFeedback = async (req, res) => {
   try {
-    const { name, feedbackCategory, message, timestamp, fileName } = req.body;
+    const {
+      name,
+      feedbackCategory,
+      message,
+      timestamp,
+      fileName,
+      calculatorName,
+      userAnswers
+    } = req.body;
     const imageBuffer = req.file?.buffer || null;
 
     if (!name || !feedbackCategory || !message) {
@@ -279,7 +287,11 @@ exports.sendCalculatorFeedback = async (req, res) => {
       imageBuffer,
       timestamp,
       fileName,
+      userAnswers: JSON.parse(userAnswers),
+      calculatorName
     };
+
+    console.log(info);
 
     const result = await sendCalculatorFeedbackEmail(info);
 
