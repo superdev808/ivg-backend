@@ -11,7 +11,7 @@ const ImpressingCopingsDirectToImplantsModel = require("../models/impressing-cop
 const ImpressingCopingsMUAsModel = require("../models/impressing-copings-mua-model");
 const MUAsModel = require("../models/mua-model");
 const RestorativeMultiUnitAbutmentsModel = require("../models/restorative-multi-unit-abutments-model");
-const RestroativeDirectToImplantModel = require("../models/restroative-direct-to-implant-model");
+const RestorativeDirectToImplantModel = require("../models/restorative-direct-to-implant-model");
 const ScanbodyDriversDirectToImplantsModel = require("../models/scanbody-drivers-direct-to-implants-model");
 const ScanbodyDriversMUAsModel = require("../models/scanbody-drivers-muas-model");
 const ScanbodyModel = require("../models/scanbody-model");
@@ -61,7 +61,7 @@ const modelMap = {
   DrillKitAndSequence: DrillKitAndSequenceModel,
   Scanbodies: ScanbodyModel,
   "Crown Materials": CrownMaterialModel,
-  RestroativeDirectToImplant: RestroativeDirectToImplantModel,
+  RestorativeDirectToImplant: RestorativeDirectToImplantModel,
   RestorativeMultiUnitAbutments: RestorativeMultiUnitAbutmentsModel,
   HealingAbutments: HealingAbutmentsModel,
   ImplantAnalogs: ImplantAnalogsModel,
