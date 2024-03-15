@@ -244,8 +244,7 @@ const sendCalculatorFeedbackEmail = async (info) => {
 </p>
 `).join('')
     htmlTemplate = htmlTemplate.replace(/{{USER_ANSWERS}}/g, userAnswersHTML);
-    htmlTemplate = htmlTemplate.replace(/{{IMG_SCREENSHOT}}/g, imageToDataURI(imageBuffer, fileName));
-    await fs.writeFile("../ttt.html", htmlTemplate);
+    htmlTemplate = htmlTemplate.replace(/{{IMG_SCREENSHOT}}/g, imageBuffer ? `<img src="${imageToDataURI(imageBuffer, fileName)}" width="100%" height="100%" style="margin-top: 1rem;"></img>` : '');
     const attachments = imageBuffer
       ? [
           {
