@@ -661,3 +661,28 @@ exports.verifyToken = async (req, res) => {
     return response.badRequest(res, { valid: false });
   }
 };
+
+exports.uploadCalculatorData = async (req, res) => {
+  const { calculatorId, calculatorLabel, gSheetLink } = req.body;
+
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(token, keys.secretOrKey);
+    const userId = decoded.id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return response.notFoundError(res, "User not found.");
+    }
+
+    if (req.user.role !== "Admin") {
+      return response.serverUnauthorized(res, "Unauthorized");
+    }
+
+    return response.success(res, "Uploaded calculator data successfully.");
+  } catch {
+    return response.badRequest(res, {
+      message: "Failed to upload calculator data.",
+    });
+  }
+};
