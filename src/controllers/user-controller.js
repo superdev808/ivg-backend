@@ -1,11 +1,14 @@
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const jwt = require("jsonwebtoken");
 const find = require("lodash/find");
-const omit = require("lodash/omit");
+const { google } = require("googleapis");
+const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
+const omit = require("lodash/omit");
+const trim = require("lodash/trim");
 
 const keys = require("../config/keys");
+const CALCULATOR_MODELS = require("../models/calculator-models");
 const User = require("../models/user");
 const {
   sendResetPasswordEmail,
@@ -24,6 +27,13 @@ const {
   validateUserInfoUpdate,
   validateUserUpdate,
 } = require("../utils/validation");
+
+const googleAuth = new google.auth.JWT(
+  process.env.GOOGLE_API_CLIENT_EMAIL,
+  null,
+  process.env.GOOGLE_API_PRIVATE_KEY.replace(/\\n/g, "\n"),
+  "https://www.googleapis.com/auth/spreadsheets"
+);
 
 async function hashPassword(password) {
   try {
@@ -663,7 +673,7 @@ exports.verifyToken = async (req, res) => {
 };
 
 exports.uploadCalculatorData = async (req, res) => {
-  const { calculatorId, calculatorLabel, gSheetLink } = req.body;
+  const { calculatorId, spreadsheetId, pageName } = req.body;
 
   try {
     const token = req.headers.authorization.split(" ")[1];
@@ -679,8 +689,48 @@ exports.uploadCalculatorData = async (req, res) => {
       return response.serverUnauthorized(res, "Unauthorized");
     }
 
-    return response.success(res, "Uploaded calculator data successfully.");
-  } catch {
+    const sheetInstance = google.sheets({
+      version: "v4",
+      auth: googleAuth,
+    });
+
+    const infoObjectFromSheet = await sheetInstance.spreadsheets.values.get({
+      auth: googleAuth,
+      spreadsheetId,
+      range: pageName,
+    });
+
+    const valuesFromSheet = infoObjectFromSheet.data.values;
+
+    if (valuesFromSheet.length <= 1) {
+      return response.badRequest(res, {
+        message: "Calculator data is not correct",
+      });
+    }
+
+    const header = valuesFromSheet[0].map(trim);
+    const rows = valuesFromSheet.slice(1);
+
+    const Model = CALCULATOR_MODELS[calculatorId];
+
+    const data = rows.map((row) => {
+      return header.reduce((acc, elem, idx) => {
+        acc[elem] = trim(row[idx]);
+        return acc;
+      }, {});
+    });
+
+    await Model.deleteMany({});
+    await Model.insertMany(data);
+
+    return response.success(
+      res,
+      `Uploaded ${data.length} ${
+        data.length === 1 ? "row" : "rows"
+      } for ${calculatorId}`
+    );
+  } catch (error) {
+    console.log(error);
     return response.badRequest(res, {
       message: "Failed to upload calculator data.",
     });
