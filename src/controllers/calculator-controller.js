@@ -66,7 +66,7 @@ const modelMap = {
   HealingAbutments: HealingAbutmentsModel,
   ImplantAnalogs: ImplantAnalogsModel,
   ImplantScrews: ImplantScrewsModel,
-  ImplantTorques: ImplantTorquesModel,
+  ImplantTorquesGuide: ImplantTorquesModel,
   Implants: ImplantsModel,
   ImpressingCopingsDirectToImplants: ImpressingCopingsDirectToImplantsModel,
   ImpressingCopingsMUAs: ImpressingCopingsMUAsModel,
