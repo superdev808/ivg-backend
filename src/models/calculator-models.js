@@ -31,7 +31,7 @@ const CALCULATOR_MODELS = {
   HealingAbutments: HealingAbutmentsModel,
   ImplantAnalogs: ImplantAnalogsModel,
   ImplantScrews: ImplantScrewsModel,
-  ImplantTorques: ImplantTorquesModel,
+  ImplantTorquesGuide: ImplantTorquesModel,
   Implants: ImplantsModel,
   ImpressingCopingsDirectToImplants: ImpressingCopingsDirectToImplantsModel,
   ImpressingCopingsMUAs: ImpressingCopingsMUAsModel,
