@@ -1,26 +1,4 @@
-const BoneReductionModel = require("../models/bone-reduction-model");
-const ChairSidePickUpModel = require("../models/chair-side-pickup-model");
-const CrownMaterialModel = require("../models/crown-material-model");
-const DrillKitAndSequenceModel = require("../models/drillkit_and_sequence_model");
-const HealingAbutmentsModel = require("../models/healing-abutments-model");
-const ImplantAnalogsModel = require("../models/implant-analog-model");
-const ImplantsModel = require("../models/implant-model");
-const ImplantScrewsModel = require("../models/implant-screw-model");
-const ImplantTorquesModel = require("../models/implant-torque-model");
-const ImpressingCopingsDirectToImplantsModel = require("../models/impressing-copings-direct-to-implant-model");
-const ImpressingCopingsMUAsModel = require("../models/impressing-copings-mua-model");
-const MUAsModel = require("../models/mua-model");
-const RestorativeMultiUnitAbutmentsModel = require("../models/restorative-multi-unit-abutments-model");
-const RestorativeDirectToImplantModel = require("../models/restorative-direct-to-implant-model");
-const ScanbodyDriversDirectToImplantsModel = require("../models/scanbody-drivers-direct-to-implants-model");
-const ScanbodyDriversMUAsModel = require("../models/scanbody-drivers-muas-model");
-const ScanbodyModel = require("../models/scanbody-model");
-const ScanbodyMUAsModel = require("../models/scanbody-mua-model");
-const StockAbutmentsModel = require("../models/stock-abutments-model");
-const TemporaryCopingsDirectToImplantsModel = require("../models/temporary-copings-direct-to-implants-model");
-const TemporaryCopingsMUAsModel = require("../models/temporary-copings-muas-model");
-const TiBasesDirectToImplantsModel = require("../models/ti-bases-direct-to-implant-model");
-const TiBasesMUAsModel = require("../models/ti-bases-muas-model");
+const CALCULATOR_MODELS = require("../models/calculator-models");
 const AnnouncementsModel = require("../models/announcement-model");
 const { OUTPUT_TYPES, LABEL_MAPPINGS } = require("../utils/constant");
 const {
@@ -55,38 +33,12 @@ const fieldsToSearch = {
   "Crown Materials": [],
 };
 
-const modelMap = {
-  BoneReduction: BoneReductionModel,
-  ChairSidePickUp: ChairSidePickUpModel,
-  DrillKitAndSequence: DrillKitAndSequenceModel,
-  Scanbodies: ScanbodyModel,
-  "Crown Materials": CrownMaterialModel,
-  RestorativeDirectToImplant: RestorativeDirectToImplantModel,
-  RestorativeMultiUnitAbutments: RestorativeMultiUnitAbutmentsModel,
-  HealingAbutments: HealingAbutmentsModel,
-  ImplantAnalogs: ImplantAnalogsModel,
-  ImplantScrews: ImplantScrewsModel,
-  ImplantTorquesGuide: ImplantTorquesModel,
-  Implants: ImplantsModel,
-  ImpressingCopingsDirectToImplants: ImpressingCopingsDirectToImplantsModel,
-  ImpressingCopingsMUAs: ImpressingCopingsMUAsModel,
-  MUAs: MUAsModel,
-  ScanbodyMUAs: ScanbodyMUAsModel,
-  ScanbodyDriversDirectToImplants: ScanbodyDriversDirectToImplantsModel,
-  ScanbodyDriversMUAs: ScanbodyDriversMUAsModel,
-  StockAbutments: StockAbutmentsModel,
-  TemporaryCopingsDirectToImplants: TemporaryCopingsDirectToImplantsModel,
-  TemporaryCopingsMUAs: TemporaryCopingsMUAsModel,
-  TiBasesDirectToImplants: TiBasesDirectToImplantsModel,
-  TiBasesMUAs: TiBasesMUAsModel,
-};
-
 exports.getCalculatorOptions = async (req, res) => {
   const { type, quiz, fields } = req.body;
 
   const calculatorType = decodeURIComponent(type);
 
-  const Model = getModelByCalculatorType(modelMap, calculatorType);
+  const Model = getModelByCalculatorType(CALCULATOR_MODELS, calculatorType);
 
   if (!Model) {
     response.notFoundError(res, `${type} data is not existing`);
@@ -127,14 +79,14 @@ exports.searchCalculator = async (req, res) => {
 
   try {
     const modelNames = [];
-    for (const modelName of Object.keys(modelMap)) {
+    for (const modelName of Object.keys(CALCULATOR_MODELS)) {
       if (fieldsToSearch[modelName]) {
         const orFields = fieldsToSearch[modelName].map((field) => ({
           [field]: { $regex: new RegExp(text, "i") },
         }));
 
         if (orFields.length) {
-          const results = await modelMap[modelName].find({
+          const results = await CALCULATOR_MODELS[modelName].find({
             $or: orFields,
           });
 
@@ -162,7 +114,10 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
 
     const decodedCalculatorType = decodeURIComponent(type);
 
-    const Model = getModelByCalculatorType(modelMap, decodedCalculatorType);
+    const Model = getModelByCalculatorType(
+      CALCULATOR_MODELS,
+      decodedCalculatorType
+    );
 
     // Check if the calculator type exists in the model map
     if (!Model) {
@@ -180,7 +135,7 @@ exports.getAllOnXCalculatorOptions = async (req, res) => {
     let quizResponse = null;
 
     if (output) {
-      const OutputModel = getModelByCalculatorType(modelMap, output);
+      const OutputModel = getModelByCalculatorType(CALCULATOR_MODELS, output);
 
       if (!OutputModel) {
         return response.notFoundError(
@@ -272,7 +227,7 @@ exports.sendCalculatorFeedback = async (req, res) => {
       timestamp,
       fileName,
       calculatorName,
-      userAnswers
+      userAnswers,
     } = req.body;
     const imageBuffer = req.file?.buffer || null;
 
@@ -288,7 +243,7 @@ exports.sendCalculatorFeedback = async (req, res) => {
       timestamp,
       fileName,
       userAnswers: JSON.parse(userAnswers),
-      calculatorName
+      calculatorName,
     };
 
     console.log(info);
@@ -307,8 +262,15 @@ exports.sendCalculatorFeedback = async (req, res) => {
 
 exports.sendCalculatorHelpfulFeedback = async (req, res) => {
   try {
-    const { name, feedbackCategory, calculatorName, message, timestamp, quiz, fileName } =
-      req.body;
+    const {
+      name,
+      feedbackCategory,
+      calculatorName,
+      message,
+      timestamp,
+      quiz,
+      fileName,
+    } = req.body;
     if (!name || !feedbackCategory || !calculatorName) {
       return response.badRequest(res, { message: "Missing required fields." });
     }
@@ -322,7 +284,7 @@ exports.sendCalculatorHelpfulFeedback = async (req, res) => {
       timestamp,
       quiz: JSON.parse(quiz),
       fileName,
-      imageBuffer
+      imageBuffer,
     };
 
     const result = await sendCalculatorHelpfulFeedbackEmail(info);
@@ -343,12 +305,12 @@ exports.getAnnouncements = async (req, res) => {
   }
 
   try {
-    const results = await AnnouncementsModel.find({})
+    const results = await AnnouncementsModel.find({});
     return response.success(res, results);
   } catch (ex) {
     response.serverError(res, { message: ex.message });
   }
-}
+};
 
 exports.createAnnouncement = async (req, res) => {
   if (req.user.role !== "Admin") {
@@ -357,10 +319,8 @@ exports.createAnnouncement = async (req, res) => {
   try {
     const { content, _id } = req.body;
     let announcement;
-    if (_id != undefined)
-      announcement = await AnnouncementsModel.findById(_id);
-    else
-      announcement = new AnnouncementsModel({ content });
+    if (_id != undefined) announcement = await AnnouncementsModel.findById(_id);
+    else announcement = new AnnouncementsModel({ content });
     announcement.content = content;
     announcement.published_at = new Date();
     const result = await announcement.save();
@@ -368,14 +328,18 @@ exports.createAnnouncement = async (req, res) => {
   } catch (ex) {
     response.serverError(res, { message: ex.message });
   }
-}
+};
 
 exports.getLatestAnnouncement = async (req, res) => {
   if (req.user.role !== "Admin") {
     return response.serverUnauthorized(res, "Unauthorized");
   }
   try {
-    const latest = await AnnouncementsModel.findOne({  }, {}, { sort: { 'published_at' : -1 } }).exec()
+    const latest = await AnnouncementsModel.findOne(
+      {},
+      {},
+      { sort: { published_at: -1 } }
+    ).exec();
     // 7 days = 7 * 24 * 60 * 60 * 1000 ms
     const expiredMs = 7 * 24 * 60 * 60 * 1000;
     if (latest.published_at < new Date(new Date() - expiredMs))
@@ -384,17 +348,17 @@ exports.getLatestAnnouncement = async (req, res) => {
   } catch (ex) {
     response.serverError(res, { message: ex.message });
   }
-}
+};
 
 exports.deleteAnnouncement = async (req, res) => {
   if (req.user.role !== "Admin") {
     return response.serverUnauthorized(res, "Unauthorized");
   }
   try {
-    const {  _id } = req.body;
-    const result = await AnnouncementsModel.findByIdAndDelete(_id)
+    const { _id } = req.body;
+    const result = await AnnouncementsModel.findByIdAndDelete(_id);
     return response.success(res, result);
   } catch (ex) {
     response.serverError(res, { message: ex.message });
   }
-}
+};
