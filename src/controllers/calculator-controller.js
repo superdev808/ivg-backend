@@ -47,25 +47,40 @@ exports.getCalculatorOptions = async (req, res) => {
 
   try {
     const query = quiz;
-    const data = await Model.find(query);
+    const data = (
+      await Model.aggregate([
+        {
+          $match: query,
+        },
+        {
+          $project: fields.reduce(
+            (finalValue, field) => ({
+              ...finalValue,
+              [field]: 1,
+            }),
+            {}
+          ),
+        },
+        {
+          $group: {
+            _id: fields.reduce(
+              (finalValue, field) => ({
+                ...finalValue,
+                [field]: `$${field}`,
+              }),
+              {}
+            ),
+          },
+        },
+      ])
+    ).map((item) => item['_id']);
 
     let result = [];
 
     if (fields.length > 1) {
-      result = _.uniq(
-        data.map((item) => {
-          const res = {};
-          fields.forEach((field) => {
-            res[field] = item[field];
-          });
-
-          return res;
-        })
-      ).sort(sortCalculatorOptions);
+      result = data.sort(sortCalculatorOptions);
     } else {
-      result = _.uniq(data.map((item) => item[fields[0]])).sort(
-        sortCalculatorOptions
-      );
+      result = data.map((item) => item[fields[0]]).sort(sortCalculatorOptions);
     }
 
     response.success(res, result);
@@ -194,7 +209,9 @@ exports.sendCalculatorSummary = async (req, res) => {
     const pdfBuffer = req.file.buffer || null;
 
     if (!recipientsList || !calculatorName || !filename) {
-      return response.badRequest(res, { message: "Missing required fields." });
+      return response.badRequest(res, {
+        message: "Missing required fields.",
+      });
     }
 
     const emails = [...new Set(recipientsList.split("|"))];
@@ -232,7 +249,9 @@ exports.sendCalculatorFeedback = async (req, res) => {
     const imageBuffer = req.file?.buffer || null;
 
     if (!name || !feedbackCategory || !message) {
-      return response.badRequest(res, { message: "Missing required fields." });
+      return response.badRequest(res, {
+        message: "Missing required fields.",
+      });
     }
 
     const info = {
@@ -272,7 +291,9 @@ exports.sendCalculatorHelpfulFeedback = async (req, res) => {
       fileName,
     } = req.body;
     if (!name || !feedbackCategory || !calculatorName) {
-      return response.badRequest(res, { message: "Missing required fields." });
+      return response.badRequest(res, {
+        message: "Missing required fields.",
+      });
     }
 
     const imageBuffer = req.file?.buffer || null;
