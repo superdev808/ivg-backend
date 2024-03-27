@@ -1,4 +1,6 @@
-export const calculatorSchema = new Schema(
+const mongoose = require("mongoose");
+
+const calculatorSchema = new mongoose.Schema(
   {
     "Implant Brand": { type: String },
     "Implant Model": { type: String },
@@ -7,3 +9,5 @@ export const calculatorSchema = new Schema(
   },
   { strict: false }
 );
+
+module.exports = { calculatorSchema };
