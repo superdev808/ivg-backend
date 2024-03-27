@@ -730,9 +730,8 @@ exports.uploadCalculatorData = async (req, res) => {
       } for ${calculatorId}`
     );
   } catch (error) {
-    console.log(error);
     return response.badRequest(res, {
-      message: "Failed to upload calculator data.",
+      message: String(error),
     });
   }
 };
