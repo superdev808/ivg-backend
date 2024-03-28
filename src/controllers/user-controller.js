@@ -31,7 +31,7 @@ const {
 const googleAuth = new google.auth.JWT(
   process.env.GOOGLE_API_CLIENT_EMAIL,
   null,
-  process.env.GOOGLE_API_PRIVATE_KEY.replace(/\\n/g, "\n"),
+  atob(process.env.GOOGLE_API_PRIVATE_KEY).replace(/\\n/g, "\n"),
   "https://www.googleapis.com/auth/spreadsheets"
 );
 
