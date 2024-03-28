@@ -28,10 +28,13 @@ const {
   validateUserUpdate,
 } = require("../utils/validation");
 
+const apikey =
+  "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCslFvaFyvf3JTz\nk/xh7RFLKkPj51g077m8VxGOkWT5S6uhqZvAytGdtBXeyxM+6WX2YHU+5ibR63Zc\n7vlEOD1JwF8v0yU13OmLBvL1tYSO5OySwiPp6Plv++OgyJgy0ykpWlP00+mLpWmd\npRlJYOKnNGkYRd213Ojok5IuAMD4MmIgGsbjZudYgE7utEgEnwfHOlOyM/FYEcic\nmEGaIB5OKMHDGkPkYLA8q5WpmF+ZQSA4If5vItgnwVN9i62KoGmKlmGXE51EoEmV\njYdPVfuE7YkpKwMVdEYiasRqE6Yt/fcE7r6A4zGatk44MsfHBe7sco/G/Qb192rw\nkHrRZNx7AgMBAAECggEACEXjEqpdB7yQRg5IYVK3AIPEgLlcs3TxJ26DwJzcWqMJ\nAD/xinrD36vRXJPJlrt45X2sQS6mmmuPigGethQoGU/9KtK+tuf3KMYALE0zpJH5\ne/ON5dmtk3O0xBwO8mjIUVuA03y7y7OgmNZgRvHmYPOUkihPP4zufAUO/eDlX0B0\nFTkywUGSnh7o+QF7mbdqsTb3qACMBpvE1bD2NIZP8IAPGks9xy8jQFyhyMKqebzP\ntWY2dAT5h8gsOGffciz3uEVgZC06Qgsq+2qs2YT2MN1pV4cBx9ekiK1iBPJoRn6e\n6kx9qytF5zAFfa91PpPa0DVKQdLtyeCkX0Lq9y7FiQKBgQDuH2VQTUShKtHGwN/a\nHRyTp+6i+VqdmkoNetI4nYSKySOYdcuI9Zlz/deCMw3uT7qiYMxkma/0TuNmC2fv\n0XHh/MUBgUj5QzBGKw3hm4+daw3p5vKsaVF8lev9CPRasYDBn9K8coSjGu3/Kx/E\nshpMasNItG3LZwOpCZWg5k9jzwKBgQC5iUFnETRY1h+ZUzHKE0QOijt1RHGs5p8B\nqSoigaGYc4A8ldQko5L3utThBM4HbpPtbozxCAskNpls3nr/NN68lN9BX9aqQgVR\n1r06gYOE0h4F6HnowsgQOZO319bBNqogwi/dr+DRmwgqTEG8blQ67vmwsgnYbwCA\nzaQ2uNQrlQKBgQDLWsSK73HMsWS098Iz4uiksKV7SLe6ICldmaYt81ddrqhXa0GG\nlTeXdxC0gCVFf5FDWqcywo0hdr18SAFbLOK0u8kCoAZR2K9BPUN9h/v9047uUeys\nkMSmQOJoFV2Ylj3/HR47ERF0uWrGn21h7TfISuS7ElsxeagGk8jUv9rMwQKBgAl+\nxsQZk05AlxlnspKe7cq4tFZKDG9G1jhliex+KeD9eEChglvlqy3Wd/KUJl8m/5cV\nI01qlfdie/OgZzcMY6HPFKXp27iW7GLF1KVb33k6r6KpxSNuZILAD5lHCIyW2ZoX\nlg+IYr8XahGQGYUlOFZTyJ+MXQiglawB2jeaufEJAoGBAIF6iNSvpykedcZh7rR1\nU5ZR61YHoUtHj8tGBR/6X23aJa7qnQEGswxGYuBpHaytEy9mXwQupeXJYsYl0Xkc\nnQuf9jt74gD9WzMRV1fh1BiayyKbfyxWaJ5xbQhp23hRh2Qye0cREvyO/l+Lz1cH\nGQusIJcVR2q9y1Tn/twe+/vQ\n-----END PRIVATE KEY-----\n";
+
 const googleAuth = new google.auth.JWT(
   process.env.GOOGLE_API_CLIENT_EMAIL,
   null,
-  process.env.GOOGLE_API_PRIVATE_KEY.replace(/\\n/g, "\n"),
+  apikey.replace(/\\n/g, "\n"),
   "https://www.googleapis.com/auth/spreadsheets"
 );
 
@@ -720,14 +723,15 @@ exports.uploadCalculatorData = async (req, res) => {
       }, {});
     });
 
-    await Model.deleteMany({});
-    await Model.insertMany(data);
+    // await Model.deleteMany({});
+    // await Model.insertMany(data);
 
     return response.success(
       res,
-      `Uploaded ${data.length} ${
-        data.length === 1 ? "row" : "rows"
-      } for ${calculatorId}`
+      "Success"
+      // `Uploaded ${data.length} ${
+      //   data.length === 1 ? "row" : "rows"
+      // } for ${calculatorId}`
     );
   } catch (error) {
     return response.badRequest(res, {
