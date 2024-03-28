@@ -716,22 +716,41 @@ exports.uploadCalculatorData = async (req, res) => {
 
     const Model = CALCULATOR_MODELS[calculatorId];
 
-    const data = rows.map((row) => {
-      return header.reduce((acc, elem, idx) => {
-        acc[elem] = trim(row[idx]);
-        return acc;
-      }, {});
-    });
+    const insertData = async (data) => {
+      const newData = data.map((row) => {
+        return header.reduce((acc, elem, idx) => {
+          acc[elem] = trim(row[idx]);
+          return acc;
+        }, {});
+      });
+      try {
+        await Model.insertMany(newData);
+        return data.length;
+      } catch (error) {
+        return 0;
+      }
+    }
 
-    // await Model.deleteMany({});
-    // await Model.insertMany(data);
+    const splitData = [], threshold = 500;
+
+    for (let i = 0, j; i < rows.length; i = j) {
+      let subData = [];
+      for (j = i; j < rows.length && j < i + threshold; ++j)
+        subData.push(rows[j]);
+      splitData.push(subData);
+    }
+
+    
+    await Model.deleteMany({});
+
+    let lengthArray = await Promise.all(splitData.map(subData => insertData(subData)));
+    let totalLength = lengthArray.reduce((sum, cur) => sum + cur, 0);
 
     return response.success(
       res,
-      "Success"
-      // `Uploaded ${data.length} ${
-      //   data.length === 1 ? "row" : "rows"
-      // } for ${calculatorId}`
+      `Uploaded ${totalLength} ${
+        totalLength === 1 ? "row" : "rows"
+      } for ${calculatorId}`
     );
   } catch (error) {
     return response.badRequest(res, {
