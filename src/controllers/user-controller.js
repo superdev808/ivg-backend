@@ -721,7 +721,7 @@ exports.uploadCalculatorData = async (req, res) => {
     });
 
     await Model.deleteMany({});
-    await Model.insertMany(data);
+    // await Model.insertMany(data);
 
     return response.success(
       res,
