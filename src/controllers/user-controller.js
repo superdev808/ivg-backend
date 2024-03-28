@@ -34,7 +34,11 @@ const apikey =
 const googleAuth = new google.auth.JWT(
   process.env.GOOGLE_API_CLIENT_EMAIL,
   null,
+<<<<<<< HEAD
   apikey.replace(/\\n/g, "\n"),
+=======
+  atob(process.env.GOOGLE_API_PRIVATE_KEY).replace(/\\n/g, "\n"),
+>>>>>>> 9235b60a7f366049f1dea004a15f3fc4d64d97fc
   "https://www.googleapis.com/auth/spreadsheets"
 );
 
