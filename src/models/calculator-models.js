@@ -3,6 +3,8 @@ const ChairSidePickUpModel = require("./chair-side-pickup-model");
 const DrillKitAndSequenceModel = require("./drillkit_and_sequence_model");
 const HealingAbutmentsModel = require("./healing-abutments-model");
 const ImplantAnalogsModel = require("./implant-analog-model");
+const ImplantBorneBridgeModel = require("./implant-borne-bridge-model");
+const ImplantBorneCrownModel = require("./implant-borne-crown-model");
 const ImplantsModel = require("./implant-model");
 const ImplantScrewsModel = require("./implant-screw-model");
 const ImplantTorquesModel = require("./implant-torque-model");
@@ -21,6 +23,7 @@ const TemporaryCopingsMUAsModel = require("./temporary-copings-muas-model");
 const TiBasesDirectToImplantsModel = require("./ti-bases-direct-to-implant-model");
 const TiBasesMUAsModel = require("./ti-bases-muas-model");
 const ToothBorneBridgeModel = require("./tooth-borne-bridge-model");
+const ToothBorneCrownModel = require("./tooth-borne-crown-model");
 
 const CALCULATOR_MODELS = {
   BoneReduction: BoneReductionModel,
@@ -31,6 +34,8 @@ const CALCULATOR_MODELS = {
   RestorativeMultiUnitAbutments: RestorativeMultiUnitAbutmentsModel,
   HealingAbutments: HealingAbutmentsModel,
   ImplantAnalogs: ImplantAnalogsModel,
+  ImplantBorneBridge: ImplantBorneBridgeModel,
+  ImplantBorneCrown: ImplantBorneCrownModel,
   ImplantScrews: ImplantScrewsModel,
   ImplantTorquesGuide: ImplantTorquesModel,
   Implants: ImplantsModel,
@@ -46,6 +51,7 @@ const CALCULATOR_MODELS = {
   TiBasesDirectToImplants: TiBasesDirectToImplantsModel,
   TiBasesMUAs: TiBasesMUAsModel,
   ToothBorneBridge: ToothBorneBridgeModel,
+  ToothBorneCrown: ToothBorneCrownModel,
 };
 
 module.exports = CALCULATOR_MODELS;
