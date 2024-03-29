@@ -713,7 +713,7 @@ exports.uploadCalculatorData = async (req, res) => {
 
     const Model = CALCULATOR_MODELS[calculatorId];
 
-    const insertData = async (data) => {
+    const insertData = async (data, index) => {
       const newData = data.map((row) => {
         return header.reduce((acc, elem, idx) => {
           acc[elem] = trim(row[idx]);
@@ -721,6 +721,7 @@ exports.uploadCalculatorData = async (req, res) => {
         }, {});
       });
       try {
+        console.log("index: ", index);
         await Model.insertMany(newData);
         return data.length;
       } catch (error) {
@@ -728,7 +729,7 @@ exports.uploadCalculatorData = async (req, res) => {
       }
     }
 
-    const splitData = [], threshold = 500;
+    const splitData = [], threshold = 100;
 
     for (let i = 0, j; i < rows.length; i = j) {
       let subData = [];
@@ -740,7 +741,7 @@ exports.uploadCalculatorData = async (req, res) => {
     
     await Model.deleteMany({});
 
-    let lengthArray = await Promise.all(splitData.map(subData => insertData(subData)));
+    let lengthArray = await Promise.all(splitData.map((subData, index) => insertData(subData, index)));
     let totalLength = lengthArray.reduce((sum, cur) => sum + cur, 0);
 
     return response.success(
