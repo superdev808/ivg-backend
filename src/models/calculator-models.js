@@ -20,6 +20,7 @@ const TemporaryCopingsDirectToImplantsModel = require("./temporary-copings-direc
 const TemporaryCopingsMUAsModel = require("./temporary-copings-muas-model");
 const TiBasesDirectToImplantsModel = require("./ti-bases-direct-to-implant-model");
 const TiBasesMUAsModel = require("./ti-bases-muas-model");
+const ToothBorneBridgeModel = require("./tooth-borne-bridge-model");
 
 const CALCULATOR_MODELS = {
   BoneReduction: BoneReductionModel,
@@ -44,6 +45,7 @@ const CALCULATOR_MODELS = {
   TemporaryCopingsMUAs: TemporaryCopingsMUAsModel,
   TiBasesDirectToImplants: TiBasesDirectToImplantsModel,
   TiBasesMUAs: TiBasesMUAsModel,
+  ToothBorneBridge: ToothBorneBridgeModel,
 };
 
 module.exports = CALCULATOR_MODELS;

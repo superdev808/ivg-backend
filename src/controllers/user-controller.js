@@ -1,15 +1,15 @@
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const find = require("lodash/find");
-const { google } = require("googleapis");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const omit = require("lodash/omit");
 const trim = require("lodash/trim");
 
+const { googleAuth, sheetInstance } = require("../config/api");
 const keys = require("../config/keys");
-const CALCULATOR_MODELS = require("../models/calculator-models");
 const User = require("../models/user");
+const UploadProgress = require("../models/upload-progress");
 const {
   sendResetPasswordEmail,
   sendVerificationEmail,
@@ -20,6 +20,7 @@ const {
   generateSignedUrl,
   uploadToS3,
 } = require("../utils/storageService");
+const { uploadData } = require("../utils/uploadData");
 const {
   validateEmail,
   validateLoginInput,
@@ -27,13 +28,6 @@ const {
   validateUserInfoUpdate,
   validateUserUpdate,
 } = require("../utils/validation");
-
-const googleAuth = new google.auth.JWT(
-  process.env.GOOGLE_API_CLIENT_EMAIL,
-  null,
-  atob(process.env.GOOGLE_API_PRIVATE_KEY).replace(/\\n/g, "\n"),
-  "https://www.googleapis.com/auth/spreadsheets"
-);
 
 async function hashPassword(password) {
   try {
@@ -685,14 +679,22 @@ exports.uploadCalculatorData = async (req, res) => {
       return response.notFoundError(res, "User not found.");
     }
 
-    if (req.user.role !== "Admin") {
+    if (user.role !== "Admin") {
       return response.serverUnauthorized(res, "Unauthorized");
     }
 
-    const sheetInstance = google.sheets({
-      version: "v4",
-      auth: googleAuth,
-    });
+    const existingProgress = await UploadProgress.findOne({ calculatorId });
+
+    if (existingProgress) {
+      if (existingProgress.status === "STARTED") {
+        return response.badRequest(
+          res,
+          `Data for ${calculatorId} calculator is being uploaded. Please wait and try again later.`
+        );
+      } else {
+        await UploadProgress.deleteOne({ calculatorId });
+      }
+    }
 
     const infoObjectFromSheet = await sheetInstance.spreadsheets.values.get({
       auth: googleAuth,
@@ -700,59 +702,49 @@ exports.uploadCalculatorData = async (req, res) => {
       range: pageName,
     });
 
-    const valuesFromSheet = infoObjectFromSheet.data.values;
+    const rows = infoObjectFromSheet.data.values;
 
-    if (valuesFromSheet.length <= 1) {
+    if (rows.length <= 1) {
       return response.badRequest(res, {
-        message: "Calculator data is not correct",
+        message: `Data for ${calculatorId} calculator is not correct`,
       });
     }
 
-    const header = valuesFromSheet[0].map(trim);
-    const rows = valuesFromSheet.slice(1);
+    const header = rows[0].map(trim);
 
-    const Model = CALCULATOR_MODELS[calculatorId];
+    const totalCount = rows.length - 1;
 
-    const insertData = async (data, index) => {
-      const newData = data.map((row) => {
-        return header.reduce((acc, elem, idx) => {
-          acc[elem] = trim(row[idx]);
-          return acc;
-        }, {});
-      });
-      try {
-        console.log("index: ", index);
-        await Model.insertMany(newData);
-        return data.length;
-      } catch (error) {
-        return 0;
-      }
-    }
+    const uploadProgress = new UploadProgress({
+      user: user.email,
+      calculatorId: calculatorId,
+      total: totalCount,
+      uploaded: 0,
+      status: "STARTED",
+    });
 
-    const splitData = [], threshold = 100;
+    const { _id: progressId } = await uploadProgress.save();
 
-    for (let i = 0, j; i < rows.length; i = j) {
-      let subData = [];
-      for (j = i; j < rows.length && j < i + threshold; ++j)
-        subData.push(rows[j]);
-      splitData.push(subData);
-    }
+    response.success(res, {
+      message: `Started uploading ${totalCount} ${
+        totalCount === 1 ? "row" : "rows"
+      } for ${calculatorId}`,
+      progressId,
+    });
 
-    
-    await Model.deleteMany({});
-
-    let lengthArray = await Promise.all(splitData.map((subData, index) => insertData(subData, index)));
-    let totalLength = lengthArray.reduce((sum, cur) => sum + cur, 0);
-
-    return response.success(
-      res,
-      `Uploaded ${totalLength} ${
-        totalLength === 1 ? "row" : "rows"
-      } for ${calculatorId}`
-    );
+    uploadData(req.body, header, totalCount, progressId);
   } catch (error) {
     return response.badRequest(res, {
       message: String(error),
     });
   }
+};
+
+exports.getUploadProgress = async (req, res) => {
+  const { id } = req.params;
+
+  const existingProgress = await UploadProgress.findOne({
+    _id: id,
+  });
+
+  return response.success(res, existingProgress);
 };
