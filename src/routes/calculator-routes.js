@@ -13,17 +13,32 @@ const {
   getAnnouncements,
   createAnnouncement,
   getLatestAnnouncement,
-  deleteAnnouncement
+  deleteAnnouncement,
+  getCalculatorInfo,
 } = require("../controllers/calculator-controller");
 
 class CalculatorRoutes {
   static getRoutes(app, router) {
     router.post("/materials", bodyParser.json(), getCalculatorOptions);
     router.get("/search", searchCalculator);
-    router.post("/announcements/create", bodyParser.json(), checkAccessToken, createAnnouncement);
-    router.post("/announcements/delete", bodyParser.json(), checkAccessToken, deleteAnnouncement);
+    router.post(
+      "/announcements/create",
+      bodyParser.json(),
+      checkAccessToken,
+      createAnnouncement
+    );
+    router.post(
+      "/announcements/delete",
+      bodyParser.json(),
+      checkAccessToken,
+      deleteAnnouncement
+    );
     router.get("/announcements/get_all", checkAccessToken, getAnnouncements);
-    router.get("/announcements/get_latest", checkAccessToken, getLatestAnnouncement);
+    router.get(
+      "/announcements/get_latest",
+      checkAccessToken,
+      getLatestAnnouncement
+    );
     router.post(
       "/allOnXCalculator",
       bodyParser.json(),
@@ -44,6 +59,7 @@ class CalculatorRoutes {
       upload.single("attachment"),
       sendCalculatorHelpfulFeedback
     );
+    router.get("/calculatorInfo", getCalculatorInfo);
   }
 }
 

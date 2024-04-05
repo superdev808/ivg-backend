@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 
 const calculatorSchema = new mongoose.Schema(
   {
-    "Implant Brand": { type: String },
-    "Implant Model": { type: String },
-    "Implant Diameter": { type: String },
-    "Implant Platform": { type: String },
+    "0": { type: String },
+    "1": { type: String },
+    "2": { type: String },
+    "3": { type: String },
   },
   { strict: false }
 );

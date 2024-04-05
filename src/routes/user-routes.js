@@ -102,7 +102,7 @@ class UserRoutes {
       bodyParser.json(),
       uploadCalculatorData
     );
-    router.get("/uploadProgress/:id", getUploadProgress);
+    router.get("/uploadProgress/:id", checkAccessToken, getUploadProgress);
   }
 }
 

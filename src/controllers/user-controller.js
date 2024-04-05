@@ -20,7 +20,7 @@ const {
   generateSignedUrl,
   uploadToS3,
 } = require("../utils/storageService");
-const { uploadData } = require("../utils/uploadData");
+const { uploadData, getSpreadSheetRows } = require("../utils/uploadData");
 const {
   validateEmail,
   validateLoginInput,
@@ -667,22 +667,14 @@ exports.verifyToken = async (req, res) => {
 };
 
 exports.uploadCalculatorData = async (req, res) => {
-  const { calculatorId, spreadsheetId, pageName } = req.body;
+  const { calculatorId, spreadsheetId, pageDataName, pageHeaderName } =
+    req.body;
+
+  if (req.user.role !== "Admin") {
+    return response.serverUnauthorized(res, "Unauthorized");
+  }
 
   try {
-    const token = req.headers.authorization.split(" ")[1];
-    const decoded = jwt.verify(token, keys.secretOrKey);
-    const userId = decoded.id;
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return response.notFoundError(res, "User not found.");
-    }
-
-    if (user.role !== "Admin") {
-      return response.serverUnauthorized(res, "Unauthorized");
-    }
-
     const existingProgress = await UploadProgress.findOne({ calculatorId });
 
     if (existingProgress) {
@@ -696,26 +688,22 @@ exports.uploadCalculatorData = async (req, res) => {
       }
     }
 
-    const infoObjectFromSheet = await sheetInstance.spreadsheets.values.get({
-      auth: googleAuth,
-      spreadsheetId,
-      range: pageName,
+    const rows = await getSpreadSheetRows(spreadsheetId, {
+      pageName: pageDataName,
     });
 
-    const rows = infoObjectFromSheet.data.values;
+    const rowsCount = rows.length;
+    const columnsCount = rows[0].length;
+    const totalCount = rowsCount - 1;
 
-    if (rows.length <= 1) {
+    if (totalCount <= 0) {
       return response.badRequest(res, {
         message: `Data for ${calculatorId} calculator is not correct`,
       });
     }
 
-    const header = rows[0].map(trim);
-
-    const totalCount = rows.length - 1;
-
     const uploadProgress = new UploadProgress({
-      user: user.email,
+      user: req.user.email,
       calculatorId: calculatorId,
       total: totalCount,
       uploaded: 0,
@@ -731,7 +719,7 @@ exports.uploadCalculatorData = async (req, res) => {
       progressId,
     });
 
-    uploadData(req.body, header, totalCount, progressId);
+    uploadData(req.body, progressId, { rowsCount, columnsCount });
   } catch (error) {
     return response.badRequest(res, {
       message: String(error),
@@ -740,11 +728,9 @@ exports.uploadCalculatorData = async (req, res) => {
 };
 
 exports.getUploadProgress = async (req, res) => {
-  const { id } = req.params;
+  const { id: _id } = req.params;
 
-  const existingProgress = await UploadProgress.findOne({
-    _id: id,
-  });
+  const existingProgress = await UploadProgress.findOne({ _id });
 
   return response.success(res, existingProgress);
 };

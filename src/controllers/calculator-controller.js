@@ -22,6 +22,8 @@ const {
 } = require("../utils/outputFormatter");
 const response = require("../utils/response");
 const _ = require("lodash");
+const MetaCalcModel = require("../models/meta-calc-model");
+const { CALCULATORS } = require("../utils/constant");
 
 const fieldsToSearch = {
   Scanbodies: [
@@ -73,7 +75,7 @@ exports.getCalculatorOptions = async (req, res) => {
           },
         },
       ])
-    ).map((item) => item['_id']);
+    ).map((item) => item["_id"]);
 
     let result = [];
 
@@ -94,20 +96,29 @@ exports.searchCalculator = async (req, res) => {
 
   try {
     const modelNames = [];
-    for (const modelName of Object.keys(CALCULATOR_MODELS)) {
-      if (fieldsToSearch[modelName]) {
-        const orFields = fieldsToSearch[modelName].map((field) => ({
-          [field]: { $regex: new RegExp(text, "i") },
-        }));
+    for (const modelName of Object.keys(fieldsToSearch)) {
+      const headerIndexes = (
+        await MetaCalcModel.find(
+          {
+            calculatorType: modelName,
+            name: {
+              $in: fieldsToSearch[modelName],
+            },
+          },
+          "index"
+        )
+      ).map((item) => item["index"]);
 
-        if (orFields.length) {
-          const results = await CALCULATOR_MODELS[modelName].find({
-            $or: orFields,
-          });
+      const orFields = headerIndexes.map((field) => ({
+        [field]: { $regex: new RegExp(text, "i") },
+      }));
+      if (orFields.length) {
+        const results = await CALCULATOR_MODELS[modelName].find({
+          $or: orFields,
+        });
 
-          if (results.length) {
-            modelNames.push(modelName);
-          }
+        if (results.length) {
+          modelNames.push(modelName);
         }
       }
     }
@@ -382,4 +393,66 @@ exports.deleteAnnouncement = async (req, res) => {
   } catch (ex) {
     response.serverError(res, { message: ex.message });
   }
+};
+
+exports.getCalculatorInfo = async (req, res) => {
+  let resultCalculators = CALCULATORS.reduce(
+    (result, cur) => ({
+      ...result,
+      [cur.type]: {
+        ...cur,
+        input: [],
+        output: [],
+      },
+    }),
+    {}
+  );
+  Object.keys(resultCalculators).forEach((key) => {
+    resultCalculators[key]["input"] = [];
+    resultCalculators[key]["output"] = [];
+  });
+  let headers = [];
+  try {
+    headers = await MetaCalcModel.find();
+  } catch (error) {}
+  headers.forEach((headerInfo) => {
+    const {
+      colIndex,
+      colName,
+      colText,
+      groupId = "",
+      groupName,
+      groupText,
+      isCommon,
+      calculatorType,
+    } = headerInfo;
+    if (!(calculatorType in resultCalculators))
+      resultCalculators[calculatorType] = {
+        type: calculatorType,
+        label: calculatorType,
+        description: "",
+        input: [],
+        output: [],
+      };
+    resultCalculators[calculatorType][
+      /input/gi.test(groupId) ? "input" : "output"
+    ].push({
+      colIndex,
+      colName,
+      colText,
+      groupId,
+      groupName,
+      groupText,
+      isCommon,
+      calculatorType,
+    });
+  });
+  Object.keys(resultCalculators).forEach((key) => {
+    const compareFn = (left, right) => {
+      return parseInt(left.index) - parseInt(right.index);
+    };
+    resultCalculators[key]["input"].sort(compareFn);
+    resultCalculators[key]["output"].sort(compareFn);
+  });
+  return response.success(res, resultCalculators);
 };
