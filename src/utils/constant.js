@@ -47,12 +47,6 @@ const LABEL_MAPPINGS = {
 };
 
 const CALCULATORS = [
-  {
-    type: "Scanbodies",
-    label: "Scanbodies (Single Unit)",
-    description:
-      "Enter your implant information below to determine compatible authentic and generic scanbodies.",
-  },
   // {
   //   type: "Implant Drivers",
   //   label: "implant driver",
@@ -113,10 +107,10 @@ const CALCULATORS = [
       "This calculator displays healing abutments based on desired implant brand and size, as well as links to purchase this equipment.",
   },
   {
-    type: "ImplantAnalogs",
-    label: "Implant Analogs",
+    type: "Implants",
+    label: "Implants",
     description:
-      "This calculator displays implant analogs for stone (lab) and digital (IOS) models based on desired implant brand and size, as well as links to purchase this equipment.",
+      "This calculator displays implants based on desired implant brand and size, as well as links to purchase this equipment.",
   },
   {
     type: "ImplantScrews",
@@ -125,10 +119,15 @@ const CALCULATORS = [
       "This calculator displays screws based on desired implant brand and size, as well as links to purchase this equipment.",
   },
   {
-    type: "Implants",
-    label: "Implants",
+    type: "ImplantTorquesGuide",
+    label: "Implant Torque Guide",
+    description: "Find the right torque value for your desired component, product, or procedure.",
+  },
+  {
+    type: "ImplantAnalogs",
+    label: "Implant Analogs",
     description:
-      "This calculator displays implants based on desired implant brand and size, as well as links to purchase this equipment.",
+      "This calculator displays implant analogs for stone (lab) and digital (IOS) models based on desired implant brand and size, as well as links to purchase this equipment.",
   },
   {
     type: "ImpressingCopingsDirectToImplants",
@@ -147,6 +146,12 @@ const CALCULATORS = [
     label: "Multi-Unit Abutments",
     description:
       "This calculator displays multi-unit abutments based on desired implant brand and size, as well as links to purchase this equipment.",
+  },
+  {
+    type: "Scanbodies",
+    label: "Scanbodies (Single Unit)",
+    description:
+      "This calculator displays scanbodies for single implants based on desired implant brand and size, as well as links to purchase this equipment.",
   },
   {
     type: "ScanbodyMUAs",
@@ -195,11 +200,6 @@ const CALCULATORS = [
     label: "Ti Bases (Multi-Unit Abutments)",
     description:
       "This calculator displays Ti Bases for multi-unit abutments based on desired implant brand and size, as well as links to purchase this equipment.",
-  },
-  {
-    type: "ImplantTorquesGuide",
-    label: "Implant Torque Guide",
-    description: "",
   },
   {
     type: "ToothBorneBridge",
