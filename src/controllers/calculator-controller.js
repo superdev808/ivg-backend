@@ -1,25 +1,14 @@
 const CALCULATOR_MODELS = require("../models/calculator-models");
 const AnnouncementsModel = require("../models/announcement-model");
-const { OUTPUT_TYPES, LABEL_MAPPINGS } = require("../utils/constant");
 const {
   sendCalculatorSummaryEmail,
   sendCalculatorFeedbackEmail,
   sendCalculatorHelpfulFeedbackEmail,
 } = require("../utils/emailService");
 const {
-  getQuizData,
-  getUniqueResult,
-  getQuizQuery,
   getModelByCalculatorType,
   sortCalculatorOptions,
 } = require("../utils/helper");
-const {
-  formatDrillkitAndSequence,
-  formatBoneReduction,
-  formatChairSidePickUp,
-  formatCommonResponse,
-  formatScanbodies,
-} = require("../utils/outputFormatter");
 const response = require("../utils/response");
 const _ = require("lodash");
 const MetaCalcModel = require("../models/meta-calc-model");
@@ -101,13 +90,13 @@ exports.searchCalculator = async (req, res) => {
         await MetaCalcModel.find(
           {
             calculatorType: modelName,
-            name: {
+            colName: {
               $in: fieldsToSearch[modelName],
             },
           },
-          "index"
+          "colIndex"
         )
-      ).map((item) => item["index"]);
+      ).map((item) => item["colIndex"]);
 
       const orFields = headerIndexes.map((field) => ({
         [field]: { $regex: new RegExp(text, "i") },
@@ -123,92 +112,6 @@ exports.searchCalculator = async (req, res) => {
       }
     }
     return response.success(res, modelNames);
-  } catch (ex) {
-    response.serverError(res, { message: ex.message });
-  }
-};
-
-/**
- * Controller function to get options based on a specific calculator type.
- * @param {Object} req - Express request object with properties { type, quiz, fields, output }.
- * @param {Object} res - Express response object.
- */
-exports.getAllOnXCalculatorOptions = async (req, res) => {
-  try {
-    // Destructure relevant properties from the request body
-    const { type = "", quiz = {}, fields = [], output = "" } = req.body;
-
-    const decodedCalculatorType = decodeURIComponent(type);
-
-    const Model = getModelByCalculatorType(
-      CALCULATOR_MODELS,
-      decodedCalculatorType
-    );
-
-    // Check if the calculator type exists in the model map
-    if (!Model) {
-      return response.notFoundError(
-        res,
-        `${decodedCalculatorType} data does not exist`
-      );
-    }
-
-    const quizData = await getQuizData(Model);
-    const quizQuery = getQuizQuery(quizData, quiz) || {};
-    // Fetch data from the selected model based on the quiz
-    const data = await Model.find(quizQuery);
-
-    let quizResponse = null;
-
-    if (output) {
-      const OutputModel = getModelByCalculatorType(CALCULATOR_MODELS, output);
-
-      if (!OutputModel) {
-        return response.notFoundError(
-          res,
-          `${decodedCalculatorType} data does not exist`
-        );
-      }
-      const quizOutputData = await getQuizData(OutputModel);
-      const quizOutputQuery = getQuizQuery(quizOutputData, quiz) || {};
-
-      quizResponse = await getQuizData(OutputModel, quizOutputQuery, true);
-      if (quizResponse) {
-        switch (output) {
-          case OUTPUT_TYPES.DRILL_KIT_AND_SEQUENCE:
-            quizResponse = formatDrillkitAndSequence(quizResponse);
-            break;
-          case OUTPUT_TYPES.BONE_REDUCTION:
-            quizResponse = formatBoneReduction(quizResponse);
-            break;
-          case OUTPUT_TYPES.CHAIR_SIDE_PICK_UP:
-            quizResponse = formatChairSidePickUp(quizResponse);
-            break;
-          case OUTPUT_TYPES.SCANBODIES:
-          case OUTPUT_TYPES.SCANBODYMUAS:
-            quizResponse = formatScanbodies(quizResponse);
-            break;
-          default:
-            quizResponse = formatCommonResponse(
-              quizResponse,
-              LABEL_MAPPINGS[output] || output
-            );
-        }
-      }
-    }
-
-    const result = getUniqueResult(data, fields).sort(sortCalculatorOptions);
-    if (result.length === 0) {
-      result.push("");
-    }
-
-    const resp = { result };
-
-    if (quizResponse) {
-      resp["quizResponse"] = quizResponse;
-    }
-
-    response.success(res, resp);
   } catch (ex) {
     response.serverError(res, { message: ex.message });
   }
