@@ -6,7 +6,6 @@ const { checkAccessToken } = require("../middlewares/check-token-permission");
 const {
   getCalculatorOptions,
   searchCalculator,
-  getAllOnXCalculatorOptions,
   sendCalculatorSummary,
   sendCalculatorFeedback,
   sendCalculatorHelpfulFeedback,
@@ -38,11 +37,6 @@ class CalculatorRoutes {
       "/announcements/get_latest",
       checkAccessToken,
       getLatestAnnouncement
-    );
-    router.post(
-      "/allOnXCalculator",
-      bodyParser.json(),
-      getAllOnXCalculatorOptions
     );
     router.post(
       "/sendCalculatorSummary",

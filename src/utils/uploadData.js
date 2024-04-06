@@ -46,7 +46,7 @@ const saveHeaders = async (sheetInfo, columnsCount) => {
   const { calculatorId, spreadsheetId, pageHeaderName } = sheetInfo;
 
   try {
-    await MetaCalcModel.deleteMany({ calculatorId });
+    await MetaCalcModel.deleteMany({ calculatorType: calculatorId });
 
     let headers = await getSpreadSheetRows(spreadsheetId, {
       pageName: pageHeaderName,
@@ -64,8 +64,8 @@ const saveHeaders = async (sheetInfo, columnsCount) => {
         colName: trim(headers[0][i] || ""),
         colText: trim(headers[1][i] || ""),
         groupId: trim(headers[2][i] || ""),
-        groupName: trim(headers[3][i] || ""),
-        groupText: trim(headers[4][i] || ""),
+        groupText: trim(headers[3][i] || ""),
+        groupName: trim(headers[4][i] || ""),
         isCommon: isCommonFields.includes(headers[0][i] || ""),
         calculatorType: calculatorId,
       });

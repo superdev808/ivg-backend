@@ -73,7 +73,8 @@ const CALCULATORS = [
   {
     type: "ImplantTorquesGuide",
     label: "Implant Torque Guide",
-    description: "Find the right torque value for your desired component, product, or procedure.",
+    description:
+      "Find the right torque value for your desired component, product, or procedure.",
   },
   {
     type: "ImplantAnalogs",
@@ -176,8 +177,5 @@ const CALCULATORS = [
 ];
 
 module.exports = {
-  OUTPUT_TYPES,
-  OUTPUT_LABELS,
-  LABEL_MAPPINGS,
   CALCULATORS,
 };
