@@ -238,9 +238,9 @@ const sendCalculatorFeedbackEmail = async (info) => {
     );
     htmlTemplate = htmlTemplate.replace(/{{TEXT}}/g, message);
     htmlTemplate = htmlTemplate.replace(/{{CALCULATOR_NAME}}/g, calculatorName);
-    const userAnswersHTML = userAnswers.map(({ name, text, answer}) => `
+    const userAnswersHTML = userAnswers.map(({ colName, colText, answer}) => `
 <p style="margin: auto">
-  <b>${answer ? text : `<del>${text}</del>`}</b> : ${answer || ''}
+  <b>${answer ? colName || colText : `<del>${colName || colText}</del>`}</b> : ${answer || ''}
 </p>
 `).join('')
     htmlTemplate = htmlTemplate.replace(/{{USER_ANSWERS}}/g, userAnswersHTML);
