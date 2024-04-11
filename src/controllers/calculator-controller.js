@@ -1,4 +1,3 @@
-const CALCULATOR_MODELS = require("../models/calculator-models");
 const AnnouncementsModel = require("../models/announcement-model");
 const {
   sendCalculatorSummaryEmail,
@@ -12,7 +11,8 @@ const {
 const response = require("../utils/response");
 const _ = require("lodash");
 const MetaCalcModel = require("../models/meta-calc-model");
-const { CALCULATORS } = require("../utils/constant");
+const CalculatorModel = require("../models/calculator-models");
+const { createModel } = require("../models/schema");
 
 const fieldsToSearch = {
   Scanbodies: [
@@ -29,7 +29,7 @@ exports.getCalculatorOptions = async (req, res) => {
 
   const calculatorType = decodeURIComponent(type);
 
-  const Model = getModelByCalculatorType(CALCULATOR_MODELS, calculatorType);
+  const Model = getModelByCalculatorType(calculatorType);
 
   if (!Model) {
     response.notFoundError(res, `${type} data is not existing`);
@@ -102,7 +102,7 @@ exports.searchCalculator = async (req, res) => {
         [field]: { $regex: new RegExp(text, "i") },
       }));
       if (orFields.length) {
-        const results = await CALCULATOR_MODELS[modelName].find({
+        const results = await getModelByCalculatorType(modelName).find({
           $or: orFields,
         });
 
@@ -299,11 +299,15 @@ exports.deleteAnnouncement = async (req, res) => {
 };
 
 exports.getCalculatorInfo = async (req, res) => {
-  let resultCalculators = CALCULATORS.reduce(
+  let basicCalculators = await CalculatorModel.getCalculators();
+  let resultCalculators = basicCalculators.reduce(
     (result, cur) => ({
       ...result,
       [cur.type]: {
-        ...cur,
+        type: cur.type,
+        label: cur.label,
+        description: cur.description,
+        disabled: cur.disabled,
         input: [],
         output: [],
       },
@@ -358,4 +362,31 @@ exports.getCalculatorInfo = async (req, res) => {
     resultCalculators[key]["output"].sort(compareFn);
   });
   return response.success(res, resultCalculators);
+};
+
+exports.createNewCalculator = async (req, res) => {
+  if (req.user.role !== "Admin") {
+    return response.serverUnauthorized(res, "Unauthorized");
+  }
+  try {
+    const { type, label, description } = req.body;
+    let calculator = await CalculatorModel.findOne({ type: type });
+    console.log(calculator);
+    if (calculator == null) {
+      calculator = new CalculatorModel({
+        type,
+        label,
+        description,
+        collectionName: type,
+      });
+    } else {
+      calculator.label = label;
+      calculator.description = description;
+    }
+    const result = await calculator.save();
+    createModel(calculator.type, calculator.collectionName);
+    return response.success(res, result);
+  } catch (ex) {
+    response.serverError(res, { message: ex.message });
+  }
 };

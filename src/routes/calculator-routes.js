@@ -14,6 +14,7 @@ const {
   getLatestAnnouncement,
   deleteAnnouncement,
   getCalculatorInfo,
+  createNewCalculator,
 } = require("../controllers/calculator-controller");
 
 class CalculatorRoutes {
@@ -54,6 +55,7 @@ class CalculatorRoutes {
       sendCalculatorHelpfulFeedback
     );
     router.get("/calculatorInfo", getCalculatorInfo);
+    router.post("/uploadNewCalculator", checkAccessToken, createNewCalculator);
   }
 }
 
