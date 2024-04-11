@@ -1,24 +1,42 @@
 const _ = require("lodash");
+const { createModel } = require("../models/schema");
+const mongoose = require("mongoose");
 
 /**
  * function to get the appropriate model based on the calculator type.
  * @param {string} key - The calculator type.
- * @param {Object} modelMap - Map of calculator types to corresponding models.
  * @returns {Object|null} - The model corresponding to the calculator type, or null if not found.
  */
-const getModelByCalculatorType = (modelMap, key = "") => {
-  return modelMap[key] || null;
+const getModelByCalculatorType = (key = "") => {
+  try {
+    return mongoose.model(key);
+  } catch {
+    return createModel(key, key);
+  }
 };
 
 const sortCalculatorOptions = (a, b) => {
-  if (typeof a !== 'string' || typeof b !== 'string') {
+  if (typeof a !== "string" || typeof b !== "string") {
     return 0;
   }
-  const priotizedBrands = ["straumann", "neodent", "zimvie", "nobel biocare", "dentsply sirona", "biohorizons"];
+  const priotizedBrands = [
+    "straumann",
+    "neodent",
+    "zimvie",
+    "nobel biocare",
+    "dentsply sirona",
+    "biohorizons",
+  ];
 
-  if (priotizedBrands.includes(a.toLowerCase()) && !priotizedBrands.includes(b.toLowerCase())) {
+  if (
+    priotizedBrands.includes(a.toLowerCase()) &&
+    !priotizedBrands.includes(b.toLowerCase())
+  ) {
     return -1;
-  } else if (!priotizedBrands.includes(a.toLowerCase()) && priotizedBrands.includes(b.toLowerCase())) {
+  } else if (
+    !priotizedBrands.includes(a.toLowerCase()) &&
+    priotizedBrands.includes(b.toLowerCase())
+  ) {
     return 1;
   }
 
@@ -32,15 +50,15 @@ const sortCalculatorOptions = (a, b) => {
   } else {
     return a.localeCompare(b);
   }
-}
+};
 
 // Function to convert image data to Data URI
 const imageToDataURI = (bitmap, fileName) => {
   // Convert binary data to base64 encoded string
-  const base64Image = Buffer.from(bitmap).toString('base64');
+  const base64Image = Buffer.from(bitmap).toString("base64");
 
   // Get image file extension
-  const ext = fileName.split('.').pop();
+  const ext = fileName.split(".").pop();
 
   // Construct Data URI
   const uri = `data:image/${ext};base64,${base64Image}`;
@@ -51,5 +69,5 @@ const imageToDataURI = (bitmap, fileName) => {
 module.exports = {
   getModelByCalculatorType,
   sortCalculatorOptions,
-  imageToDataURI
+  imageToDataURI,
 };

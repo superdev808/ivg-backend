@@ -2,8 +2,8 @@ const trim = require("lodash/trim");
 
 const { googleAuth, sheetInstance } = require("../config/api");
 const UploadProgress = require("../models/upload-progress");
-const CALCULATOR_MODELS = require("../models/calculator-models");
 const MetaCalcModel = require("../models/meta-calc-model");
+const { getModelByCalculatorType } = require("./helper");
 
 const CHUNK_SIZE = 500;
 const META_FIELDS_COUNT = 5; // see the number of fields in the MetaCalcModel
@@ -100,7 +100,7 @@ const saveDataWithSheetRange = async (
     }, {});
   });
 
-  const Model = CALCULATOR_MODELS[calculatorId];
+  const Model = getModelByCalculatorType(calculatorId);
 
   await Model.insertMany(data, { ordered: true });
 
@@ -120,7 +120,7 @@ const uploadData = async (
   try {
     await saveHeaders(sheetInfo, columnsCount);
 
-    const Model = CALCULATOR_MODELS[calculatorId];
+    const Model = getModelByCalculatorType(calculatorId);
     await Model.deleteMany({});
 
     for (let position = 1; position < rowsCount; position += CHUNK_SIZE) {
