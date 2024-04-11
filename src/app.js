@@ -68,7 +68,6 @@ app.use(
 );
 
 const mongoose = require("mongoose");
-const { CALCULATORS } = require("./utils/constant");
 
 if (process.env.CURRENT_ENV !== "prod") {
   mongoose.set("debug", true);
