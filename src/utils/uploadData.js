@@ -73,7 +73,7 @@ const saveHeaders = async (sheetInfo, columnsCount) => {
     MetaCalcModel.insertMany(metaCalcData, { ordered: true });
     return metaCalcData;
   } catch (error) {
-    return [];
+    throw error;
   }
 };
 
@@ -130,12 +130,14 @@ const uploadData = async (
         position,
       });
     }
-  } catch {}
-
-  await UploadProgress.findOneAndUpdate(
-    { _id: progressId },
-    { status: "FINISHED" }
-  );
+  } catch (error) {
+    throw error;
+  } finally {
+    await UploadProgress.findOneAndUpdate(
+      { _id: progressId },
+      { status: "FINISHED" }
+    );
+  }
 };
 
 module.exports = { uploadData, getSpreadSheetRows };
