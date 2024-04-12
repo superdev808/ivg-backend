@@ -71,7 +71,10 @@ exports.getCalculatorOptions = async (req, res) => {
     if (fields.length > 1) {
       result = data.sort(sortCalculatorOptions);
     } else {
-      result = data.map((item) => item[fields[0]]).sort(sortCalculatorOptions);
+      result = data
+        .map((item) => item[fields[0]])
+        .filter((data) => data)
+        .sort(sortCalculatorOptions);
     }
 
     response.success(res, result);

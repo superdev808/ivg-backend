@@ -730,7 +730,13 @@ exports.uploadCalculatorData = async (req, res) => {
 exports.getUploadProgress = async (req, res) => {
   const { id: _id } = req.params;
 
-  const existingProgress = await UploadProgress.findOne({ _id });
+  try {
+    const existingProgress = await UploadProgress.findOne({ _id });
 
-  return response.success(res, existingProgress);
+    return response.success(res, existingProgress);
+  } catch (error) {
+    return response.badRequest(res, {
+      message: String(error),
+    });
+  }
 };

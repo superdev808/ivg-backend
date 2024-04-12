@@ -80,12 +80,14 @@ mongoose.connect(process.env.MongoDbUri).then(
     console.log("Connected to MongoDB");
     const CalculatorModel = require("./models/calculator-models");
     const { createModel } = require("./models/schema");
+    const UploadProgressModel = require("./models/upload-progress");
 
     CalculatorModel.getCalculators().then((calculators) => {
       calculators.forEach((calculator) => {
         createModel(calculator.type, calculator.collectionName);
       });
     });
+    UploadProgressModel.deleteMany({}).exec();
     // CalculatorModel.insertMany(
     //   CALCULATORS.map((calculator) => ({
     //     ...calculator,
