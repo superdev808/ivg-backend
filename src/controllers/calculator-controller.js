@@ -75,6 +75,7 @@ exports.getCalculatorOptions = async (req, res) => {
         .map((item) => item[fields[0]])
         .filter((data) => data)
         .sort(sortCalculatorOptions);
+      if (result.length == 0) result = [""];
     }
 
     response.success(res, result);
@@ -359,7 +360,7 @@ exports.getCalculatorInfo = async (req, res) => {
   });
   Object.keys(resultCalculators).forEach((key) => {
     const compareFn = (left, right) => {
-      return parseInt(left.index) - parseInt(right.index);
+      return parseInt(left.colIndex) - parseInt(right.colIndex);
     };
     resultCalculators[key]["input"].sort(compareFn);
     resultCalculators[key]["output"].sort(compareFn);

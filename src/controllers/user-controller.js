@@ -215,7 +215,7 @@ exports.getAllUsers = (req, res) => {
 
   User.find()
     .select(
-      "_id firstName lastName email role active verified organizationName verificationEmailSent"
+      "_id firstName lastName email role active verified organizationName verificationEmailSent organizationState"
     )
     .then((result) => res.json(result))
     .catch((err) => {
