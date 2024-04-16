@@ -464,6 +464,8 @@ exports.requestPasswordReset = async (req, res) => {
       return response.notFoundError(res, "Email not found.");
     }
 
+    await setupPasswordReset(user);
+
     return response.success(res, "Reset password email sent successfully.");
   } catch (error) {
     return response.serverError(res, error.message);
