@@ -352,6 +352,7 @@ exports.getUserInfo = async (req, res) => {
       referralSourceOther: user.referralSourceOther || "",
       logo: user.logo ? generateSignedUrl(user.logo) : "",
       savedResults: user.savedResults || [],
+      savedCalculators: user.savedCalculators || [],
     };
 
     return response.success(res, userData);
@@ -738,5 +739,40 @@ exports.getUploadProgress = async (req, res) => {
     return response.badRequest(res, {
       message: String(error),
     });
+  }
+};
+
+exports.saveCalculator = async (req, res) => {
+  const { calculatorType } = req.body;
+
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(token, keys.secretOrKey);
+    const userId = decoded.id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return response.notFoundError(res, "User not found.");
+    }
+
+    if (!calculatorType) {
+      return response.badRequest(res, { message: "Calculator is required" });
+    }
+
+    if (user.savedCalculators?.includes(calculatorType)) {
+      return response.success(res, {
+        message: "Saved calculator successfully.",
+      });
+    }
+
+    user.savedCalculators = user.savedCalculators
+      ? [...user.savedCalculators, calculatorType]
+      : [calculatorType];
+
+    await user.save();
+
+    return response.success(res, { message: "Saved calculator successfully." });
+  } catch (error) {
+    return response.badRequest(res, { message: "Failed to save calculator." });
   }
 };
