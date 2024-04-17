@@ -70,10 +70,10 @@ const saveHeaders = async (sheetInfo, columnsCount) => {
         calculatorType: calculatorId,
       });
     }
-    MetaCalcModel.insertMany(metaCalcData, { ordered: true });
+    await MetaCalcModel.insertMany(metaCalcData, { ordered: true });
     return metaCalcData;
   } catch (error) {
-    return [];
+    throw error;
   }
 };
 
@@ -130,12 +130,15 @@ const uploadData = async (
         position,
       });
     }
-  } catch {}
-
-  await UploadProgress.findOneAndUpdate(
-    { _id: progressId },
-    { status: "FINISHED" }
-  );
+  } catch (error) {
+    console.log(error);
+    await UploadProgress.deleteMany({ _id: progressId });
+  } finally {
+    await UploadProgress.findOneAndUpdate(
+      { _id: progressId },
+      { status: "FINISHED" }
+    );
+  }
 };
 
 module.exports = { uploadData, getSpreadSheetRows };
