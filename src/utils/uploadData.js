@@ -70,7 +70,7 @@ const saveHeaders = async (sheetInfo, columnsCount) => {
         calculatorType: calculatorId,
       });
     }
-    MetaCalcModel.insertMany(metaCalcData, { ordered: true });
+    await MetaCalcModel.insertMany(metaCalcData, { ordered: true });
     return metaCalcData;
   } catch (error) {
     throw error;
@@ -131,7 +131,8 @@ const uploadData = async (
       });
     }
   } catch (error) {
-    throw error;
+    console.log(error);
+    await UploadProgress.deleteMany({ _id: progressId });
   } finally {
     await UploadProgress.findOneAndUpdate(
       { _id: progressId },

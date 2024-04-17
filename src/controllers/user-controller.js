@@ -735,7 +735,11 @@ exports.getUploadProgress = async (req, res) => {
 
   try {
     const existingProgress = await UploadProgress.findOne({ _id });
-
+    if (!existingProgress) {
+      return response.badRequest(res, {
+        message: "Please check sheets again",
+      });
+    }
     return response.success(res, existingProgress);
   } catch (error) {
     return response.badRequest(res, {
