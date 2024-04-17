@@ -23,6 +23,7 @@ const {
   deleteSavedResult,
   uploadCalculatorData,
   getUploadProgress,
+  saveCalculator,
 } = require("../controllers/user-controller");
 const bodyParser = require("body-parser");
 
@@ -103,6 +104,12 @@ class UserRoutes {
       uploadCalculatorData
     );
     router.get("/uploadProgress/:id", getUploadProgress);
+    router.post(
+      "/saveCalculator",
+      checkAccessToken,
+      bodyParser.json(),
+      saveCalculator
+    );
   }
 }
 

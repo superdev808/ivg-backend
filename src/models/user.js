@@ -103,6 +103,11 @@ const UserSchema = new Schema({
     required: false,
     default: "",
   },
+  savedCalculators: {
+    type: Array,
+    required: false,
+    default: [],
+  },
 });
 
 UserSchema.plugin(mongoosePagniate);

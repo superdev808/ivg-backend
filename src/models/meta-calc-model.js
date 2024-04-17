@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const schema = new Schema({
-  colIndex: { type: String, required: true }, // the index of this header in the sheet
+  colIndex: { type: Number, required: true }, // the index of this header in the sheet
   colName: { type: String, required: true }, // the name of this header - first row in the sheet
   colText: { type: String, default: "" }, // the description of this header to display on client-side UI - second row in the sheet
   groupId: { type: String, default: "" }, // the grouping name of this header - third row in the sheet
