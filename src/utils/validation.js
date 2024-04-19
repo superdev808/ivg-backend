@@ -242,3 +242,38 @@ exports.validateUserUpdate = (data) => {
 exports.isValidToken = (expiresUnixTimestamp) => {
   return new Date(new Date()) - new Date(expiresUnixTimestamp * 1000) < 0;
 };
+
+exports.validateSubmitRequest = (data) => {
+  const errors = {};
+
+  data.featureType = !isEmpty(data.featureType) ? data.featureType : "";
+  data.productTypes = !isEmpty(data.productTypes) ? data.productTypes : [];
+  data.message = !isEmpty(data.message) ? data.message : "";
+  data.discuss = !isEmpty(data.discuss) ? data.discuss : "";
+  data.token = !isEmpty(data.token) ? data.token : "";
+
+  if (Validator.isEmpty(data.featureType)) {
+    errors.name = "Feature type is required";
+  }
+
+  if (Validator.isEmpty(data.productTypes)) {
+    errors.name = "Product types is required";
+  }
+
+  if (Validator.isEmpty(data.message)) {
+    errors.name = "Note is required";
+  }
+
+  if (Validator.isEmpty(data.discuss)) {
+    errors.name = "Discuss is required";
+  }
+
+  if (Validator.isEmpty(data.token)) {
+    errors.token = "Invalid captcha";
+  }
+
+  return {
+    errors,
+    isValid: isEmpty(errors),
+  };
+};

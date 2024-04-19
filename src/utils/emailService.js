@@ -1,7 +1,7 @@
 const Mailjet = require("node-mailjet");
 const fs = require("fs").promises;
 const path = require("path");
-const { imageToDataURI } = require('./helper')
+const { imageToDataURI } = require("./helper");
 const mailjet = new Mailjet({
   apiKey: process.env.MJ_APIKEY_PUBLIC || "",
   apiSecret: process.env.MJ_APIKEY_PRIVATE || "",
@@ -214,7 +214,7 @@ const sendCalculatorFeedbackEmail = async (info) => {
       timestamp,
       fileName,
       calculatorName,
-      userAnswers
+      userAnswers,
     } = info;
 
     const templatePath = path.join(
@@ -238,13 +238,27 @@ const sendCalculatorFeedbackEmail = async (info) => {
     );
     htmlTemplate = htmlTemplate.replace(/{{TEXT}}/g, message);
     htmlTemplate = htmlTemplate.replace(/{{CALCULATOR_NAME}}/g, calculatorName);
-    const userAnswersHTML = userAnswers.map(({ colName, colText, answer}) => `
+    const userAnswersHTML = userAnswers
+      .map(
+        ({ colName, colText, answer }) => `
 <p style="margin: auto">
-  <b>${answer ? colName || colText : `<del>${colName || colText}</del>`}</b> : ${answer || ''}
+  <b>${
+    answer ? colName || colText : `<del>${colName || colText}</del>`
+  }</b> : ${answer || ""}
 </p>
-`).join('')
+`
+      )
+      .join("");
     htmlTemplate = htmlTemplate.replace(/{{USER_ANSWERS}}/g, userAnswersHTML);
-    htmlTemplate = htmlTemplate.replace(/{{IMG_SCREENSHOT}}/g, imageBuffer ? `<img src="${imageToDataURI(imageBuffer, fileName)}" width="100%" height="100%" style="margin-top: 1rem;"></img>` : '');
+    htmlTemplate = htmlTemplate.replace(
+      /{{IMG_SCREENSHOT}}/g,
+      imageBuffer
+        ? `<img src="${imageToDataURI(
+            imageBuffer,
+            fileName
+          )}" width="100%" height="100%" style="margin-top: 1rem;"></img>`
+        : ""
+    );
     const attachments = imageBuffer
       ? [
           {
@@ -285,8 +299,16 @@ const sendCalculatorFeedbackEmail = async (info) => {
 
 const sendCalculatorHelpfulFeedbackEmail = async (info) => {
   try {
-    const { name, feedbackCategory, message, timestamp, calculatorName, quiz, fileName, imageBuffer } =
-      info;
+    const {
+      name,
+      feedbackCategory,
+      message,
+      timestamp,
+      calculatorName,
+      quiz,
+      fileName,
+      imageBuffer,
+    } = info;
 
     const templatePath = path.join(
       __dirname,
@@ -356,6 +378,65 @@ const sendCalculatorHelpfulFeedbackEmail = async (info) => {
   }
 };
 
+const sendRequestNotification = async (
+  name,
+  email,
+  phone,
+  featureType,
+  productTypes,
+  message,
+  discuss
+) => {
+  const templatePath = path.join(
+    __dirname,
+    "..",
+    "templates",
+    "request-notification.html"
+  );
+  let htmlTemplate = await fs.readFile(templatePath, "utf8");
+
+  htmlTemplate = htmlTemplate.replace(/{{name}}/g, name);
+  htmlTemplate = htmlTemplate.replace(/{{email}}/g, email.toLowerCase());
+  htmlTemplate = htmlTemplate.replace(/{{phone}}/g, phone);
+  htmlTemplate = htmlTemplate.replace(/{{featureType}}/g, featureType);
+  htmlTemplate = htmlTemplate.replace(/{{productTypes}}/g, productTypes);
+  htmlTemplate = htmlTemplate.replace(/{{message}}/g, message);
+  htmlTemplate = htmlTemplate.replace(/{{discuss}}/g, discuss);
+
+  const request = mailjet.post("send", { version: "v3.1" }).request({
+    Messages: [
+      {
+        From: {
+          Email: process.env.EMAIL_USER || "",
+          Name: "Ivory Guide",
+        },
+        To: [
+          {
+            Email: "support@ivoryguide.com",
+            Name: "Ivory Guide",
+          },
+        ],
+        Subject: `[Contact Us] New Message from ${name}`,
+        TextPart: `Hello Team, We've received a new message. Here are the details of the submission for your review and action:
+				Name: {{name}} |
+				Email: {{email}} |
+				Phone: {{phone}} |
+				Type of Feature: {{featureType}} |
+				Type of Products: {{productTypes}} |
+				Message: {{message}} |
+        Can Discuss: {{discuss}}`,
+        HTMLPart: htmlTemplate,
+      },
+    ],
+  });
+
+  request
+    .then((result) => result)
+    .catch((err) => {
+      throw new Error(err.message);
+    });
+};
+
 module.exports = {
   sendVerificationEmail,
   sendResetPasswordEmail,
@@ -363,4 +444,5 @@ module.exports = {
   sendContactNotification,
   sendCalculatorFeedbackEmail,
   sendCalculatorHelpfulFeedbackEmail,
+  sendRequestNotification,
 };

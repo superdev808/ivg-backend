@@ -1,18 +1,18 @@
+const axios = require("axios");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const find = require("lodash/find");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const omit = require("lodash/omit");
-const trim = require("lodash/trim");
 
-const { googleAuth, sheetInstance } = require("../config/api");
 const keys = require("../config/keys");
 const User = require("../models/user");
 const UploadProgress = require("../models/upload-progress");
 const {
   sendResetPasswordEmail,
   sendVerificationEmail,
+  sendRequestNotification,
 } = require("../utils/emailService");
 const response = require("../utils/response");
 const {
@@ -27,6 +27,7 @@ const {
   validateRegisterInput,
   validateUserInfoUpdate,
   validateUserUpdate,
+  validateSubmitRequest,
 } = require("../utils/validation");
 
 async function hashPassword(password) {
@@ -780,5 +781,47 @@ exports.saveCalculator = async (req, res) => {
     return response.success(res, { message: "Saved calculator successfully." });
   } catch (error) {
     return response.badRequest(res, { message: "Failed to save calculator." });
+  }
+};
+
+exports.submitRequest = async (req, res) => {
+  try {
+    const userToken = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(userToken, keys.secretOrKey);
+    const userId = decoded.id;
+    const user = await User.findById(userId);
+
+    const { errors, isValid } = validateSubmitRequest(req.body);
+
+    if (!isValid) {
+      return response.validationError(res, errors);
+    }
+
+    const { featureType, productTypes, message, discuss, token } = req.body;
+
+    const secret = process.env.RECAPTCHA_SECRET_KEY || "";
+
+    const googleResponse = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`
+    );
+    const { success } = googleResponse.data;
+
+    if (!success) {
+      return response.validationError(res, { token: "Invalid captcha" });
+    }
+
+    sendRequestNotification(
+      `${user.firstName} ${user.lastName}`,
+      user.email,
+      user.phone,
+      featureType,
+      productTypes,
+      message,
+      discuss
+    );
+
+    return response.success(res, { message: "Message successfully sent." });
+  } catch (error) {
+    return response.serverError(res, error.message);
   }
 };
