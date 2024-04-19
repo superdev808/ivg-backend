@@ -24,6 +24,7 @@ const {
   uploadCalculatorData,
   getUploadProgress,
   saveCalculator,
+  submitRequest,
 } = require("../controllers/user-controller");
 const bodyParser = require("body-parser");
 
@@ -109,6 +110,12 @@ class UserRoutes {
       checkAccessToken,
       bodyParser.json(),
       saveCalculator
+    );
+    router.post(
+      "/submitRequest",
+      checkAccessToken,
+      bodyParser.json(),
+      submitRequest
     );
   }
 }
