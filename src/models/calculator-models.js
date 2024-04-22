@@ -8,6 +8,7 @@ const schema = new Schema(
     label: { type: String, default: "" },
     description: { type: String, default: "" },
     disabled: { type: Boolean, default: false },
+    isCustom: { type: Boolean, default: false },
   },
   {
     statics: {
