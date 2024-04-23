@@ -38,33 +38,37 @@ exports.getCalculatorOptions = async (req, res) => {
 
   try {
     const query = quiz;
-    const data = (
-      await Model.aggregate([
-        {
-          $match: query,
-        },
-        {
-          $project: fields.reduce(
-            (finalValue, field) => ({
-              ...finalValue,
-              [field]: 1,
-            }),
-            {}
-          ),
-        },
-        {
-          $group: {
-            _id: fields.reduce(
+    let data = [];
+
+    if (fields.length > 0) {
+      data = (
+        await Model.aggregate([
+          {
+            $match: query,
+          },
+          {
+            $project: fields.reduce(
               (finalValue, field) => ({
                 ...finalValue,
-                [field]: `$${field}`,
+                [field]: 1,
               }),
               {}
             ),
           },
-        },
-      ])
-    ).map((item) => item["_id"]);
+          {
+            $group: {
+              _id: fields.reduce(
+                (finalValue, field) => ({
+                  ...finalValue,
+                  [field]: `$${field}`,
+                }),
+                {}
+              ),
+            },
+          },
+        ])
+      ).map((item) => item["_id"]);
+    }
 
     let result = [];
 
