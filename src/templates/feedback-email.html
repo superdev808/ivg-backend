@@ -93,15 +93,16 @@
                   style="display: inline-block"
                 >
                   <img
-                    src="https://ivoryguide.s3.us-west-1.amazonaws.com/images/Ivory-Guide-Logo-Stack.png"
+                    src="https://ivoryguide.s3.us-west-1.amazonaws.com/images/Ivory-Guide-Logo.png"
                     alt=""
                     border="0"
-                    width="150"
+                    width="300"
                     style="
                       display: block;
-                      width: 150px;
-                      max-width: 150px;
-                      min-width: 150px;
+                      width: 300px;
+                      max-width: 300px;
+                      min-width: 300px;
+                      margin: 20px 0;
                     "
                   />
                 </a>
@@ -139,7 +140,7 @@
                 >
                   Feedback submitted from {{NAME}}
                 </h1>
-                <p style="margin: 0;"><small>{{TIMESTAMP}}</small></p>
+                <p style="margin: 0"><small>{{TIMESTAMP}}</small></p>
               </td>
             </tr>
           </table>
@@ -166,7 +167,7 @@
                   line-height: 24px;
                 "
               >
-                <h3 style="margin: 0;">{{FEEDBACK_CATEGORY}}</h3>
+                <h3 style="margin: 0">{{FEEDBACK_CATEGORY}}</h3>
                 <hr />
                 <p style="margin: auto">{{TEXT}}</p>
                 {{IMG_SCREENSHOT}}
@@ -182,8 +183,7 @@
                   font-size: 16px;
                   line-height: 24px;
                 "
-              >
-              </td>
+              ></td>
             </tr>
             <tr>
               <td
@@ -196,7 +196,10 @@
                   line-height: 24px;
                 "
               >
-                <h3 style="margin: 0;">{{NAME}} selected following answers from {{CALCULATOR_NAME}} calculator.</h3>
+                <h3 style="margin: 0">
+                  {{NAME}} selected following answers from {{CALCULATOR_NAME}}
+                  calculator.
+                </h3>
                 <hr />
                 {{USER_ANSWERS}}
               </td>
