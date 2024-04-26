@@ -317,6 +317,7 @@ exports.getCalculatorInfo = async (req, res) => {
         description: cur.description,
         disabled: cur.disabled,
         isCustom: cur.isCustom,
+        isProduction: cur.isProduction,
         input: [],
         output: [],
       },
