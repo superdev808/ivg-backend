@@ -88,12 +88,6 @@ mongoose.connect(process.env.MongoDbUri).then(
       });
     });
     UploadProgressModel.deleteMany({}).exec();
-    // CalculatorModel.insertMany(
-    //   CALCULATORS.map((calculator) => ({
-    //     ...calculator,
-    //     collectionName: calculator.type,
-    //   }))
-    // );
   },
   async (err) => {
     console.error(err);
