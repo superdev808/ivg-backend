@@ -82,7 +82,7 @@ mongoose.connect(process.env.MongoDbUri).then(
     const { createModel } = require("./models/schema");
     const UploadProgressModel = require("./models/upload-progress");
 
-    CalculatorModel.getCalculators().then((calculators) => {
+    CalculatorModel.getCalculators().exec().then((calculators) => {
       calculators.forEach((calculator) => {
         createModel(calculator.type, calculator.collectionName);
       });
