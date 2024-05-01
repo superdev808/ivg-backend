@@ -72,15 +72,8 @@ exports.getCalculatorOptions = async (req, res) => {
 
     let result = [];
 
-    if (fields.length > 1) {
-      result = data.sort(sortCalculatorOptions);
-    } else {
-      result = data
-        .map((item) => item[fields[0]])
-        .filter((data) => data)
-        .sort(sortCalculatorOptions);
-      if (result.length == 0) result = [""];
-    }
+    result = data.sort(sortCalculatorOptions);
+    // if (result.length == 0) result = [""];
 
     response.success(res, result);
   } catch (ex) {
@@ -370,31 +363,6 @@ exports.getCalculatorInfo = async (req, res) => {
     };
     resultCalculators[key]["input"].sort(compareFn);
     resultCalculators[key]["output"].sort(compareFn);
-
-    // group input questions
-    const POPUP_TEXTS = [
-      "Reasoning",
-      "Supporting Article",
-      "Notes",
-      "Recommendation",
-    ];
-    const isPopupText = (text) =>
-      POPUP_TEXTS.filter((popupText) => text.startsWith(popupText)).length > 0;
-
-    let groupedInputs = [],
-      currentInputs = resultCalculators[key]["input"];
-    for (let i = 0, j; i < currentInputs.length; i = j) {
-      let newSubGroupInput = [],
-        count = 0;
-      for (j = i; j < currentInputs.length; ++j) {
-        if (!isPopupText(currentInputs[j].groupText)) count += 1;
-        if (count == 2) break;
-        newSubGroupInput.push(currentInputs[j]);
-      }
-      groupedInputs.push(newSubGroupInput);
-    }
-
-    resultCalculators[key]["input"] = groupedInputs;
   });
   return response.success(res, resultCalculators);
 };
