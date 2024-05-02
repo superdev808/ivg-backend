@@ -74,12 +74,13 @@ exports.getCalculatorOptions = async (req, res) => {
 
     result = data.sort(sortCalculatorOptions);
 
+    if (result.length === 0) result = [{}];
+
     for (let resultItem of result) {
       fields.forEach((field) => {
         if (!(field in resultItem)) resultItem[field] = null;
       });
     }
-    // if (result.length == 0) result = [""];
 
     response.success(res, result);
   } catch (ex) {
