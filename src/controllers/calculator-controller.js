@@ -72,14 +72,14 @@ exports.getCalculatorOptions = async (req, res) => {
 
     let result = [];
 
-    if (fields.length > 1) {
-      result = data.sort(sortCalculatorOptions);
-    } else {
-      result = data
-        .map((item) => item[fields[0]])
-        .filter((data) => data)
-        .sort(sortCalculatorOptions);
-      if (result.length == 0) result = [""];
+    result = data.sort(sortCalculatorOptions);
+
+    if (result.length === 0) result = [{}];
+
+    for (let resultItem of result) {
+      fields.forEach((field) => {
+        if (!(field in resultItem)) resultItem[field] = null;
+      });
     }
 
     response.success(res, result);
