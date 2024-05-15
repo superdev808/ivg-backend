@@ -72,43 +72,43 @@ exports.getCalculatorOptions = async (req, res) => {
     }
 
     if (remainingFields && remainingFields.length > 0) {
-      remainingData = (
-        await Model.aggregate([
-          {
-            $match: query,
-          },
-          {
-            $project: remainingFields.reduce(
-              (finalValue, field) => ({
-                ...finalValue,
-                [field]: 1,
-              }),
-              {}
-            ),
-          },
-          {
-            $group: {
-              _id: null,
-              ...remainingFields.reduce(
+      remainingData =
+        (
+          await Model.aggregate([
+            {
+              $match: query,
+            },
+            {
+              $project: remainingFields.reduce(
                 (finalValue, field) => ({
                   ...finalValue,
-                  [field]: {
-                    $addToSet: `$${field}`,
-                  },
+                  [field]: 1,
                 }),
                 {}
               ),
             },
-          },
-        ])
-      )[0];
-      console.log(remainingData);
+            {
+              $group: {
+                _id: null,
+                ...remainingFields.reduce(
+                  (finalValue, field) => ({
+                    ...finalValue,
+                    [field]: {
+                      $addToSet: `$${field}`,
+                    },
+                  }),
+                  {}
+                ),
+              },
+            },
+          ])
+        )[0] || {};
       remainingData = remainingFields.reduce(
         (finalValue, field) => ({
           ...finalValue,
-          [field]: _.isArray(remainingData[field])
-            ? remainingData[field].filter(Boolean).length > 0
-            : undefined,
+          [field]:
+            _.isArray(remainingData[field]) &&
+            remainingData[field].filter(Boolean).length > 0,
         }),
         {}
       );
