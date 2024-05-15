@@ -25,7 +25,7 @@ const fieldsToSearch = {
 };
 
 exports.getCalculatorOptions = async (req, res) => {
-  const { type, quiz, fields } = req.body;
+  const { type, quiz, fields, remainingFields } = req.body;
 
   const calculatorType = decodeURIComponent(type);
 
@@ -38,7 +38,8 @@ exports.getCalculatorOptions = async (req, res) => {
 
   try {
     const query = quiz;
-    let data = [];
+    let data = [],
+      remainingData = {};
 
     if (fields.length > 0) {
       data = (
@@ -70,6 +71,49 @@ exports.getCalculatorOptions = async (req, res) => {
       ).map((item) => item["_id"]);
     }
 
+    if (remainingFields && remainingFields.length > 0) {
+      remainingData =
+        (
+          await Model.aggregate([
+            {
+              $match: query,
+            },
+            {
+              $project: remainingFields.reduce(
+                (finalValue, field) => ({
+                  ...finalValue,
+                  [field]: 1,
+                }),
+                {}
+              ),
+            },
+            {
+              $group: {
+                _id: null,
+                ...remainingFields.reduce(
+                  (finalValue, field) => ({
+                    ...finalValue,
+                    [field]: {
+                      $addToSet: `$${field}`,
+                    },
+                  }),
+                  {}
+                ),
+              },
+            },
+          ])
+        )[0] || {};
+      remainingData = remainingFields.reduce(
+        (finalValue, field) => ({
+          ...finalValue,
+          [field]:
+            _.isArray(remainingData[field]) &&
+            remainingData[field].filter(Boolean).length > 0,
+        }),
+        {}
+      );
+    }
+
     let result = [];
 
     result = data.sort(sortCalculatorOptions);
@@ -82,7 +126,10 @@ exports.getCalculatorOptions = async (req, res) => {
       });
     }
 
-    response.success(res, result);
+    response.success(res, {
+      data: result,
+      questionAvailability: remainingData,
+    });
   } catch (ex) {
     response.serverError(res, { message: ex.message });
   }
