@@ -116,7 +116,7 @@ exports.getCalculatorOptions = async (req, res) => {
 
     let result = [];
 
-    result = data.sort(sortCalculatorOptions);
+    result = data.sort(sortCalculatorOptions(fields));
 
     if (result.length === 0) result = [{}];
 

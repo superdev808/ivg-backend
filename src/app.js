@@ -86,6 +86,7 @@ mongoose.connect(process.env.MongoDbUri).then(
       calculators.forEach((calculator) => {
         createModel(calculator.type, calculator.collectionName);
       });
+      console.info("Successfully initialized all calculators");
     });
     UploadProgressModel.deleteMany({}).exec();
     // CalculatorModel.insertMany(
