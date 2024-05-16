@@ -15,10 +15,7 @@ const getModelByCalculatorType = (key = "") => {
   }
 };
 
-const sortCalculatorOptions = (a, b) => {
-  if (typeof a !== "string" || typeof b !== "string") {
-    return 0;
-  }
+const sortCalculatorOptions = (fields) => (a, b) => {
   const priotizedBrands = [
     "straumann",
     "neodent",
@@ -27,29 +24,17 @@ const sortCalculatorOptions = (a, b) => {
     "dentsply sirona",
     "biohorizons",
   ];
-
-  if (
-    priotizedBrands.includes(a.toLowerCase()) &&
-    !priotizedBrands.includes(b.toLowerCase())
-  ) {
-    return -1;
-  } else if (
-    !priotizedBrands.includes(a.toLowerCase()) &&
-    priotizedBrands.includes(b.toLowerCase())
-  ) {
-    return 1;
+  for (let field of fields) {
+    let valA = (a[field] || "").toLowerCase();
+    let valB = (b[field] || "").toLowerCase();
+    let indexA = priotizedBrands.indexOf(valA);
+    let indexB = priotizedBrands.indexOf(valB);
+    if ((indexA >= 0 || indexB >= 0) && indexA !== indexB)
+      return -(indexA - indexB);
+    else if (indexA < 0 && indexB < 0 && valA !== valB)
+      return valA.localeCompare(valB);
   }
-
-  const aFloatValue = parseFloat(a);
-  const bFloatValue = parseFloat(b);
-
-  if (aFloatValue < bFloatValue) {
-    return -1;
-  } else if (aFloatValue > bFloatValue) {
-    return 1;
-  } else {
-    return a.localeCompare(b);
-  }
+  return 0;
 };
 
 // Function to convert image data to Data URI
