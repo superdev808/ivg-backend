@@ -437,6 +437,70 @@ const sendRequestNotification = async (
     });
 };
 
+const sendItemRequestNotification = async (
+  name,
+  email,
+  phone,
+  itemName,
+  inputSummaries
+) => {
+  const templatePath = path.join(
+    __dirname,
+    "..",
+    "templates",
+    "request-product-email.html"
+  );
+  let htmlTemplate = await fs.readFile(templatePath, "utf8");
+
+  htmlTemplate = htmlTemplate.replace(/{{name}}/g, name);
+  htmlTemplate = htmlTemplate.replace(/{{email}}/g, email.toLowerCase());
+  htmlTemplate = htmlTemplate.replace(/{{phone}}/g, phone);
+  htmlTemplate = htmlTemplate.replace(/{{itemName}}/g, itemName);
+  const inputSummariesHtml = `<ul>
+      ${inputSummaries
+        .map(({ question, answer }) => `<li>${question} - ${answer}</li>`)
+        .join("")}
+    </ul>`;
+  const inputSummariesText = inputSummaries.map(
+    ({ question, answer }) => `${question} - ${answer}`
+  );
+  htmlTemplate = htmlTemplate.replace(
+    /{{inputSummaries}}/g,
+    inputSummariesHtml
+  );
+
+  const request = mailjet.post("send", { version: "v3.1" }).request({
+    Messages: [
+      {
+        From: {
+          Email: process.env.EMAIL_USER || "",
+          Name: "Ivory Guide",
+        },
+        To: [
+          {
+            Email: "feedback@ivoryguide.com",
+            Name: "Ivory Guide",
+          },
+        ],
+        Subject: `[Contact Us] New Item Request from ${name}`,
+        TextPart: `Hello Team, We've received a new item request. Here are the details of the submission for your review and action::
+				Name: ${name} |
+				Email: ${email} |
+				Phone: ${phone} |
+				Item Name: ${itemName} |
+				Input Summaries: ${inputSummariesText}`,
+        HTMLPart: htmlTemplate,
+      },
+    ],
+  });
+
+  request
+    .then((result) => result)
+    .catch((err) => {
+      throw new Error(err.message);
+    });
+};
+
 module.exports = {
   sendVerificationEmail,
   sendResetPasswordEmail,
@@ -445,4 +509,5 @@ module.exports = {
   sendCalculatorFeedbackEmail,
   sendCalculatorHelpfulFeedbackEmail,
   sendRequestNotification,
+  sendItemRequestNotification,
 };

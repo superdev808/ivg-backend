@@ -277,3 +277,25 @@ exports.validateSubmitRequest = (data) => {
     isValid: isEmpty(errors),
   };
 };
+
+exports.validateSubmitItemRequest = (data) => {
+  const errors = {};
+
+  data.itemName = !isEmpty(data.itemName) ? data.itemName : "";
+  data.inputSummaries = !isEmpty(data.inputSummaries)
+    ? data.inputSummaries
+    : [];
+
+  if (isEmpty(data.itemName)) {
+    errors.itemName = "Item Name is required";
+  }
+
+  if (isEmpty(data.inputSummaries)) {
+    errors.inputSummaries = "Input Summaries are required";
+  }
+
+  return {
+    errors,
+    isValid: isEmpty(errors),
+  };
+};

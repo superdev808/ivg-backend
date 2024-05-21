@@ -13,6 +13,7 @@ const {
   sendResetPasswordEmail,
   sendVerificationEmail,
   sendRequestNotification,
+  sendItemRequestNotification,
 } = require("../utils/emailService");
 const response = require("../utils/response");
 const {
@@ -28,6 +29,7 @@ const {
   validateUserInfoUpdate,
   validateUserUpdate,
   validateSubmitRequest,
+  validateSubmitItemRequest,
 } = require("../utils/validation");
 
 async function hashPassword(password) {
@@ -179,7 +181,7 @@ exports.loginUser = (req, res) => {
           name: user.name,
           email: user.email,
           role: user.role,
-          organizationName: user.organizationName
+          organizationName: user.organizationName,
         };
 
         jwt.sign(
@@ -822,6 +824,37 @@ exports.submitRequest = async (req, res) => {
     );
 
     return response.success(res, { message: "Message successfully sent." });
+  } catch (error) {
+    return response.serverError(res, error.message);
+  }
+};
+
+exports.submitItemRequest = async (req, res) => {
+  try {
+    const userToken = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(userToken, keys.secretOrKey);
+    const userId = decoded.id;
+    const user = await User.findById(userId);
+
+    const { errors, isValid } = validateSubmitItemRequest(req.body);
+
+    if (!isValid) {
+      return response.validationError(res, errors);
+    }
+
+    const { itemName, inputSummaries } = req.body;
+
+    sendItemRequestNotification(
+      `${user.firstName} ${user.lastName}`,
+      user.email,
+      user.phone,
+      itemName,
+      inputSummaries
+    );
+
+    return response.success(res, {
+      message: "Item Requested Successfully.",
+    });
   } catch (error) {
     return response.serverError(res, error.message);
   }
