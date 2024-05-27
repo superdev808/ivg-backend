@@ -203,6 +203,9 @@ exports.loginUser = (req, res) => {
             });
           }
         );
+
+        user.lastLoginDate = Date.now();
+        user.save();
       } else {
         return res
           .status(400)
@@ -219,7 +222,7 @@ exports.getAllUsers = (req, res) => {
 
   User.find()
     .select(
-      "_id firstName lastName email role active verified organizationName verificationEmailSent organizationState"
+      "_id firstName lastName email role active verified organizationName verificationEmailSent organizationState lastLoginDate"
     )
     .then((result) => res.json(result))
     .catch((err) => {
@@ -720,9 +723,8 @@ exports.uploadCalculatorData = async (req, res) => {
     const { _id: progressId } = await uploadProgress.save();
 
     response.success(res, {
-      message: `Started uploading ${totalCount} ${
-        totalCount === 1 ? "row" : "rows"
-      } for ${calculatorId}`,
+      message: `Started uploading ${totalCount} ${totalCount === 1 ? "row" : "rows"
+        } for ${calculatorId}`,
       progressId,
     });
 
