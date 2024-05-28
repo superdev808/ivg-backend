@@ -17,12 +17,20 @@ const getModelByCalculatorType = (key = "") => {
 
 const sortCalculatorOptions = (fields) => (a, b) => {
   const priotizedBrands = [
+    // Brand sorting
     "straumann",
     "neodent",
     "zimvie",
     "nobel biocare",
     "dentsply sirona",
     "biohorizons",
+    // Shade Guide Conversation Sorting
+    "IPS E-max Press Ingot Selection".toLowerCase(),
+    "Dentsply Portrait IPN".toLowerCase(),
+    "Ivoclar BlueLine".toLowerCase(),
+    "Vita MFT".toLowerCase(),
+    "Vita Classic with Bleached Shades".toLowerCase(),
+    "Vita 3D Master with Bleached Shades".toLowerCase(),
   ];
   for (let field of fields) {
     let valA = (a[field] || "").toLowerCase();
