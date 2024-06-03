@@ -31,6 +31,13 @@ const sortCalculatorOptions = (fields) => (a, b) => {
     "Vita MFT".toLowerCase(),
     "Vita Classic with Bleached Shades".toLowerCase(),
     "Vita 3D Master with Bleached Shades".toLowerCase(),
+    //Cementing / Bonding Sorting
+    "Full Metal".toLowerCase(),
+    "Resin".toLowerCase(),
+    "PFM".toLowerCase(),
+    "Porcelain".toLowerCase(),
+    "Lithium Disilicate".toLowerCase(),
+    "Zirconia".toLowerCase(),
   ];
   for (let field of fields) {
     let valA = (a[field] || "").toLowerCase();
