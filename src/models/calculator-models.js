@@ -10,6 +10,7 @@ const schema = new Schema(
     disabled: { type: Boolean, default: false },
     isProduction: { type: Boolean, default: true },
     isCustom: { type: Boolean, default: false },
+    outputType: { type: String, required: true, default: "CALC-1B" },
   },
   {
     statics: {

@@ -365,6 +365,7 @@ exports.getCalculatorInfo = async (req, res) => {
         disabled: cur.disabled,
         isCustom: cur.isCustom,
         isProduction: cur.isProduction,
+        outputType: cur.outputType,
         input: [],
         output: [],
       },
@@ -428,7 +429,6 @@ exports.createNewCalculator = async (req, res) => {
   try {
     const { type, label, description } = req.body;
     let calculator = await CalculatorModel.findOne({ type: type });
-    console.log(calculator);
     if (calculator == null) {
       calculator = new CalculatorModel({
         type,

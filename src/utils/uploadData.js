@@ -4,6 +4,7 @@ const { googleAuth, sheetInstance } = require("../config/api");
 const UploadProgress = require("../models/upload-progress");
 const MetaCalcModel = require("../models/meta-calc-model");
 const { getModelByCalculatorType } = require("./helper");
+const CalculatorModel = require("../models/calculator-models");
 
 const CHUNK_SIZE = 500;
 const META_FIELDS_COUNT = 5; // see the number of fields in the MetaCalcModel
@@ -115,10 +116,19 @@ const uploadData = async (
   progressId,
   { rowsCount, columnsCount }
 ) => {
-  const { calculatorId } = sheetInfo;
+  const { calculatorId, outputType } = sheetInfo;
 
   try {
     await saveHeaders(sheetInfo, columnsCount);
+
+    await CalculatorModel.findOneAndUpdate(
+      {
+        type: calculatorId,
+      },
+      {
+        outputType,
+      }
+    );
 
     const Model = getModelByCalculatorType(calculatorId);
     await Model.deleteMany({});
