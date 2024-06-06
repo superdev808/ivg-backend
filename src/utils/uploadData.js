@@ -121,15 +121,6 @@ const uploadData = async (
   try {
     await saveHeaders(sheetInfo, columnsCount);
 
-    await CalculatorModel.findOneAndUpdate(
-      {
-        type: calculatorId,
-      },
-      {
-        outputType,
-      }
-    );
-
     const Model = getModelByCalculatorType(calculatorId);
     await Model.deleteMany({});
 

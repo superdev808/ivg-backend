@@ -427,7 +427,7 @@ exports.createNewCalculator = async (req, res) => {
     return response.serverUnauthorized(res, "Unauthorized");
   }
   try {
-    const { type, label, description } = req.body;
+    const { type, label, description, outputType } = req.body;
     let calculator = await CalculatorModel.findOne({ type: type });
     if (calculator == null) {
       calculator = new CalculatorModel({
@@ -435,10 +435,12 @@ exports.createNewCalculator = async (req, res) => {
         label,
         description,
         collectionName: type,
+        outputType
       });
     } else {
       calculator.label = label;
       calculator.description = description;
+      calculator.outputType = outputType;
     }
     const result = await calculator.save();
     createModel(calculator.type, calculator.collectionName);
