@@ -113,6 +113,11 @@ const UserSchema = new Schema({
     required: false,
     default: "",
   },
+  lastActivityDate: {
+    type: Date,
+    required: false,
+    default: "",
+  },
 });
 
 UserSchema.plugin(mongoosePagniate);

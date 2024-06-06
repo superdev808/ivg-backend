@@ -222,7 +222,7 @@ exports.getAllUsers = (req, res) => {
 
   User.find()
     .select(
-      "_id firstName lastName email role active verified organizationName organizationRole referralSource verificationEmailSent organizationState lastLoginDate"
+      "_id firstName lastName email role active verified organizationName organizationRole referralSource verificationEmailSent organizationState lastActivityDate"
     )
     .then((result) => res.json(result))
     .catch((err) => {
@@ -676,6 +676,20 @@ exports.verifyToken = async (req, res) => {
   }
 };
 
+exports.updateLastActivity = async (req, res) => {
+  try {
+    User.findById(req.user.id).then((user) => {
+      user.lastActivityDate = Date.now();
+      user.save();
+      return response.success(res, "Updated last activity successfully.");
+    });
+  } catch {
+    return response.badRequest(res, {
+      message: "Failed to delete saved result.",
+    });
+  }
+};
+
 exports.uploadCalculatorData = async (req, res) => {
   const { calculatorId, spreadsheetId, pageDataName, pageHeaderName } =
     req.body;
@@ -723,9 +737,8 @@ exports.uploadCalculatorData = async (req, res) => {
     const { _id: progressId } = await uploadProgress.save();
 
     response.success(res, {
-      message: `Started uploading ${totalCount} ${
-        totalCount === 1 ? "row" : "rows"
-      } for ${calculatorId}`,
+      message: `Started uploading ${totalCount} ${totalCount === 1 ? "row" : "rows"
+        } for ${calculatorId}`,
       progressId,
     });
 

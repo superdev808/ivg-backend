@@ -26,6 +26,7 @@ const {
   saveCalculator,
   submitRequest,
   submitItemRequest,
+  updateLastActivity,
 } = require("../controllers/user-controller");
 const bodyParser = require("body-parser");
 
@@ -58,6 +59,7 @@ class UserRoutes {
       bodyParser.json(),
       updateUserInfo
     );
+    router.put("/update-last-activity", checkAccessToken, updateLastActivity);
     router.post(
       "/upload-logo",
       checkAccessToken,
