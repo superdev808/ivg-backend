@@ -42,8 +42,9 @@ const sortCalculatorOptions = (fields) => (a, b) => {
   for (let field of fields) {
     let valA = (a[field] || "").toLowerCase();
     let valB = (b[field] || "").toLowerCase();
-    let indexA = priotizedBrands.indexOf(valA);
-    let indexB = priotizedBrands.indexOf(valB);
+    
+    let indexA = priotizedBrands.findIndex(brand => valA.startsWith(brand));
+    let indexB = priotizedBrands.findIndex(brand => valB.startsWith(brand));
     if ((indexA >= 0 || indexB >= 0) && indexA !== indexB)
       return -(indexA - indexB);
     else if (indexA < 0 && indexB < 0 && valA !== valB)
